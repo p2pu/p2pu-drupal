@@ -1,0 +1,13 @@
+; $Id: og_abt_domain.info,v 1.1.2.1.2.1 2008/06/16 16:46:00 jrbeeman Exp $
+name = Organic Groups ABT Domain
+description = "Audience by Content Type per Domain - limits audience list based on domain, as defined in a domains taxonomy"
+package = "Organic groups"
+dependencies[] = og_abt
+dependencies[] = taxonomy
+core = 6.x
+; Information added by drupal.org packaging script on 2008-11-04
+version = "6.x-1.0-rc1"
+core = "6.x"
+project = "og_abt"
+datestamp = "1225823719"
+

@@ -1,0 +1,381 @@
+<?php
+// $Id: formdefaults.module,v 1.14.2.1 2008/03/15 19:55:31 metzlerd Exp $
+/**
+ * Provides a mechanism to override the description and title fields on drupal forms.
+ * Note that this is not too useful for node fields because they all are node_edit. 
+**/
+
+/**
+ * Implementation of hook_perm().
+ */
+function formdefaults_perm() {
+  return array('change form labels');
+}
+
+/**
+ * Implementation of hook_help().
+ */
+function formdefaults_help($section) 
+{
+  switch ($section) {
+    case 'admin/modules#description':
+      return t("Lets the site administrator edit the description, title and markup attributes of a form.");
+  }
+}
+/**
+* Implements hook_menu.
+*
+*/
+function formdefaults_menu() 
+{
+  global $user;
+  $items = array();
+
+  $items['formdefaults'] = array(
+      'title' => t('Edit Form'),
+      'description' => t('Edit a form'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('formdefaults_edit'),
+      'access callback' => 'user_access',
+      'access arguments' => array('change form labels'),
+      'type' => MENU_CALLBACK,
+      );
+      
+  $items['admin/build/formdefaults'] = array(
+      'title' => t('Form Labels and Text'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('formdefaults_enable'),
+      'description' => t('Turns on or off the editing controls to allow editing form labels and descriptions'),
+      'access callback' => 'user_access',
+      'access arguments' => array('change form labels'),
+      'type' => MENU_NORMAL_ITEM,
+      );
+      
+  return $items;
+}
+
+/**
+ * implements hook_form_alter
+ */
+function formdefaults_form_alter(&$form,$form_state,$formid)
+{
+  $enabled = ($_SESSION['formdefaults_enabled'] && $formid != 'formdefaults_edit');
+  // Add a header and a footer to all forms for instructions
+  $form['formdefaults_header'] = array(
+    '#type'=>'markup',
+    '#value' => '',
+    '#weight' => -10,
+    );
+  
+  $form['formdefaults_footer'] = array(
+    '#type' => 'markup',
+    '#value' => '',
+    '#weight' => 10,
+    );
+  
+  //If the user has the right privs, add the links to alter the form
+  $formfieldsarray = array();
+  if (user_access('change form labels') && $enabled) {
+    $forms = $_SESSION['formdefaults_forms'];
+    foreach ($form as $fieldname=>$value) _formdefaults_get_field($formid, $fieldname, $form[$fieldname], $formfieldsarray);
+    $forms[$formid] = $formfieldsarray;
+    $_SESSION['formdefaults_forms'] = $forms; 
+  }
+  $savedform = formdefaults_getform($formid);
+  if ($savedform) {
+    foreach ($form as $fieldname=>$value) formdefaults_alterform($formid, $fieldname, $form[$fieldname], $savedform);
+  }
+}
+
+/**
+ * Recursively iterate through the form array to save  titles and descirptions.
+ * The the resulting title/description array is intentionally flattened to make
+ * indexing easier during the "replacement" portion of the code. 
+ * Also tack on the [edit] link.
+ * @param $formid the formid of the form we're altering
+ * @param $fieldname the fieldname of the last form field we found.
+ * @param $fieldvalue The array of field values that we found last.
+ * @param $fieldarray We store the array of titles and desciptions in this array for storing later.
+ */
+function _formdefaults_get_field($formid, $fieldname, &$fieldvalue, &$fieldarray)
+{
+    if (is_array($fieldvalue) && !(strpos($fieldname, '#')===0)) {
+      // Determine return location for links. 
+      $query = array();  
+      $query['destination'] = $_GET['q']; 
+      $query = drupal_query_string_encode($query); 
+      $type = $fieldvalue['#type'];
+      $fieldarray[$fieldname]['type'] = $type; 
+      // Skip submit and hidden fields cause they're too dangerous to alter.
+      if ($type != 'submit' && $type != 'hidden') {
+      	if(array_key_exists('#weight',$fieldvalue))
+          $fieldarray[$fieldname]['weight'] = $fieldvalue['#weight']; 
+        else
+          $fieldarray[$fieldname]['weight'] = 'unset'; 
+          
+        if ($type == 'markup') {
+          $fieldarray[$fieldname]['value'] = $fieldvalue['#value'];
+          $fieldvalue['#value'] = l('['.t('edit').']','formdefaults/'.$formid.'/'.$fieldname,
+             array('query'=>$query)).' '. $fieldvalue['#value'] ; 
+        }
+        else {
+
+          $fieldarray[$fieldname]['title'] = $fieldvalue['#title'];
+          $fieldarray[$fieldname]['description'] = $fieldvalue['#description']; 
+          $fieldvalue['#description'] = l('['.t('edit').']', 'formdefaults/' . $formid . '/' . $fieldname, array('query' => $query)).' '. $fieldvalue['#description'] ;
+        }
+      }
+      foreach($fieldvalue as $key=>$value)
+      {
+        if (!(strpos($key,'#')===0)) _formdefaults_get_field($formid, $key, $fieldvalue[$key], $fieldarray);
+      }
+   }
+
+}
+
+/**
+ * Alters the form based on the form replacement items passed.
+ * @param $formid the form id of the form that we're altering
+ * @param $fieldname the field name of the last field we found
+ * @param $fieldvalues the field value array form the last field we found.
+ * @param $formreplace the replacement data for the form. 
+*/
+function formdefaults_alterform($formid,$fieldname,&$fieldvalue,$formreplace)
+{
+	// Determine return location for links. 
+	$query = array();  
+	$query['destination'] = $_GET['q']; 
+	$query = drupal_query_string_encode($query); 
+    $enabled = $_SESSION['formdefaults_enabled'] && $formid!='formdefaults_edit'; 
+    // Need to make sure we aren't processing attributes.
+    if (is_array($fieldvalue) && !(strpos($fieldname,'#')===0)) {
+      if (is_array($formreplace[$fieldname])) {
+        // perform the replacement.
+        if ($formreplace[$fieldname]['hide_it'] && (!$_SESSION['formdefaults_enabled'])) {
+            //drupal_set_message($fieldname.":".$formreplace[$fieldname]['hide_it']);
+        	$fieldvalue['#type']='hidden';
+            $fieldvalue['#value']=$fieldvalue['#default_value']; 
+        }
+        if ($formreplace[$fieldname]['weight']!='unset') {
+          $fieldvalue['#weight'] = $formreplace[$fieldname]['weight']; 
+        }
+        if ($fieldvalue['#type'] == 'markup') {
+          $fieldvalue['#value'] = check_markup($formreplace[$fieldname]['value'],$formreplace[$fieldname]['format'],false);
+        }
+        else {
+          $fieldvalue['#title'] = $formreplace[$fieldname]['title'];
+          $fieldvalue['#description'] = $formreplace[$fieldname]['description'];
+        }
+        
+        // add back on the edit control if appropriate. 
+        if (user_access('change form labels') && $enabled) {
+          if ($fieldvalue['#type'] != 'markup')
+           $fieldvalue['#description'] = l('['.t('edit').']', 'formdefaults/' . $formid . '/' . $fieldname, array('query' => $query)).' '. $fieldvalue['#description'] ;
+          else
+           $fieldvalue['#value'] = l('['.t('edit markup').']','formdefaults/' . $formid . '/'.$fieldname, array('query' => $query)).' '. $fieldvalue['#value'] ;
+        }
+      }
+      
+      // If this is a fieldset, we're going to need to recurse. 
+      foreach($fieldvalue as $key=>$value) {
+        if (!(strpos($key,'#')===0)) formdefaults_alterform($formid,$key,$fieldvalue[$key],$formreplace);
+      } 
+    }
+   
+}
+
+/**
+ * Form to edit the field title and description. 
+ */
+function formdefaults_edit()
+{               
+  $form_array = $_SESSION['formdefaults_forms'];
+  $formid = arg(1);
+  $fieldname = arg(2);
+  $originalfields = $form_array[$formid][$fieldname];
+  $savedform = formdefaults_getform($formid);
+  $weight_range = range(-10,10); 
+  $weights=array('unset' => 'unset'); 
+  foreach ($weight_range as $weight) $weights[(string)$weight]=(string)$weight; 
+  
+  if (is_array($savedform[$fieldname])) $formfields = array_merge($originalfields,$savedform[$fieldname]);
+  else $formfields = $originalfields;
+    
+  $form['formid'] = array(
+     '#type' => 'hidden',
+     '#value' => $formid,
+     );
+  
+  $form['fieldname'] = array(
+     '#type' => 'hidden',
+     '#value' => $fieldname,
+     );
+  
+  $form['type'] = array(
+     '#type' => 'hidden',
+     '#title' => 'Field Type',
+     '#value' => $originalfields['type'],
+     );
+     
+  $form['warning'] = array(
+     '#type' => 'markup',
+     '#value' => 'Some text to edit',
+     );
+     
+  $form['hide_it'] = array(
+     '#type' => 'checkbox',
+     '#title' => 'Hide this field',
+     '#description' => 'Checking this box will convert the field to a hidden field.'.
+         ' Fields will not actually be hidden while the form editor is enabled. '.
+         '(Otherwise you wouldn\'t be able to unhide them). ',
+     '#default_value' => $formfields['hide_it']
+  ); 
+  
+  if ($originalfields['type'] == 'markup') {
+    $form['value'] = array(
+       '#type' => 'textarea',
+       '#title' => 'Text or markup',
+       '#rows' => 30,
+       '#cols' => 80,
+       '#default_value' => $formfields['value'],
+       );
+
+    $form['format'] = filter_form($formfields['format']);
+
+    $form['value_original'] = array(
+      '#type' => item,
+      '#title' => 'Original value',
+      '#value' => $originalfields['value'],
+      );
+  }
+  else {
+    $form['title'] = array(
+       '#type' => 'textfield',
+       '#title' => 'Field Title',
+       '#default_value' => $formfields['title'],
+       );
+
+    $form['title_old'] = array(
+       '#type' => 'item',
+       '#title' => 'Original Title',
+       '#value' => $originalfields['title'],
+       );
+
+    $form['description'] = array(
+       '#type' => 'textarea',
+       '#title' => 'Field Description',
+       '#default_value' => $formfields['description'],
+       '#rows' => 30,
+       '#cols' => 80,
+       );
+
+    $form['description_old'] = array(
+       '#type' => 'item',
+       '#title' => 'Original Description',
+       '#value' => $originalfields['description'],
+       );
+  }
+  $form['weight'] = array(
+       '#type' => 'select',
+       '#title' => 'Weight',
+       '#options' => $weights,
+       '#default_value' => $formfields['weight'],
+       '#description' => 'Higher values appear near at the top of the form, lower values at the bottom.',
+       );
+  $form['weight_old'] = array(
+       '#type' => 'item',
+       '#title' => 'Original Weight',
+       '#value' => $originalfields['weight'],
+       ); 
+  
+  $form['submit'] = array(
+     '#type' => 'submit',
+     '#value' => 'Save',
+     );
+  return $form;
+}
+
+function formdefaults_edit_submit($formid,$form_state)
+{
+  $form_values = $form_state['values']; 
+  $formid = $form_values['formid'];
+  $fieldname = $form_values['fieldname'];
+  $formarray=formdefaults_getform($formid);
+  $baseform = $formarray;
+  // set the form values
+  if ($form_values['type'] == 'markup') {
+    $formarray[$fieldname]['value'] = $form_values['value'];
+    $formarray[$fieldname]['format'] = $form_values['format']; 
+  }
+  else {
+    $formarray[$fieldname]['title'] = $form_values['title'];
+    $formarray[$fieldname]['description'] = $form_values['description'];
+  }
+  $formarray[$fieldname]['hide_it'] =$form_values['hide_it']; 
+  $formarray[$fieldname]['weight'] = $form_values['weight']; 
+  $formdata = serialize($formarray); 
+  if ($baseform) db_query('UPDATE {formdefaults_forms} SET formdata=\'%s\' WHERE formid=\'%s\'',$formdata,$formid);
+  else
+    db_query('INSERT INTO {formdefaults_forms} (formid, formdata) VALUES (\'%s\',\'%s\')',$formid,$formdata); 
+}
+
+/**
+ * Retrieve from alterations from the database
+ * @formid the form id to retrieve.
+ */
+function formdefaults_getform($formid)
+{
+  $result = db_query('SELECT * FROM {formdefaults_forms} WHERE formid=\'%s\'',$formid);
+  $form = db_fetch_object($result);
+  if ($form) {
+    $formarray = unserialize($form->formdata);
+  }
+  else {
+
+    $formarray=array();
+  }
+  return $formarray; 
+}
+
+function formdefaults_enable()
+{
+  $form['instructions'] = array(
+    '#type' => markup,
+    '#value' => '<p>To alter the defaults associated with a form, enable the forms module below and look for the [edit] '.
+                'controls in the description of each form field.  Navigate to the form and click [edit] link on the field  '.
+                'you want to edit.  You\'ll be allowed to edit field titles, markup fields (like this one) as well as the textual descriptions '.
+                'with each field.</p>',
+    );
+  
+    if ($_SESSION['formdefaults_enabled']) {
+      $form['disable'] = array(
+        '#type' => 'submit',
+        '#value' => 'disable',
+        );
+    }
+    else {
+      $form['enable'] = array(
+        '#type' => 'submit',
+        '#value' => 'enable',
+        );      
+    }
+    return $form;
+}
+  
+/**
+ *Toggle the form editor controls on and off
+ */
+function formdefaults_enable_submit($formid, $form_state)
+{
+  $editor_enabled = $_SESSION['formdefaults_enabled'];
+  if ($editor_enabled) {
+    $_SESSION['formdefaults_enabled']=false;
+    drupal_set_message('Form defaults editor is now disabled');
+  }
+  else {
+    $_SESSION['formdefaults_enabled']=true;
+    drupal_set_message('Form defaults editor is now enabled');
+  }
+  return $output;
+}
+

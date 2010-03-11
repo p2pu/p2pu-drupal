@@ -1,0 +1,80 @@
+<?php
+// $Id: viewfield.install,v 1.6 2009/05/24 05:33:35 darrenoh Exp $
+
+/**
+ * @file
+ * Installation functions.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function viewfield_install() {
+  drupal_load('module', 'content');
+  content_notify('install', 'viewfield');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function viewfield_uninstall() {
+  drupal_load('module', 'content');
+  content_notify('uninstall', 'viewfield');
+}
+
+/**
+ * Implementation of hook_enable().
+ *
+ * Notify content module when this module is enabled.
+ */
+function viewfield_enable() {
+  drupal_load('module', 'content');
+  content_notify('enable', 'viewfield');
+}
+
+/**
+ * Implementation of hook_disable().
+ *
+ * Notify content module when this module is disabled.
+ */
+function viewfield_disable() {
+  drupal_load('module', 'content');
+  content_notify('disable', 'viewfield');
+}
+
+/**
+ * Implementation of hook_update_N().
+ */
+function viewfield_update_6000() {
+  if ($abort = content_check_update('viewfield')) {
+    return $abort;
+  }
+  $ret = array();
+  $result = db_query("SELECT * FROM {content_node_field} WHERE type = 'viewfield'");
+  while ($field = db_fetch_array($result)) {
+    $field_result = db_query("SELECT * FROM {content_node_field_instance} WHERE field_name = '%s'", $field['field_name']);
+    while ($instance = db_fetch_array($field_result)) {
+      $instance['widget_settings'] = unserialize($instance['widget_settings']);
+      $widget_settings = serialize(array('force_default' => $instance['widget_settings']['force_default']));
+      $instance['display_settings'] = unserialize($instance['display_settings']);
+      foreach ($instance['display_settings'] as $display_context => $display_setting) {
+        $instance['display_settings'][$display_context]['format'] = $display_setting['format'] == 'hidden' ? $display_setting['format'] : 'default';
+      }
+      $display_settings = serialize($instance['display_settings']);
+      $update = db_query("UPDATE {content_node_field_instance} SET widget_settings = '%s', display_settings = '%s' WHERE field_name = '%s' AND type_name = '%s'", $widget_settings, $display_settings, $instance['field_name'], $instance['type_name']);
+      $ret[] = array('success' => $result !== FALSE, 'query' => "UPDATE {content_node_field_instance} SET widget_settings = '$widget_settings', display_settings = '$display_settings' WHERE field_name = '$instance[field_name]' AND type_name = '$instance[type_name]'");
+    }
+    $display = $display_setting['format'] == 'block' ? 'block_1' : 'default';
+    $field['global_settings'] = unserialize($field['global_settings']);
+    $field['global_settings']['token_enabled'] = TRUE;
+    $super_default_widget = $field['global_settings']['super_default_widget'][0][$field['field_name']];
+    $field['global_settings']['super_default_widget'] = array(
+      'vname' => empty($super_default_widget['vnames']) ? NULL : $super_default_widget['vnames'] .'|'. $display,
+      'vargs' => $super_default_widget['vargs'],
+    );
+    $global_settings = serialize($field['global_settings']);
+    $update = db_query("UPDATE {content_node_field} SET global_settings = '%s' WHERE field_name = '%s'", $global_settings, $field['field_name']);
+    $ret[] = array('success' => $update !== FALSE, 'query' => "UPDATE {content_node_field} SET global_settings = '$global_settings' WHERE field_name = '$field[field_name]'");
+  }
+  return $ret;
+}

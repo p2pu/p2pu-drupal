@@ -1,0 +1,148 @@
+<?php
+$view = new view;
+$view->name = 'statspro_comment';
+$view->description = 'New comments';
+$view->tag = 'Statistics pro';
+$view->view_php = '';
+$view->base_table = 'statspro';
+$view->is_cacheable = FALSE;
+$view->api_version = 2;
+$view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+$handler = $view->new_display('default', 'Defaults', 'default');
+$handler->override_option('fields', array(
+  'day' => array(
+    'label' => 'Date',
+    'date_format' => 'custom',
+    'custom_date_format' => 'd. F Y',
+    'exclude' => 0,
+    'id' => 'day',
+    'table' => 'statspro',
+    'field' => 'day',
+    'relationship' => 'none',
+  ),
+  'comment' => array(
+    'label' => 'Comments',
+    'set_precision' => FALSE,
+    'precision' => 0,
+    'decimal' => '.',
+    'separator' => '.',
+    'prefix' => '',
+    'suffix' => '',
+    'exclude' => 0,
+    'id' => 'comment',
+    'table' => 'statspro',
+    'field' => 'comment',
+    'override' => array(
+      'button' => 'Override',
+    ),
+    'relationship' => 'none',
+    'display_mode' => 'graph',
+    'graph_size' => '350',
+  ),
+  'comment_1' => array(
+    'label' => 'Trend',
+    'set_precision' => FALSE,
+    'precision' => 0,
+    'decimal' => '.',
+    'separator' => ',',
+    'prefix' => '',
+    'suffix' => '',
+    'exclude' => 0,
+    'id' => 'comment_1',
+    'table' => 'statspro',
+    'field' => 'comment',
+    'override' => array(
+      'button' => 'Override',
+    ),
+    'relationship' => 'none',
+    'display_mode' => 'trend',
+    'graph_size' => '',
+  ),
+  'comment_2' => array(
+    'label' => 'Amount',
+    'set_precision' => FALSE,
+    'precision' => 0,
+    'decimal' => '.',
+    'separator' => '.',
+    'prefix' => '',
+    'suffix' => '',
+    'exclude' => 0,
+    'id' => 'comment_2',
+    'table' => 'statspro',
+    'field' => 'comment',
+    'override' => array(
+      'button' => 'Override',
+    ),
+    'relationship' => 'none',
+    'display_mode' => 'text',
+    'graph_size' => '',
+  ),
+));
+$handler->override_option('sorts', array(
+  'day' => array(
+    'order' => 'DESC',
+    'id' => 'day',
+    'table' => 'statspro',
+    'field' => 'day',
+    'override' => array(
+      'button' => 'Override',
+    ),
+    'relationship' => 'none',
+  ),
+));
+$handler->override_option('access', array(
+  'type' => 'perm',
+  'perm' => 'access statistics',
+));
+$handler->override_option('title', 'Statistics pro');
+$handler->override_option('header', 'Overview for new created comments.');
+$handler->override_option('header_format', '1');
+$handler->override_option('header_empty', 0);
+$handler->override_option('items_per_page', 20);
+$handler->override_option('use_pager', '1');
+$handler->override_option('style_plugin', 'table');
+$handler->override_option('style_options', array(
+  'grouping' => '',
+  'override' => 1,
+  'sticky' => 0,
+  'order' => 'desc',
+  'columns' => array(
+    'day' => 'day',
+    'comment' => 'comment',
+    'comment_1' => 'comment_1',
+    'comment_2' => 'comment_2',
+  ),
+  'info' => array(
+    'day' => array(
+      'sortable' => 1,
+      'separator' => '',
+    ),
+    'comment' => array(
+      'sortable' => 0,
+      'separator' => '',
+    ),
+    'comment_1' => array(
+      'sortable' => 0,
+      'separator' => '',
+    ),
+    'comment_2' => array(
+      'sortable' => 1,
+      'separator' => '',
+    ),
+  ),
+  'default' => 'day',
+));
+$handler = $view->new_display('page', 'Page', 'page_1');
+$handler->override_option('path', 'admin/reports/statspro/comment');
+$handler->override_option('menu', array(
+  'type' => 'tab',
+  'title' => 'Comments',
+  'weight' => '0',
+  'name' => 'navigation',
+));
+$handler->override_option('tab_options', array(
+  'type' => 'none',
+  'title' => '',
+  'weight' => 0,
+));
+

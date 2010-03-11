@@ -1,0 +1,19 @@
+// $Id: INSTALL.txt,v 1.1 2008/09/20 09:37:30 fajerstarter Exp $
+
+REQUIREMENTS
+------------
+
+  * Drupal 6.0 or later
+
+INSTALLATION
+------------
+
+1. INSTALL FOCUS
+   
+   Unpack the module in your sites module directory. Then browse to 
+   "Administer" -> "Site building" -> "Modules" and enable the module.
+   
+3. CONFIGURE FOCUS (optional)
+
+   Browse to "Administer" -> "Site configuration" ->
+   "Form field focus" to add or remove forms that get focus.

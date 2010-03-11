@@ -1,0 +1,55 @@
+Theme Settings API 6.x-1.4
+  #236930 by DrupalBone: Package name in .info file is incorrect
+  #241738 by Takafumi: Added Japanese translation
+
+Theme Settings API 6.x-1.3
+  #199635: WSOD (white screen of death) on cached pages
+  #198819: Fixed incompatibility with i18n module (since 6.x-1.2)
+
+Theme Settings API 6.x-1.2
+  * Moved code to conditionally included themesettings.admin.inc file.
+  #193134 by Hass: Upgraded translations to be 6.x compatible.
+
+Theme Settings API 6.x-1.1
+  #184173: settings form doesn't show with FOOtheme or FOO_theme
+
+Theme Settings API 6.x-1.0
+  * Most of the API now resides in Drupal CORE.
+  * Removed ability to use a file named settings.php.
+  * Otherwise, this release is feature-identical to 5.x-2.1.
+
+Theme Settings API 5.x-2.7
+  #199635: WSOD (white screen of death) on cached pages
+
+Theme Settings API 5.x-2.6
+  #198819: Fixed incompatibility with i18n module (since 5.x-2.4)
+
+Theme Settings API 5.x-2.5
+  * Backport of the DRUPAL-6 setting on admin/settings/admin to load the admin
+    theme on node/add/* and node/*/edit
+
+Theme Settings API 5.x-2.4
+  * Moved code to conditionally included themesettings.admin.inc file (performance improvement).
+
+Theme Settings API 5.x-2.3
+  #184173: settings form doesn't show with FOOtheme or FOO_theme
+
+Theme Settings API 5.x-2.2
+  * Updated the "best practices" examples and added a link to the online
+    documentation. No API or code changes.
+
+Theme Settings API 5.x-2.1
+  #171633: backport of the committed DRUPAL-6 custom theme settings API. Changed
+    the name of "settings.php" to "theme-settings.php".
+
+Theme Settings API 5.x-2.0
+  #142907: backport of the proposed DRUPAL CORE custom theme settings API
+  * Completely updated API, but with easy migration path.
+  * Added ability to switch themes when displaying the theme settings.
+
+Theme Settings API 5.x-1.4
+  * Moved Theme Settings API module to a separate project.
+  * Added German translation (contributed by Hass.)
+
+Theme Settings API 5.x-1.0
+  Initial release

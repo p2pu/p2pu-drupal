@@ -1,0 +1,41 @@
+# LANGUAGE translation of Drupal (email_verify.module)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from file: email_verify.module,v 1.4 2006/01/29 18:34:04 dbr
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2007-01-07 10:07+0100\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: email_verify.module:19
+msgid "Verifies thoroughly email addresses during registration and account edition."
+msgstr ""
+
+#: email_verify.module:61
+msgid "Email host %host does not seem valid"
+msgstr ""
+
+#: email_verify.module:92
+msgid "Email host %host does not seem valid, it does not answer"
+msgstr ""
+
+#: email_verify.module:126
+msgid "Email address %mail does not seem valid"
+msgstr ""
+
+#: email_verify.module:137
+msgid "Verify user emails"
+msgstr ""
+
+#: email_verify.module:86;113;120;125;0
+msgid "email_verify"
+msgstr ""
+

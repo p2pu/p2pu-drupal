@@ -1,0 +1,29 @@
+CHANGELOG for 0 Point 2 for Drupal 6
+
+0 Point (Dec 25, 2009)
+
+  Bug fixes:
+    o #598024: Print icon shows twice.
+    o #518452: The search box check box in the "toggle display" section of the zeropoint theme keeps resetting.
+    o #579360: Bullets/numbers rendering improperly in IE.
+    o #512230: Forum icons don't look normal if advance forum module is installed.
+    o #559964: Images in views are collapsed while opening page with IE8.
+    o #630164: FCKeditor not appearing.
+    o #510644: Suckerfish Alignment.
+    o #574908 by castawaybcn: Table view not stretching to full page width.
+    o #524448 by paolodoors: custom-style.css to overwrite specific theme's styles.
+    o #591792: Google Maps does not appear.
+    o #512692 by dereine: The logo is not linking to the front page if multilanguage enabled.
+    o #645546: Wrap tabs in user profile.
+    o #537974: Collection of layout issues.
+    o #576518: Imagecache thumbnails in IE8 - not showing or not inline.
+    o #536930: Problem with IE6 on the views pages.
+    o #510840: Ie7 and ie6 layout bugs.
+
+  Other changes:
+    o #451304: Remove the duplicate meta content-type tag, a bug in Drupal 6.
+    o 0 Point has been optimized for e-commerce with Ubercart.  
+    o #487588: 0 Point has now three widths: adaptive, fluid and fixed width. Fluid width and Fixed width can be customized in custom-style.css.
+    o Added different sidebars behaviours (widths).
+    o Themed blocks for user regions can now be added through theme advanced settings.
+    

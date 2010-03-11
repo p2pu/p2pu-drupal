@@ -1,0 +1,11 @@
+; $Id: focus.info,v 1.3 2008/09/20 09:37:29 fajerstarter Exp $
+name = Focus
+description = Sets focus on the first field in a form.
+core = 6.x
+
+; Information added by drupal.org packaging script on 2010-02-08
+version = "6.x-1.0"
+core = "6.x"
+project = "focus"
+datestamp = "1265660108"
+

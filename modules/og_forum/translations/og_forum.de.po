@@ -1,0 +1,500 @@
+# $Id: og_forum.de.po,v 1.1.2.1 2009/07/16 11:36:37 paulbooker Exp $
+#
+# German translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  og_forum.module,v 1.11.2.11.2.18.2.17.2.6 2009/06/15 10:52:59 paulbooker
+#  og_forum.info,v 1.1.2.1.2.5.2.1.2.1 2009/05/17 16:23:11 paulbooker
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Drupal OG Forum V6.x-2.0\n"
+"POT-Creation-Date: 2009-06-15 21:57+0200\n"
+"PO-Revision-Date: 2009-06-15 22:00+0100\n"
+"Last-Translator: Frank Tartler <frank.tartler@googlemail.com>\n"
+"Language-Team: Frank Tartler <frank.tartler@googlemail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: og_forum.module:23
+msgid "Ties forums to organic groups."
+msgstr "Bindet Foren an Organische Gruppen"
+
+#: og_forum.module:43
+msgid "Forums"
+msgstr "Foren"
+
+#: og_forum.module:49
+msgid "Organic groups forums"
+msgstr "Foren für Organische Gruppen"
+
+#: og_forum.module:50
+msgid "Configure forums for organic groups"
+msgstr "Foren für Organische Gruppen konfigurieren"
+
+#: og_forum.module:56;1258;1396
+msgid "Make forum public"
+msgstr "Forum öffentlich machen"
+
+#: og_forum.module:64
+msgid "Make forum private"
+msgstr "Forum privat machen"
+
+#: og_forum.module:72
+msgid "Reset forum publicity"
+msgstr "Forums-Öffentlichkeit zurücksetzen"
+
+#: og_forum.module:81
+msgid "Manage groups forum"
+msgstr "Gruppenforen verwalten"
+
+#: og_forum.module:89
+msgid "Add forum"
+msgstr "Forum hinzufügen"
+
+#: og_forum.module:97
+msgid "Edit forum"
+msgstr "Forum bearbeiten"
+
+#: og_forum.module:149
+msgid "Active forum topics in group"
+msgstr "Aktive Forumsthemen in Gruppe"
+
+#: og_forum.module:150
+msgid "New forum topics in group"
+msgstr "Neue Forumsthemen in Gruppe"
+
+#: og_forum.module:154
+msgid "Number of topics"
+msgstr "Anzahl Themen"
+
+#: og_forum.module:165
+msgid "Active group forum topics"
+msgstr "Aktive Gruppenforumsthemen"
+
+#: og_forum.module:176
+msgid "New group forum topics"
+msgstr "Neue Gruppenforumsthemen"
+
+#: og_forum.module:189
+msgid "more"
+msgstr "weiter"
+
+#: og_forum.module:246
+msgid "The forum module requires both the taxonomy module and the comment module to be enabled and configured."
+msgstr "Das Forum-Modul erfordert, dass sowohl das Taxonomy-Modul als auch das Comment-Modul aktiviert und konfiguriert ist."
+
+#: og_forum.module:326
+msgid "Topic"
+msgstr "Thema"
+
+#: og_forum.module:327
+msgid "Replies"
+msgstr "Antworten"
+
+#: og_forum.module:328
+msgid "Created"
+msgstr "Erstellt"
+
+#: og_forum.module:329
+msgid "Last reply"
+msgstr "Letzte Antwort"
+
+#: og_forum.module:398;401
+msgid "Post new forum topic."
+msgstr "Neues Forumsthema erstellen"
+
+#: og_forum.module:405
+msgid "Select a forum below."
+msgstr "Unten ein Forum auswählen"
+
+#: og_forum.module:408
+msgid "You are not allowed to post a new forum topic."
+msgstr "Sie dürfen kein neues Forumsthema erstellen."
+
+#: og_forum.module:411
+msgid "<a href=\"@login\">Login</a> to post a new forum topic."
+msgstr "<a href=\"@login\">Anmelden</a> zum Erstellen eines neuen Forumsthemas."
+
+#: og_forum.module:424
+msgid "No forums defined or you don't have permission to view them."
+msgstr "Es sind keine Foren definiert oder Sie haben nicht die Berechtigung, sie anzuzeigen."
+
+#: og_forum.module:440
+msgid "Forum"
+msgstr "Forum"
+
+#: og_forum.module:440
+msgid "Topics"
+msgstr "Themen"
+
+#: og_forum.module:440
+msgid "Posts"
+msgstr "Beiträge"
+
+#: og_forum.module:440
+msgid "Last post"
+msgstr "Letzter Beitrag"
+
+#: og_forum.module:490
+msgid "This topic has been moved"
+msgstr "Das Thema wurde verschoben"
+
+#: og_forum.module:548
+msgid "Retroactively update old groups"
+msgstr "Alte Gruppen rückwirkend aktualisieren"
+
+#: og_forum.module:549
+msgid "Pressing this button will create forums for any groups that do not already have them."
+msgstr "Das Drücken dieser Schaltfläche erstellt Foren für alle Gruppen, die noch keine haben."
+
+#: og_forum.module:554;666
+msgid "Update old groups"
+msgstr "Alte Gruppen aktualisieren"
+
+#: og_forum.module:559
+msgid "Default forum name"
+msgstr "Standard-Forumsname"
+
+#: og_forum.module:560
+msgid "When this module creates a container and default forum for a new group, this will be the name given to that group."
+msgstr "Wenn dieses Modul einen Ordner und Standardforum für eine neue Gruppe erstellt, erhält diese Gruppe diesen Namen."
+
+#: og_forum.module:565
+msgid "Group forum container"
+msgstr "Gruppenforumsordner"
+
+#: og_forum.module:571
+msgid "Would you like all group forums to be placed in the same container?"
+msgstr "Sollen alle Gruppenforen im selben Ordner platziert werden?"
+
+#: og_forum.module:572
+msgid "If you would like your forums to all be under one container, check this box and select a container in the drop down box."
+msgstr "Wenn alle Foren unter einem Ordner sein sollen muss dieses Kästchen angekreuzt und ein Ordner im Auswahlfeld ausgewählt werden."
+
+#: og_forum.module:579
+msgid "none"
+msgstr ""
+
+#: og_forum.module:586
+msgid "Select container"
+msgstr "Ordner auswählen"
+
+#: og_forum.module:587
+msgid "You need to have setup the container before hand."
+msgstr "Der Ordner muss vorher von Hand erstellt werden."
+
+#: og_forum.module:593
+msgid "Forum publicity administration"
+msgstr "Verwaltung der Forums-Öffentlichkeit"
+
+#: og_forum.module:594
+msgid "Using these features is probably expensive in terms of SQL queries."
+msgstr "Das Verwenden dieser Funktionen ist wahrscheinlich aufwendig in Hinsicht auf SQL-Abfragen."
+
+#: og_forum.module:600
+msgid "Automatic forum publicity"
+msgstr "Automatische Forums-Öffentlichkeit"
+
+#: og_forum.module:601
+msgid ""
+"If you would like to make the publicity, or public-ness, of forums automatic based on whether there are any public posts inside\n"
+"    of them, then check this box."
+msgstr "Wenn die Öffentlichkeit - oder Nicht-Öffentlichkeit - von Foren automatisch eingestellt werden soll, abhängig davon ob darin öffentliche Beiträge sind, dann muss dieses Kästchen angekreuzt werden."
+
+#: og_forum.module:608
+msgid "Allow public choice"
+msgstr "Auswahl ‚öffentlich‘ zulassen"
+
+#: og_forum.module:609
+msgid ""
+"If you would like to allow group owners the ability to decide which, if any, of their forums are publicly viewable, check the box.\n"
+"    Those with the <em>make forums public</em> permission can always make forums and containers public. If auto mode is checked, above, then this will\n"
+"    allow group owners to override auto settings on a case by case basis. The auto mode respects group owner-set values."
+msgstr "Wenn Gruppenbesitzer die Fähigkeit haben sollen, zu entscheiden ob ihre Foren öffentlich sichtbar sind, dann muss dieses Kästchen angekreuzt werden. Wer die Berechtigung <em>Foren öffentlich machen</em> hat, kann Foren und Ordner immer öffentlich machen. Wenn der automatische Modus ausgewählt ist, erlaubt dies Gruppenbesitzern, automatische Einstellungen fallweise aufzuheben."
+
+#: og_forum.module:617
+msgid "Make all forums public"
+msgstr "Alle Foren öffentlich machen"
+
+#: og_forum.module:618
+msgid ""
+"This is only a display option and will not affect database entries. If you have both boxes unchecked above and no users assigned\n"
+"    to the <em>make forums public</em> permission, no database entries will be made as to the publicity of forums, but all will be visible and traversable.\n"
+"    User 1 can still affect the database through the normal \"make public\" and \"make private\" functionality, but such changes won't affect the forums'\n"
+"    display until such time as this feature is disabled. Individual posts will be public or private based on their own settings, just like if the above\n"
+"    features are used. This is an easy way to get all forums visible to all users so they can see what posts they are missing out on (in the case where posts\n"
+"    are private themselves). With this setting, no forums can be private. You could use this feature during a promotion period to temporarily open the whole\n"
+"    site to guests."
+msgstr ""
+"Dies ist nur eine Anzeigeoption und betrifft nicht die Datenbankeinträge. Wenn beide Kästchen oben nicht angekreuzt sind und keinen Benutzern das Recht\n"
+"    <em>Foren öffentlich machen</em> zugeordnet ist, werden keine Datenbankeinträge zur Öffentlichkeit der Foren erstellt, abber alle sind sichtbar und TRAVERSABLE.\n"
+"    Der Benutzer mit der ID 1 kann trotzdem die Datenbank durch die normale Funktionalität durch „öffentlich machen“ und „privat machen“ beeinflussen, aber diese Änderungen\n"
+"    beeinflussen nicht die Anzeige der Foren solange diese Funktion deaktiviert ist. Einzelne Beiträge sind öffentlich oder privat basierend auf deren eigener Einstellung, als ob die obigen\n"
+"    Funktionen verwendet würden. Dies ist ein einfacher Weg alle Foren sichtbar für alle Benutzer zumachen, so dass sie sehen können welche Beiträge THEY ARE MISSING OUT ON\n"
+"    (im Fall das Beiträge selbst privat sind). Mit dieser Einstellung kann kein Forum privat sein. Diese Funktion kann verwendet werden, um temporär für einen Werbezeitraum\n"
+"    die gesamte Website für Gäste zu öffnen."
+
+#: og_forum.module:629
+msgid "Manage publicity of old groups"
+msgstr "Öffentlichkeit alter Gruppen verwalten"
+
+#: og_forum.module:630
+msgid ""
+"If you check the \"Automatic forum publicity\" box, this will go through all existing forums and set them accordingly.\n"
+"    Otherwise, a public forum topic will need to be created or resaved in each forum. You don't need to click this if you haven't checked that box.\n"
+"    <strong>You should use this only once - usually the first time you upgrade to a version with this feature as it will not respect settings made by\n"
+"    group owners.</strong>"
+msgstr ""
+"Wenn das Kästchen „Automatische Forums-Öffentlichkeit“ angekreuzt wird, werden alle existierende Foren entsprechend eingestellt.\n"
+"    Ansonsten muss ein öffentliches Forumsthema in jedem Forum erstellt oder gespeichert werden. Dies muss nicht angeklickt werden, wenn das Kästchen nicht angekreuzt wurde.\n"
+"    <strong>Dies sollte nur einmal verwendet werden - üblicherweise wenn das erste Mal auf eine Version mit dieser Funktion aktualisiert wird, da sie Einstellungen von Benutzern\n"
+"    nicht berücksichtigt.</strong>"
+
+#: og_forum.module:637;669
+msgid "Publicize old groups"
+msgstr "Alte Gruppen veröffentlichen"
+
+#: og_forum.module:641
+msgid "Switch to automatic publicity"
+msgstr "Zur automatischen Öffentlichkeit umschalten"
+
+#: og_forum.module:642
+#, fuzzy
+msgid ""
+"This will switch all group admin-set publicity values to automatic values. PUBLIC_BY_GROUP_OWNER -> PUBLIC_AUTO, PRIVATE_BY_GROUP_OWNER -> PRIVATE_DEFAULT. This will allow you to switch a site from\n"
+"    group admin-controlled publicity to automatic publicity of forums."
+msgstr "Dies stellt alle durch einen Gruppenadministrator eingestellten Öffentlichkeitswerte auf automatische Werte. PUBLIC_BY_GROUP_OWNER -> PUBLIC_AUTO, PRIVATE_BY_GROUP_OWNER -> PRIVATE_DEFAULT. Dies ermöglicht es, von einer von Gruppenadministratoren festgelegten Öffentlichkeit zur automatischen Öffentlichkeit von Foren umzuschalten."
+
+#: og_forum.module:647;687
+msgid "Switch to auto mode"
+msgstr "In automatischen Modus umschalten"
+
+#: og_forum.module:652
+msgid "Limit number of forums per group"
+msgstr "Anzahl der Foren pro Gruppe begrenzen"
+
+#: og_forum.module:655
+msgid "Set the number of forums a container can have. 0 means no limit. 1 means groups can only have the default \"General Discussion\" forum."
+msgstr "Anzahl der Foren, die ein Ordner haben darf. 0 bedeutet keine Grenze. 1 bedeutet, dass Gruppen nur das Standardforum „Allgemeine Diskussion“ haben können."
+
+#: og_forum.module:684
+msgid "You need to select \"Automatic forum publicity\" for this to work."
+msgstr "„Automatische Forums-Öffentlichkeit“ muss aktiviert sein, damit dies funktioniert."
+
+#: og_forum.module:692
+msgid "Save configuration"
+msgstr "Konfiguration speichern"
+
+#: og_forum.module:1039;1523
+msgid "Home"
+msgstr "Startseite"
+
+#: og_forum.module:1042
+msgid "Groups"
+msgstr "Gruppen"
+
+#: og_forum.module:1043;1046;1055
+msgid "@title"
+msgstr ""
+
+#: og_forum.module:1101
+msgid "Group forums"
+msgstr "Gruppenforen"
+
+#: og_forum.module:1101
+msgid "View group forum discussions."
+msgstr "Gruppenforumsdiskussionen anzeigen"
+
+#: og_forum.module:1104
+msgid "Manage group forums"
+msgstr "Gruppenforen verwalten"
+
+#: og_forum.module:1104
+msgid "Let you create, edit, delete group's forums."
+msgstr "Erlaubt das Erstellen, Bearbeiten und Löschen von Gruppenforen."
+
+#: og_forum.module:1125
+msgid "%num groups had forums created"
+msgstr "%num Gruppen hatten Foren erstellt"
+
+#: og_forum.module:1191
+msgid "Audience"
+msgstr "Zielgruppe"
+
+#: og_forum.module:1245
+msgid "Make container public"
+msgstr "Ordner öffentlich machen"
+
+#: og_forum.module:1246
+msgid "This will allow all users to <em>view</em> this container. Only forums within this container that are also marked public will be visible to anonymous users."
+msgstr "Dies erlaubt allen Benutzern, diesen Ordner zu <em>sehen</em>. Nur Foren innerhalb dieses Ordners, die auch als öffentlich markiert sind, sind für Gäste sichtbar."
+
+#: og_forum.module:1259
+msgid "This will allow all users to <em>view</em> this forum. The parent container must also be public to browse here. Otherwise users will need a direct link to this forum."
+msgstr "Dies erlaubt allen Benutzern, dieses Forum zu <em>sehen</em>. Der übergeordnete Ordner muss ebenfalls öffentlich sein, um hier zu browsen. Ansonsten benötigen Benutzer einen direkten Link zu diesem Forum."
+
+#: og_forum.module:1280
+msgid "This page shows the forums associated with the %group group."
+msgstr "Diese Seite zeigt die Foren, die mit der Gruppe %group verknüpft sind."
+
+#: og_forum.module:1283
+msgid "Name"
+msgstr "Name"
+
+#: og_forum.module:1283
+msgid "Operations"
+msgstr "Operationen"
+
+#: og_forum.module:1296
+msgid "You have reached the maximum allowed number of forums for groups."
+msgstr "Die maximal erlaubte Anzahl von Foren für Gruppen ist erreicht."
+
+#: og_forum.module:1300
+msgid "add forum"
+msgstr "Forum hinzufügen"
+
+#: og_forum.module:1305;1308;1311
+msgid "edit forum"
+msgstr "Forum bearbeiten"
+
+#: og_forum.module:1305
+msgid "make public"
+msgstr "öffentlich machen"
+
+#: og_forum.module:1305;1308
+msgid "reset publicity"
+msgstr "Öffentlichkeit zurücksetzen"
+
+#: og_forum.module:1308
+msgid "make private"
+msgstr "privat machen"
+
+#: og_forum.module:1326;1405;1501
+msgid "Delete"
+msgstr "Löschen"
+
+#: og_forum.module:1358
+msgid "Forum name"
+msgstr "Forumsname"
+
+#: og_forum.module:1361
+msgid "The forum name is used to identify related discussions."
+msgstr "Der Forumsname wird verwendet um zusammengehörende Diskussionen zu identifizieren."
+
+#: og_forum.module:1365
+msgid "Description"
+msgstr "Beschreibung"
+
+#: og_forum.module:1367
+msgid "The forum description can give users more information about the discussion topics it contains."
+msgstr "Die Forumsbeschreibung kann Benutzern Informationen über die enthaltenen Diskussionsthemen liefern."
+
+#: og_forum.module:1388
+msgid "Weight"
+msgstr "Gewichtung"
+
+#: og_forum.module:1390
+msgid "When listing forums, those with lighter (smaller) weights get listed before containers with heavier (larger) weights. Forums with equal weights are sorted alphabetically."
+msgstr "Beim Auflisten von Foren werden die mit leicherer (kleinerer) Gewichtung vor Ordnern mit schwererer (größerer) Gewichtung aufgeführt. Foren mit gleicher Gewichtung werden alphabetisch sortiert."
+
+#: og_forum.module:1397
+msgid "This will allow non-group members to <em>view</em> this forum."
+msgstr "Dies erlaubt Nicht-Gruppenmitgliedern dieses Forum zu <em>sehen</em>."
+
+#: og_forum.module:1403
+msgid "Submit"
+msgstr "Speichern"
+
+#: og_forum.module:1429
+msgid "Internal error processing your data. Please contact website administrators."
+msgstr "Interner Fehler beim Verarbeiten der Daten. Bitte den Website-Administrator kontaktieren."
+
+#: og_forum.module:1439
+msgid "forum"
+msgstr "Forum"
+
+#: og_forum.module:1448
+msgid "Created new !type %term."
+msgstr "!type %term neu erstellt."
+
+#: og_forum.module:1451
+msgid "The !type %term has been updated."
+msgstr "!type %term wurde aktualisiert."
+
+#: og_forum.module:1501
+msgid "Are you sure you want to delete the forum %name?"
+msgstr "Soll das Forum %name wirklich gelöscht werden?"
+
+#: og_forum.module:1501
+msgid "Deleting a forum or container will delete all sub-forums and associated posts as well. This action cannot be undone."
+msgstr "Das Löschen eines Forums oder Ordners löscht alle untergeordneten Foren genauso wie zugeordnete Beiträge. Diese Aktion kann nicht rückgängig gemacht werden."
+
+#: og_forum.module:1501
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: og_forum.module:1512
+msgid "The forum %term and all sub-forums and associated posts have been deleted."
+msgstr "Das Forum %term und alle untergeordneten Foren und zugeordneten Beiträge wurden gelöscht."
+
+#: og_forum.module:1513
+msgid "forum: deleted %term and all its sub-forums and associated posts."
+msgstr "Forum: %term und alle untergeordneten Foren und zugeordneten Beiträge gelöscht"
+
+#: og_forum.module:1525;1527
+msgid "@name"
+msgstr ""
+
+#: og_forum.module:1531
+#, fuzzy
+msgid "Add @title forums"
+msgstr "@title-Foren hinzufügen"
+
+#: og_forum.module:1534
+msgid "Edit @title forums"
+msgstr "@title-Foren bearbeiten"
+
+#: og_forum.module:1537
+msgid "Manage @title forums"
+msgstr "@title-Foren verwalten"
+
+#: og_forum.module:1652
+msgid "@time ago<br />by !author"
+msgstr "vor @time<br />von !author"
+
+#: og_forum.module:1655
+msgid "n/a"
+msgstr "nicht verfügbar"
+
+#: og_forum.module:465;500;509;518;527
+msgid "1 new"
+msgid_plural "@count new"
+msgstr[0] "1 neu"
+msgstr[1] "@count neu"
+
+#: og_forum.module:34
+msgid "make forums public"
+msgstr "Foren öffentlich machen"
+
+#: og_forum.module:34
+msgid "admin own group forums"
+msgstr "eigene Gruppenforen verwalten"
+
+#: og_forum.info:0
+msgid "OG forum"
+msgstr "OG Forum"
+
+#: og_forum.info:0
+msgid "Creates forums within organic groups."
+msgstr "Erstellt Foren innerhalb Organischer Gruppen"
+
+#: og_forum.info:0
+msgid "Organic groups"
+msgstr "Organische Gruppen"
+

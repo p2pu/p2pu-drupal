@@ -1,0 +1,65 @@
+<?php
+// $Id: profile_privacy.install,v 1.2.2.1 2008/07/19 23:59:22 quicksketch Exp $
+
+/**
+ * Implementation of hook_schema().
+ */
+function profile_privacy_schema() {
+  $schema['profile_privacy_fields'] = array(
+    'fields' => array(
+      'fid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0
+      ),
+      'privacy' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0 
+      )
+    ),
+    'primary key' => array('fid')
+  );
+
+  $schema['profile_privacy_values'] = array(
+    'fields' => array(
+      'fid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0
+      ),
+      'private' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0 
+      )
+    ),
+    'indexes' => array(
+      'uid' => array('uid'),
+      'fid' => array('fid')
+    )
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function profile_privacy_install() {
+  drupal_install_schema('profile_privacy');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function profile_privacy_uninstall() {
+  drupal_uninstall_schema('profile_privacy');
+}

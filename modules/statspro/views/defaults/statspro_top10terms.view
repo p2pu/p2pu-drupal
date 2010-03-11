@@ -1,0 +1,111 @@
+<?php
+$view = new view;
+$view->name = 'statspro_top10_terms';
+$view->description = 'Top 10 terms with most nodes';
+$view->tag = 'Statistics pro';
+$view->view_php = '';
+$view->base_table = 'term_data';
+$view->is_cacheable = FALSE;
+$view->api_version = 2;
+$view->disabled = TRUE; /* Edit this to true to make a default view disabled initially */
+$handler = $view->new_display('default', 'Standards', 'default');
+$handler->override_option('fields', array(
+  'name' => array(
+    'label' => 'Term',
+    'link_to_taxonomy' => 1,
+    'exclude' => 0,
+    'id' => 'name',
+    'table' => 'term_data',
+    'field' => 'name',
+    'override' => array(
+      'button' => 'Übersteuern',
+    ),
+    'relationship' => 'none',
+  ),
+  'ncount' => array(
+    'label' => 'Nodes',
+    'set_precision' => FALSE,
+    'precision' => 0,
+    'decimal' => '.',
+    'separator' => '.',
+    'prefix' => '',
+    'suffix' => '',
+    'exclude' => 0,
+    'id' => 'ncount',
+    'table' => 'statspro_term',
+    'field' => 'ncount',
+    'override' => array(
+      'button' => 'Übersteuern',
+    ),
+    'relationship' => 'none',
+    'display_mode' => 'graph',
+    'graph_size' => '150',
+  ),
+  'ncount_1' => array(
+    'label' => 'Amount',
+    'set_precision' => FALSE,
+    'precision' => 0,
+    'decimal' => '.',
+    'separator' => ',',
+    'prefix' => '',
+    'suffix' => '',
+    'exclude' => 0,
+    'id' => 'ncount_1',
+    'table' => 'statspro_term',
+    'field' => 'ncount',
+    'override' => array(
+      'button' => 'Übersteuern',
+    ),
+    'relationship' => 'none',
+    'display_mode' => 'text',
+    'graph_size' => '',
+  ),
+));
+$handler->override_option('sorts', array(
+  'ncount' => array(
+    'order' => 'DESC',
+    'id' => 'ncount',
+    'table' => 'statspro_term',
+    'field' => 'ncount',
+    'relationship' => 'none',
+  ),
+));
+$handler->override_option('access', array(
+  'type' => 'none',
+));
+$handler->override_option('title', 'Top 10 terms');
+$handler->override_option('style_plugin', 'table');
+$handler->override_option('style_options', array(
+  'grouping' => '',
+  'override' => 1,
+  'sticky' => 0,
+  'order' => 'asc',
+  'columns' => array(
+    'ncount' => 'ncount',
+    'ncount_1' => 'ncount_1',
+  ),
+  'info' => array(
+    'ncount' => array(
+      'sortable' => 0,
+      'separator' => '',
+    ),
+    'ncount_1' => array(
+      'sortable' => 0,
+      'separator' => '',
+    ),
+  ),
+  'default' => '-1',
+));
+$handler = $view->new_display('page', 'Seite', 'page_1');
+$handler->override_option('path', 'top10terms');
+$handler->override_option('menu', array(
+  'type' => 'normal',
+  'title' => 'Top 10 terms',
+  'weight' => '0',
+  'name' => 'navigation',
+));
+$handler->override_option('tab_options', array(
+  'type' => 'none',
+  'title' => '',
+  'weight' => 0,
+));

@@ -1,0 +1,12 @@
+; $Id: $
+name = Profile Privacy
+description = Provides options for users to over ride visibility of their own profile fields.
+dependencies[] = profile
+core = 6.x
+
+; Information added by drupal.org packaging script on 2008-09-05
+version = "6.x-1.2"
+core = "6.x"
+project = "profile_privacy"
+datestamp = "1220657115"
+

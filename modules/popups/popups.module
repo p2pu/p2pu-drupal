@@ -1,0 +1,298 @@
+<?php
+// $Id: popups.module,v 1.11.2.26 2009/03/05 20:05:44 starbow Exp $
+
+/**
+ * @file
+ * This module provides a hook_popups for links to be openned in an Ajax Popup Dialog. 
+ *
+ * @todo 
+ * * Adding Javascript into popups doesn't always work (see examples in popups_admin.modules)
+ * * Cache the results of hook_popups.
+ */
+
+
+// **************************************************************************
+// CORE HOOK FUNCTIONS   ****************************************************
+// **************************************************************************
+
+/**
+ * Implementation of hook_menu().
+ *
+ * @return array of new menu items.
+ */
+function popups_menu() {
+   
+  // Themable page save dialog.
+  $items['popups/save_dialog'] = array(
+    'page callback' => 'theme',
+    'page arguments' => array('popup_save_dialog'),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );  
+  
+  // Admin Settings.
+  $items['admin/settings/popups'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('popups_admin_settings'),
+    'title' => 'Popups',
+    'access arguments' => array('administer site configuration'),
+    'description' => 'Configure the page-in-a-dialog behavior.',
+  ); 
+  
+  return $items;
+}
+
+/**
+ * Implementation of hook_init().
+ * 
+ * Look at the page path and see if popup behavior has been requested for any links in this page.
+ */
+function popups_init() {  
+  $popups = popups_get_popups();
+
+  if (variable_get('popups_always_scan', 0)) {
+    popups_add_popups();
+  }
+
+  foreach ($popups as $path => $popup_config) {
+    if ($path == $_GET['q']) {
+      popups_add_popups($popups[$path]);
+    }
+    elseif (strpos($path, '*') !== FALSE && drupal_match_path($_GET['q'], $path)) {
+      popups_add_popups($popups[$path]);
+    }
+  }  
+  
+  $render_mode = '';
+  if (isset($_SERVER['HTTP_X_DRUPAL_RENDER_MODE'])) {
+    $render_mode = $_SERVER['HTTP_X_DRUPAL_RENDER_MODE'];
+  }
+  
+  // Check and see if the page_override param is in the URL.
+  // Note - the magic happens here.
+  // Need to cache the page_override flag in the session, so it will effect
+  // the results page that follows a form submission.
+  if ($render_mode == 'json/popups') {
+    $_SESSION['page_override'] = TRUE;
+  }
+
+  // Move the page_override flag back out of the session.
+  if (isset($_SESSION['page_override'])) {
+    // This call will not return on form submission.
+    $content = menu_execute_active_handler();
+    
+    // The call did return, so it wasn't a form request, 
+    // so we are returning a result, so clear the session flag.
+    $override = $_SESSION['page_override'];
+    unset($_SESSION['page_override']);
+       
+    // Menu status constants are integers; page content is a string.
+    if (isset($content) && !is_int($content) && isset($override)) {
+      print popups_render_as_json($content); 
+      exit;  // Do not continue processing request in index.html.
+    }    
+  }
+  
+}
+
+/**
+ * Implementation of hook_theme().
+ *
+ */
+function popups_theme($existing, $type) {  
+  return array(
+    'popups_popup' => array(
+      'template' => 'popups-popup',
+    ),
+    'popups_save_dialog' => array(),      
+  );
+}
+
+/**
+ * Implementation of hook_form_alter().
+ * 
+ * Look at the form_id and see if popup behavior has been requested for any links in this form.
+ *
+ * @param form_array $form
+ * @param array $form_state
+ * @param str $form_id: 
+ */
+function popups_form_alter(&$form, $form_state, $form_id) {
+  // Add popup behavior to the form if requested.
+  $popups = popups_get_popups();
+  if (isset($popups[$form_id])) {
+    popups_add_popups($popups[$form_id]);
+  } 
+
+  // Alter the theme configuration pages, to add a per-theme-content selector. 
+  $theme = arg(4);
+  if ($form_id == 'system_theme_settings' && $theme) {
+    $form['popups'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Popup Settings'),
+      '#weight' => -2,
+    );
+    $form['popups']['popups_content_selector'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Content Selector'),
+      '#default_value' => variable_get('popups_'. $theme .'_content_selector', _popups_default_content_selector()),
+      '#description' => t("jQuery selector to define the page's content area on this theme."),
+    ); 
+    $form['popups']['popups_theme'] = array(
+      '#type' => 'hidden',
+      '#value' => $theme,
+    ); 
+    $form['#submit'][] = 'popups_theme_settings_form_submit';
+  }
+}
+
+// **************************************************************************
+// UTILITY FUNCTIONS   ******************************************************
+// **************************************************************************
+
+/**
+ * Render the page contents in a custom json wrapper.
+ *
+ * @param $content: themed html.
+ * @return $content in a json wrapper with metadata.
+ */
+function popups_render_as_json($content) { 
+  $path = $_GET['q']; // Get current path from params.
+  return drupal_json(array(
+    'title' => drupal_get_title(),
+    'messages' => theme('status_messages'),
+    'path' => $path,
+    'content' => $content,
+  ));
+}
+
+/**
+ * Define hook_popups().
+ * Build the list of popup rules from all modules that implement hook_popups.
+ * 
+ * @todo - Add some caching so we don't rebuild everytime?
+ */
+function popups_get_popups() {
+  static $popups = NULL;
+  if (!isset($popups)) {
+    $popups = module_invoke_all('popups');
+  }
+  return $popups;
+}
+
+/**
+ * Attach the popup behavior to the page.
+ * 
+ * The default behavoir of a popup is to open a form that will modify the original page.  
+ * The popup submits the form and reloads the original page with the resulting new content. 
+ * The popup then replaces the original page's content area with the new copy of that content area.
+ *
+ * @param array $rules: Array of rules to apply to the page or form, keyed by jQuery link selector.
+ *   See README.txt for a listing of the options, and popups_admin.module for examples. 
+ */
+function popups_add_popups($rules=NULL) { 
+  static $added = FALSE;
+  $settings = array('popups' => array());
+  
+  if (is_array($rules)) {
+    $settings['popups']['links'] = array();
+    foreach ($rules as $popup_selector => $options) { 
+      if (is_array($options)) {
+        $settings['popups']['links'][$popup_selector] = $options;
+        if (isset($options['additionalJavascript']) && is_array($options['additionalJavascript'])) {
+          foreach ($options['additionalJavascript'] as $file) {
+            drupal_add_js($file);
+          }
+        }
+        // Experimental.  Won't be needed if http://drupal.org/node/336641 works.
+        if (isset($options['additionalJavascriptSettings']) && is_array($options['additionalJavascriptSettings'])) {
+          foreach ($options['additionalJavascriptSettings'] as $key => $setting) {
+              drupal_add_js(array($key => $setting), 'setting');
+          }
+        }
+        if (isset($options['additionalCss']) && is_array($options['additionalCss'])) {
+          foreach ($options['additionalCss'] as $file) {
+            drupal_add_css($file);
+          }
+        }
+      }
+      else {
+        $settings['popups']['links'][$options] = array();
+      }
+    }
+    if($added) {
+      drupal_add_js( $settings, 'setting' );
+    }
+  }
+  if (!$added) {
+    drupal_add_css(drupal_get_path('module', 'popups') .'/popups.css');
+    drupal_add_css(drupal_get_path('module', 'popups') .'/popups-skin.css');
+    drupal_add_js(drupal_get_path('module', 'popups') .'/popups.js');
+    drupal_add_js('misc/jquery.form.js');
+    
+    // Determing if we are showing the default theme or a custom theme.
+    global $custom_theme;
+    $theme = $custom_theme;
+    if (!$theme) {
+      $theme = variable_get('theme_default','none');
+    }
+    $default_target_selector = variable_get('popups_'. $theme .'_content_selector', _popups_default_content_selector());
+    
+    $settings['popups']['originalPath'] = $_GET['q'];
+    $settings['popups']['defaultTargetSelector'] = $default_target_selector;
+    $settings['popups']['template'] = theme('popups_popup');
+    $settings['popups']['modulePath'] = drupal_get_path('module', 'popups');
+    $settings['popups']['popupFinalMessage'] = variable_get('popups_popup_final_message', 1);
+    drupal_add_js( $settings, 'setting' );
+    $added = TRUE;
+  }
+}
+
+/**
+ * Returns the default jQuery content selector as a string.
+ * Currently uses the selector for Garland.  
+ * Sometime in the future I will change this to '#content' or '#content-content'.
+ */
+function _popups_default_content_selector() {
+  return 'div.left-corner > div.clear-block:last'; // Garland in Drupal 6.
+}
+
+// **************************************************************************
+// ADMIN SETTINGS   *********************************************************
+// **************************************************************************
+
+/**
+ * Form for the Popups Settings page.
+ *
+ */
+function popups_admin_settings() {
+  drupal_set_title("Popups Settings");
+  $form = array();
+
+  $form['popups_always_scan'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Scan all pages for popup links.'),
+    '#default_value' => variable_get('popups_always_scan', 0),
+  );
+  $form['popups_popup_final_message'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Do NOT auto-close final message.'),
+    '#default_value' => variable_get('popups_popup_final_message', 1),
+  );
+  
+  return system_settings_form($form);
+}
+
+/**
+ * popups_form_alter adds this submit handler to the theme pages.
+ * Set a per-theme jQuery content selector that gets passed into the js settings. 
+ *
+ * @param $form
+ * @param $form_state
+ */
+function popups_theme_settings_form_submit($form, &$form_state) {
+  $theme = $form_state['values']['popups_theme'];
+  $content_selector = $form_state['values']['popups_content_selector'];
+  variable_set('popups_'. $theme .'_content_selector', $content_selector);
+}
+

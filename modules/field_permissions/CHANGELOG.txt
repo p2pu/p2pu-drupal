@@ -1,0 +1,34 @@
+// $Id: CHANGELOG.txt,v 1.1.2.20 2009/11/14 16:09:23 markuspetrux Exp $
+
+6.x-1.0
+=======
+
+Features:
+- #627218 Refinement of the troubleshooting report.
+- Updated translation template.
+
+Bugfixes:
+- #628136 The uid of the node is not always supplied to hook_field_access().
+- #629800 by hefox: array_filter warning.
+- #632292 Document Field Permissions requires CCK 6.x-2.5 or higher.
+- Fixed a couple of Coder module warnings.
+
+
+6.x-1.0-beta2
+=============
+
+Features:
+- #626446 Externalize code to separate include files to reduce memory consumption during normal site operation.
+- #626584 Field permissions overview.
+- #627218 Add report to help troubleshoot the execution of content_access().
+
+Bugfixes:
+- #626444 Ensure the content module is loaded in implementations of hook_install(), hook_uninstall() and hook_update_6001().
+
+
+6.x-1.0-beta1
+=============
+
+- Use @ to format URL to permissions administration.
+- Added support for create field permission.
+- Every permission type can be enabled independently.

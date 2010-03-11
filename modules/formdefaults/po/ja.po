@@ -1,0 +1,59 @@
+# $Id: ja.po,v 1.1 2007/05/15 15:18:40 imagine Exp $
+# -----------------------------------------------------------------------------
+# Japanese translation of Drupal (formdefaults.module)
+#
+# Copyright (c) 2006-2007  Drupal Japan  ( http://drupal.jp/ )  /
+#                          Drupal Nippon ( http://drupon.org/ ) /
+#                          Takafumi      ( jp.drupal@imagine **reverse order**)
+#
+# Generated from file:
+#  formdefaults.module,v 1.8 2007/05/03 23:47:37 metzlerd
+#
+# -----------------------------------------------------------------------------
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2007-05-15 01:27+0900\n"
+"Last-Translator: Takafumi <jp.drupal@imagine **reverse order**>\n"
+"Language-Team: Drupal Japan / Drupal Nippon\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#: formdefaults.module:21
+msgid "Lets the site administrator edit the description, title and markup attributes of a form."
+msgstr "サイト管理者が、フォームの説明やタイトル、マークアップ属性を編集できるようにします。"
+
+#: formdefaults.module:35
+msgid "Edit Form"
+msgstr "フォームの編集"
+
+#: formdefaults.module:36
+msgid "Edit a form"
+msgstr "フォームの編集"
+
+#: formdefaults.module:44
+msgid "Form Labels and Text"
+msgstr "フォームのラベルとテキスト"
+
+#: formdefaults.module:47
+msgid "Turns on or off the editing controls to allow editing form labels and descriptions"
+msgstr "フォームのラベルと説明の編集を、できるようにするかどうかを切り替えます。"
+
+# ----------
+#: formdefaults.module:115;121;164;166
+msgid "edit"
+msgstr "編集"
+
+#: formdefaults.module:12
+msgid "change form labels"
+msgstr "フォームラベルの変更"
+
+#: formdefaults.module:0 formdefaults.info:0;0
+msgid "formdefaults"
+msgstr "formdefaults"
+
+#: formdefaults.info:0
+msgid "Modifies help text and desciriptions on any from in drupal."
+msgstr "任意のフォームのラベルや説明を変更できるようにします。"
+

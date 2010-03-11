@@ -1,0 +1,33 @@
+name = p2pu10
+description = Template theme
+version = 1.0
+core = 6.x
+engine = phptemplate
+
+stylesheets[screen][] = style/page-structure.css
+stylesheets[screen][] = style/page-defaults.css
+stylesheets[screen][] = style/typography.css
+stylesheets[screen][] = style/color-defaults.css
+stylesheets[screen][] = style/style.css
+
+regions[header] = Header
+regions[primary_navigation] = Primary navigation
+regions[sub_header] = Sub header
+regions[left] = Left sidebar
+regions[content_top] = Content top
+regions[content] = Content
+regions[content_bottom] = Content bottom
+regions[right] = Right sidebar
+regions[footer] = Footer
+
+features[] = logo
+features[] = name
+features[] = slogan
+features[] = mission
+features[] = node_user_picture
+features[] = comment_user_picture
+features[] = search
+features[] = favicon
+features[] = primary_links
+features[] = secondary_links
+features[] = breadcrumb

@@ -1,0 +1,4 @@
+@charset "UTF-8";
+
+div.popup-hover-activate-element:hover{ position: relative;}
+div.popup-hover-activate-element:hover div.popup-body{ display: block; z-index: 3000;}

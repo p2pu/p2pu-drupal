@@ -1,0 +1,44 @@
+name = 0 Point
+description = 0 Point theme is ideal for a wide range of sites. It has been optimized for e-commerce with <a href="http://www.ubercart.org">Ubercart</a>. <br /> <em>By <a href="http://www.radut.net">Dr. Radut</a>.<em>
+
+core = 6.x
+engine = phptemplate
+screenshot = screenshot.png
+php = DRUPAL_MINIMUM_PHP
+
+stylesheets[print][] = css/print.css
+
+regions[left] = Left sidebar
+regions[right] = Right sidebar
+regions[above] = Above
+regions[banner] = Banner
+regions[header] = Header
+regions[user1] = User 1
+regions[user2] = User 2
+regions[user3] = User 3
+regions[user4] = User 4
+regions[content_top] = Top content
+regions[content_middle] = Middle content
+regions[content_bottom] = Bottom content
+regions[user5] = User 5
+regions[user6] = User 6
+regions[user7] = User 7
+regions[user8] = User 8
+regions[below] = Below
+
+features[] = logo
+features[] = name
+features[] = slogan
+features[] = mission
+features[] = node_user_picture
+features[] = comment_user_picture
+features[] = search
+features[] = favicon
+features[] = primary_links
+features[] = secondary_links
+; Information added by drupal.org packaging script on 2009-12-26
+version = "6.x-1.9"
+core = "6.x"
+project = "zeropoint"
+datestamp = "1261802769"
+

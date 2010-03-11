@@ -1,0 +1,37 @@
+# $Id: themesettingsapi.pot,v 1.2 2007/11/25 18:30:33 johnalbin Exp $
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  themesettingsapi.admin.inc,v 1.1 2007/11/25 18:25:58 johnalbin
+#  themesettingsapi.info,v 1.5 2007/09/23 08:51:36 johnalbin
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Theme Settings API 6.x-1.x\n"
+"POT-Creation-Date: 2007-11-25 11:27-0700\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: themesettingsapi.admin.inc:57
+msgid "Use administration theme when configuring theme settings"
+msgstr ""
+
+#: themesettingsapi.admin.inc:58
+msgid "If this setting is disabled or if using the \"System default\" theme, the theme settings pages will be switched to the theme being configured."
+msgstr ""
+
+#: themesettingsapi.info:0
+msgid "Theme Settings API"
+msgstr ""
+
+#: themesettingsapi.info:0
+msgid "Allows themes to add options to the themes settings page"
+msgstr ""
+

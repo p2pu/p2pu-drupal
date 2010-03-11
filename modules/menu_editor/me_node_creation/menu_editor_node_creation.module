@@ -1,0 +1,60 @@
+<?php
+
+function menu_editor_node_creation_menu() {
+  $items = array();
+  $items['node/add/%menu_editor_node_type/mlid/%menu_editor_mlid'] = array(
+    'title' => 'Create a node',
+    'page callback' => 'menu_editor_node_creation_create_node',
+    'page arguments' => array(2, 4),
+    'file' => 'menu_editor_node_creation.inc',
+    'access callback' => 'menu_editor_node_creation_create_node_access',
+    'access arguments' => array(2),
+  );
+  return $items;
+}
+
+
+function menu_editor_node_type_load($type_arg) {
+  $type_arg = strtr($type_arg, array('-' => '_'));
+  foreach (node_get_types() as $type_name => $type_object) {
+    if ($type_name == $type_arg) {
+      return $type_name;
+    }
+  }
+  return false;
+}
+
+
+function menu_editor_mlid_load($mlid) {
+  if ($type_arg == 'auto') {
+    return 1;
+  } 
+  if ((int)$mlid == $mlid && $mlid > 0) {
+    return $mlid;
+  }
+  return false;
+}
+
+
+function menu_editor_node_creation_create_node_access($type) {
+  return node_access('create', $type);
+}
+
+
+function menu_editor_node_creation_menu_editor_placeholders() {
+  $placeholders = array('<new page>' => NULL);
+  foreach (node_get_types() as $type_name => $type_info) {
+    $placeholders["<new $type_name>"] = "node/add/$type_name/mlid/%mlid";
+  }
+  // we want that <new page> is first, if this content type exists.
+  // if not, we remove this placeholder.
+  if (!isset($placeholders['<new page>'])) {
+    unset($placeholders['<new page>']);
+  }
+  return $placeholders;
+}
+
+
+
+require_once drupal_get_path('module', 'menu_editor_node_creation') . '/menu_editor_node_creation.inc';
+

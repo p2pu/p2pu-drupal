@@ -1,0 +1,610 @@
+# $Id: mass_contact.pot,v 1.1.2.3 2008/10/23 20:14:12 oadaeh Exp $
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  mass_contact.module,v 1.9.2.9 2008/10/23 19:34:26 oadaeh
+#  mass_contact.info,v 1.3 2008/05/28 00:09:12 oadaeh
+#  mass_contact.install,v 1.5.2.1 2008/07/19 20:13:00 oadaeh
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2008-10-23 13:11-0700\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: mass_contact.module:33
+msgid "Related tasks:"
+msgstr ""
+
+#: mass_contact.module:39
+msgid "The Mass Contact module is simply a modified version of the core contact module. It works opposite the latter, in that it allows site moderators (or anyone with permission), to <a href=\"mass_contact\">send mass e-mail</a> to a set role or group of roles or even to all registered users."
+msgstr ""
+
+#: mass_contact.module:40
+msgid "The sender's own address may be placed in the 'To:' field and all recipients placed in the 'BCC:' field, or the recipients simply placed in the 'To:' field. Note that the latter option leaves all recipients open to abuse due to their e-mail addresses being visible to all other recipients."
+msgstr ""
+
+#: mass_contact.module:41
+msgid "The e-mail may be sent as HTML or plain text, and may include a single binary file attachment (if permitted by admin)."
+msgstr ""
+
+#: mass_contact.module:42
+msgid "At the option of the sender (if permitted by admin), a node may be created in order to keep a record of the e-mail sent. Do not try to send e-mails by creating nodes; it will not work."
+msgstr ""
+
+#: mass_contact.module:43
+msgid "Users may opt-out of mass mailings on their profile page, but this may be overridden by the admin (or respected). The entire opt-out system may be disabled on the <a href=\"@settings-page\">settings page</a>."
+msgstr ""
+
+#: mass_contact.module:44
+msgid "Make sure to add at least one category and configure the module before trying to send mass e-mails."
+msgstr ""
+
+#: mass_contact.module:47
+msgid "The menu item can be customized and configured only once the menu module has been <a href=\"@modules-page\">enabled</a>."
+msgstr ""
+
+#: mass_contact.module:53
+msgid "The Mass Contact module also adds a <a href=\"@menu-settings\">menu item</a> (disabled by default) to the navigation block."
+msgstr ""
+
+#: mass_contact.module:177
+msgid "Group e-mail settings"
+msgstr ""
+
+#: mass_contact.module:183
+msgid "Opt-out of Mass E-mails"
+msgstr ""
+
+#: mass_contact.module:185
+msgid "Allows you to opt-out of group e-mails from privileged users. Note that site administrators are able to include you in mass e-mails even if you choose not to enable this feature, and the ability to opt-out may be removed by the administrator at any time."
+msgstr ""
+
+#: mass_contact.module:297;355
+msgid "Yes"
+msgstr ""
+
+#: mass_contact.module:297;355
+msgid "No"
+msgstr ""
+
+#: mass_contact.module:297
+msgid "edit"
+msgstr ""
+
+#: mass_contact.module:297
+msgid "delete"
+msgstr ""
+
+#: mass_contact.module:299;325;834
+msgid "Category"
+msgstr ""
+
+#: mass_contact.module:299
+msgid "Recipients"
+msgstr ""
+
+#: mass_contact.module:299;354
+msgid "Selected"
+msgstr ""
+
+#: mass_contact.module:299
+msgid "Operations"
+msgstr ""
+
+#: mass_contact.module:328
+msgid "Will appear in the subject of your e-mail as [category]."
+msgstr ""
+
+#: mass_contact.module:342
+msgid "Roles to receive e-mail"
+msgstr ""
+
+#: mass_contact.module:345
+msgid "These roles will be added to the mailing list. Note: if you check \"authenticated users\", other roles will not be added, as they will receive the e-mail anyway."
+msgstr ""
+
+#: mass_contact.module:350
+msgid "Selected categories"
+msgstr ""
+
+#: mass_contact.module:357
+msgid "Set this to <em>Yes</em> if you would like this category to be selected by default."
+msgstr ""
+
+#: mass_contact.module:361
+msgid "Reset all previously selected categories to <em>No</em>."
+msgstr ""
+
+#: mass_contact.module:371
+msgid "Save"
+msgstr ""
+
+#: mass_contact.module:394
+msgid "You must check one or more recipients."
+msgstr ""
+
+#: mass_contact.module:442
+msgid "Category %category has been added."
+msgstr ""
+
+#: mass_contact.module:443;448
+msgid "view"
+msgstr ""
+
+#: mass_contact.module:447
+msgid "Category %category has been updated."
+msgstr ""
+
+#: mass_contact.module:473
+msgid "Are you sure you want to delete %category?"
+msgstr ""
+
+#: mass_contact.module:473
+msgid "This action cannot be undone."
+msgstr ""
+
+#: mass_contact.module:473
+msgid "Delete"
+msgstr ""
+
+#: mass_contact.module:473
+msgid "Cancel"
+msgstr ""
+
+#: mass_contact.module:476
+msgid "Category not found."
+msgstr ""
+
+#: mass_contact.module:493
+msgid "Category %category has been deleted."
+msgstr ""
+
+#: mass_contact.module:519
+msgid "Additional information for Mass Contact form"
+msgstr ""
+
+#: mass_contact.module:520
+msgid "Send e-mails using the following form."
+msgstr ""
+
+#: mass_contact.module:521
+msgid "Information to show on the <a href=\"@form\">Mass Contact page</a>."
+msgstr ""
+
+#: mass_contact.module:526
+msgid "Character set"
+msgstr ""
+
+#: mass_contact.module:528
+msgid "You may specify an alternate character set to use when sending e-mails. If left blank, the default of UTF-8 will be used. If you are unsure of what to put here, then leave it blank. Caution: setting this may not get you the results you desire. Other modules may come along and change that value after it has been set by this module."
+msgstr ""
+
+#: mass_contact.module:533
+msgid "Default sender information"
+msgstr ""
+
+#: mass_contact.module:534
+msgid "If anything is specified in here, it is used in place of the \"Your name\" and \"Your e-mail address\" fileds when sending the mass e-mail. Otherwise, the sender's name and e-mail address will be the default values. You must fill in both values, if you want to specify a default."
+msgstr ""
+
+#: mass_contact.module:538
+msgid "Default sender name"
+msgstr ""
+
+#: mass_contact.module:542
+msgid "The optional user name to send e-mail as. Replaces the \"Your name\" value when sending mass e-mails."
+msgstr ""
+
+#: mass_contact.module:546
+msgid "Default sender e-mail address"
+msgstr ""
+
+#: mass_contact.module:550
+msgid "The optional user e-mail address to send e-mail as. Replaces the \"Your e-mail address\" value when sending mass e-mails."
+msgstr ""
+
+#: mass_contact.module:554
+msgid "Allow the sender to change these values."
+msgstr ""
+
+#: mass_contact.module:556
+msgid "If checked, gives the sender the ability of changing the default sender and e-mail address when creating the message. If unchecked, the fields will be disabled."
+msgstr ""
+
+#: mass_contact.module:561
+msgid "Maximum number of recipients before splitting up the e-mail"
+msgstr ""
+
+#: mass_contact.module:564
+msgid "This is a workaround for server-side limits on the number of recipients in a single mail message. Once this limit is reached, the recipient list will be broken up and multiple copies of the message will be sent out until all recipients receive the mail. Setting this to \"0\" will turn off this feature."
+msgstr ""
+
+#: mass_contact.module:570
+msgid "Allow users to opt-out of mass e-mails."
+msgstr ""
+
+#: mass_contact.module:576
+msgid "Send as BCC (hide recipients) by default."
+msgstr ""
+
+#: mass_contact.module:581
+msgid "Allow sender to override BCC setting."
+msgstr ""
+
+#: mass_contact.module:587
+msgid "Include category in subject line."
+msgstr ""
+
+#: mass_contact.module:593
+msgid "Supplemental message body texts"
+msgstr ""
+
+#: mass_contact.module:594
+msgid "You may specify additional text to insert before and/or after the message text of every mass e-mail that is sent."
+msgstr ""
+
+#: mass_contact.module:599;623
+msgid "Text to be prepended to all messages"
+msgstr ""
+
+#: mass_contact.module:600
+msgid "[user-name] has sent you a group e-mail from [site-name]."
+msgstr ""
+
+#: mass_contact.module:601;625
+msgid "The text you specify above will be added to all e-mails sent out. The text will be placed before the message text enetered in by the sender."
+msgstr ""
+
+#: mass_contact.module:605;629
+msgid "Text to be appended to all messages"
+msgstr ""
+
+#: mass_contact.module:606;630
+msgid ""
+msgstr ""
+
+#: mass_contact.module:607;631
+msgid "The text you specify above will be added to all e-mails sent out. The text will be placed after the message text enetered in by the sender."
+msgstr ""
+
+#: mass_contact.module:611
+msgid "Replacement tokens"
+msgstr ""
+
+#: mass_contact.module:614
+msgid "You may use any of the following replacements tokens for use in the prefix and/or suffix texts above."
+msgstr ""
+
+#: mass_contact.module:624
+msgid "You were sent a group e-mail from !site."
+msgstr ""
+
+#: mass_contact.module:637
+msgid "Send as HTML by default."
+msgstr ""
+
+#: mass_contact.module:639
+msgid "This will use the default input filter as specified on the <a href=\"@formats_settings\">Input formats settings</a> page."
+msgstr ""
+
+#: mass_contact.module:643
+msgid "Allow sender to override HTML setting."
+msgstr ""
+
+#: mass_contact.module:649
+msgid "Attachment location"
+msgstr ""
+
+#: mass_contact.module:651
+msgid "If a copy of the message is saved as a node, this is the file path where to save the attachment so it can be viewed later."
+msgstr ""
+
+#: mass_contact.module:656
+msgid "Save a copy as a node by default."
+msgstr ""
+
+#: mass_contact.module:661
+msgid "Allow sender to override node copy setting."
+msgstr ""
+
+#: mass_contact.module:667
+msgid "Hourly threshold"
+msgstr ""
+
+#: mass_contact.module:670
+msgid "The maximum number of Mass Contact form submissions a user can perform per hour."
+msgstr ""
+
+#: mass_contact.module:689;695
+msgid "If you are going to specify default user settings, you must specify both a user name and a user e-mail address."
+msgstr ""
+
+#: mass_contact.module:721
+msgid "You cannot send more than %number messages per hour. Please try again later."
+msgstr ""
+
+#: mass_contact.module:769
+msgid "Send an e-mail message using the contact form below."
+msgstr ""
+
+#: mass_contact.module:777;786;794
+msgid "Your name"
+msgstr ""
+
+#: mass_contact.module:806;815;823
+msgid "Your e-mail address"
+msgstr ""
+
+#: mass_contact.module:858
+msgid "Respect user opt-outs."
+msgstr ""
+
+#: mass_contact.module:874
+msgid "Send as BCC (hide recipients)."
+msgstr ""
+
+#: mass_contact.module:886
+msgid "Recipients will be hidden."
+msgstr ""
+
+#: mass_contact.module:886
+msgid "Recipients will NOT be hidden."
+msgstr ""
+
+#: mass_contact.module:892
+msgid "Subject"
+msgstr ""
+
+#: mass_contact.module:899
+msgid "Message"
+msgstr ""
+
+#: mass_contact.module:909
+msgid "Attachment"
+msgstr ""
+
+#: mass_contact.module:918
+msgid "Send as HTML."
+msgstr ""
+
+#: mass_contact.module:920
+msgid "This will use the settings for the default input filter. More information about what is available is on the <a href=\"@formats_settings\">Input formats</a> page."
+msgstr ""
+
+#: mass_contact.module:931
+msgid "The message will be sent as HTML."
+msgstr ""
+
+#: mass_contact.module:931
+msgid "The message will be sent as plain text."
+msgstr ""
+
+#: mass_contact.module:940
+msgid "Send yourself a copy."
+msgstr ""
+
+#: mass_contact.module:950
+msgid "Save a copy as a node."
+msgstr ""
+
+#: mass_contact.module:979
+msgid "Send e-mail"
+msgstr ""
+
+#: mass_contact.module:984
+msgid "Either you have not created any categories, or you are not allowed to send to any of the existing categories."
+msgstr ""
+
+#: mass_contact.module:984
+msgid "Either create at least one category of users to send to, or contact your system administer for access to the existing categories."
+msgstr ""
+
+#: mass_contact.module:991
+msgid "Related tasks"
+msgstr ""
+
+#: mass_contact.module:1021
+msgid "You must select a valid category."
+msgstr ""
+
+#: mass_contact.module:1025
+msgid "You must enter a valid e-mail address."
+msgstr ""
+
+#: mass_contact.module:1266
+msgid "[!category] !subject"
+msgstr ""
+
+#: mass_contact.module:1331
+msgid "There are no users in this category. The message was not sent."
+msgstr ""
+
+#: mass_contact.module:1379
+msgid "[Success] Send #!ccc: -e-mails"
+msgstr ""
+
+#: mass_contact.module:1426
+msgid "[Success] Send Remainder: -e-mails"
+msgstr ""
+
+#: mass_contact.module:1474
+msgid "[Success] Send Once: -e-mails"
+msgstr ""
+
+#: mass_contact.module:1514
+msgid "View."
+msgstr ""
+
+#: mass_contact.module:1517
+msgid "A carbon copy has been created as a node."
+msgstr ""
+
+#: mass_contact.module:1525
+msgid "Message sent successfully to !total users: -e-mails"
+msgstr ""
+
+#: mass_contact.module:1528
+msgid "!errors error(s) encountered sending message. Please check the logs and try again."
+msgstr ""
+
+#: mass_contact.module:1567
+msgid "Node type created."
+msgstr ""
+
+#: mass_contact.module:1597
+msgid "Category: "
+msgstr ""
+
+#: mass_contact.module:1597
+msgid "Roles: "
+msgstr ""
+
+#: mass_contact.module:1597
+msgid "Recipients: "
+msgstr ""
+
+#: mass_contact.module:232;237;242;443;448;494;1522;0
+msgid "mass_contact"
+msgstr ""
+
+#: mass_contact.module:232
+msgid "There was an error deleting the attachment."
+msgstr ""
+
+#: mass_contact.module:237
+msgid "There was an indication of an attachment within the node body, but the attachment was not found. If the attachment is still there, it was NOT deleted."
+msgstr ""
+
+#: mass_contact.module:242
+msgid "There was an indication of an attachment within the node body, but the attachment path was not found. If the attachment is still there, it was NOT deleted."
+msgstr ""
+
+#: mass_contact.module:443
+msgid "Mass Contact form: category %category added."
+msgstr ""
+
+#: mass_contact.module:448
+msgid "Mass Contact form: category %category updated."
+msgstr ""
+
+#: mass_contact.module:494
+msgid "Mass Contact form: category %category deleted."
+msgstr ""
+
+#: mass_contact.module:1514
+msgid "content"
+msgstr ""
+
+#: mass_contact.module:1514
+msgid "Mass Contact content added \"%title\"."
+msgstr ""
+
+#: mass_contact.module:1522
+msgid "%name-from sent an e-mail to the %category group."
+msgstr ""
+
+#: mass_contact.module:68
+msgid "administer mass contact"
+msgstr ""
+
+#: mass_contact.module:68
+msgid "choose whether to archive mass contact messages"
+msgstr ""
+
+#: mass_contact.module:68
+msgid "create mass_contact content"
+msgstr ""
+
+#: mass_contact.module:68
+msgid "send mass contact attachments"
+msgstr ""
+
+#: mass_contact.module:68
+msgid "send mass contact e-mails"
+msgstr ""
+
+#: mass_contact.module:70
+msgid "SELECT category FROM {mass_contact}"
+msgstr ""
+
+#: mass_contact.module:72
+msgid "send to users in the "
+msgstr ""
+
+#: mass_contact.module:72
+msgid " category"
+msgstr ""
+
+#: mass_contact.module:91
+msgid "Mass Contact form"
+msgstr ""
+
+#: mass_contact.module:94
+msgid "Create a mass contact form and set up categories for the form to use."
+msgstr ""
+
+#: mass_contact.module:97
+msgid "Category list"
+msgstr ""
+
+#: mass_contact.module:103
+msgid "Add category"
+msgstr ""
+
+#: mass_contact.module:111
+msgid "Edit Mass Contact category"
+msgstr ""
+
+#: mass_contact.module:118
+msgid "Delete Mass Contact category"
+msgstr ""
+
+#: mass_contact.module:125
+msgid "Settings"
+msgstr ""
+
+#: mass_contact.module:133 mass_contact.info:0
+msgid "Mass Contact"
+msgstr ""
+
+#: mass_contact.install:16
+msgid "The base table for nodes."
+msgstr ""
+
+#: mass_contact.install:19
+msgid "The primary id field for the category table."
+msgstr ""
+
+#: mass_contact.install:24
+msgid "The name of the category."
+msgstr ""
+
+#: mass_contact.install:30
+msgid "A list of the users to receive the message."
+msgstr ""
+
+#: mass_contact.install:35;40;47
+msgid "."
+msgstr ""
+
+#: mass_contact.install:69
+msgid "All tables and entries required by the Mass Contact module have been created."
+msgstr ""
+
+#: mass_contact.info:0
+msgid "Enables site administrator or privileged users to send mass e-mails to registered users. (This module will take advantage of the Token module, if it is installed and enabled, but does not require it.)"
+msgstr ""
+
+#: mass_contact.info:0
+msgid "Mail"
+msgstr ""
+

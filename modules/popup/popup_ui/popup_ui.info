@@ -1,0 +1,7 @@
+
+name = Popup UI
+description = Provides a UI to manage popup formats used within content types and views 
+package = User interface
+version = "6.x-2.3"
+core = 6.x
+dependencies[] = popup

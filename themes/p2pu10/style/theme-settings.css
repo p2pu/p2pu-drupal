@@ -1,0 +1,23 @@
+@CHARSET "UTF-8";
+
+div.inline label{ float: left; padding: 5px 5px 0px 0px;}
+
+div#theme-workspace{ background: #efefef; border: 1px inset #dfdfdf;}
+div#theme-workspace img{ display: block; position: absolute;}
+div#theme-workspace div.tools{ float: right; margin: 10px 10px 0 0; width: 140px;}
+
+div#theme-workspace fieldset{ padding: 5px;}
+div#theme-workspace fieldset div.form-item{ margin: 0; padding: 0;}
+div#theme-workspace fieldset input{ margin: 0; padding: 0;}
+div#theme-workspace fieldset input.form-checkbox{ position: relative; top: 2px;}
+
+div#theme-workspace fieldset.wrapper{ margin: 0; padding: 0; border: 0;}
+div#theme-workspace fieldset fieldset.wrapper{ font-size: 10px; margin-top: 5px;}
+div#theme-workspace fieldset.inline label{ display: inline;}
+div#theme-workspace fieldset.inline div.form-item{ display: inline; padding: 0 5px;}
+
+
+div#theme-workspace div.canvas{ background: #ffffff; border: 1px #cccccc; border-style: none solid solid none; margin: 10px 160px 10px 10px; position: relative;}
+div#theme-workspace div.scroll{ overflow: scroll; position: relative; height: 400px;}
+
+div#theme-workspace div.grid{ background: url('../images/ruler.gif'); left: 0px; position: absolute; top: 0px; width: 100%; height: 100%;}

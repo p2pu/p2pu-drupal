@@ -1,0 +1,12 @@
+<?php
+// $Id: themesettingsapi.module,v 1.9 2008/04/03 19:13:23 johnalbin Exp $
+
+/**
+ * Implementation of hook_init().
+ */
+function themesettingsapi_init() {
+  // Conditionally load on admin/build/themes/settings/* and admin/settings/admin
+  if (arg(0) == 'admin' && (arg(4) != '' && arg(2) == 'themes' && arg(3) == 'settings' && arg(1) == 'build' || arg(2) == 'admin' && arg(1) == 'settings')) {
+    include_once('./'. drupal_get_path('module', 'themesettingsapi') .'/themesettingsapi.admin.inc');
+  }
+}

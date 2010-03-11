@@ -1,0 +1,41 @@
+# LANGUAGE translation of Drupal (email_verify.module)
+# Copyright 2007 Daniel Bonniot <bonniot@users.sf.net>
+# Generated from file: email_verify.module,v 1.4 2006/01/29 18:34:04 dbr
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2007-01-07 10:07+0100\n"
+"PO-Revision-Date: 2007-01-07 10:26+0100\n"
+"Last-Translator: Daniel Bonniot <bonniot@users.sf.net>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: email_verify.module:19
+msgid "Verifies thoroughly email addresses during registration and account edition."
+msgstr "Vérifie avec soin the adresses email pendant l'inscription et la modification du compte"
+
+#: email_verify.module:61
+msgid "Email host %host does not seem valid"
+msgstr "Le serveur mail %host ne semble pas valide"
+
+#: email_verify.module:92
+msgid "Email host %host does not seem valid, it does not answer"
+msgstr "Le serveur mail %host ne semble pas valide, il ne répond pas"
+
+#: email_verify.module:126
+msgid "Email address %mail does not seem valid"
+msgstr "L'adresse email %mail ne semble pas valide"
+
+#: email_verify.module:137
+msgid "Verify user emails"
+msgstr "Vérifie les emails des utilisateurs"
+
+#: email_verify.module:86;113;120;125;0
+msgid "email_verify"
+msgstr "Vérification d'email"
+

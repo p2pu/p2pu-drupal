@@ -1,0 +1,12 @@
+@CHARSET "UTF-8";
+
+body{ background: #fff; color: #222222;}
+
+a{ color: #000099;}
+a:hover{ color: #0000ee;}
+
+div.messages{ background: #FFFFDD; color: #bb6600; border-color: #cccc00;}
+div.error{ background: #aa0000; color: #fff; border-color: #aa0000;}
+
+div.tabs ul.primary,
+div.tabs ul.primary li{ border-color: #BBBBBB;}

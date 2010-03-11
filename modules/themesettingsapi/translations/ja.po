@@ -1,0 +1,40 @@
+# $Id: ja.po,v 1.1 2008/04/02 10:02:53 imagine Exp $
+#
+# Japanese translation of Drupal (themesettingsapi)
+# Copyright 2008 0829 <hixarg+0829@gmail.com>
+# Generated from files:
+#  themesettingsapi.info,v 1.5 2007/09/23 08:51:36 johnalbin Exp
+#  themesettingsapi.admin.inc,v 1.1.2.2 2007/11/25 18:43:22 johnalbin Exp
+#  themesettingsapi.module,v 1.7.2.3 2007/12/10 06:49:41 johnalbin Exp
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Drupal 6.x\n"
+"POT-Creation-Date: 2008-02-20 19:46+0900\n"
+"PO-Revision-Date: 2008-02-20 19:52+0900\n"
+"Last-Translator: 0829 <hixarg+0829@gmail.com>\n"
+"Language-Team: DRUPAL*DRUPAL <hixarg+0829@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#: modules/themesettingsapi/themesettingsapi.info:0
+msgid "Theme Settings API"
+msgstr "テーマ設定 API"
+
+#: modules/themesettingsapi/themesettingsapi.info:0
+msgid "Allows themes to add options to the themes settings page"
+msgstr "テーマの設定ページにオプションを追加可能にします。"
+
+#: modules/themesettingsapi/themesettingsapi.admin.inc:57
+msgid "Use administration theme when configuring theme settings"
+msgstr "テーマ設定ページで管理用テーマを使用する"
+
+#: modules/themesettingsapi/themesettingsapi.admin.inc:58
+msgid "If this setting is disabled or if using the \"System default\" theme, the theme settings pages will be switched to the theme being configured."
+msgstr "この設定が無効の場合、または管理用テーマに \"システムデフォルト\" が選択されている場合、各テーマの個別設定ページにはそれぞれのテーマが適用されます。"
+
+#: modules/themesettingsapi/themesettingsapi.module:0
+msgid "themesettingsapi"
+msgstr "テーマ設定 API"

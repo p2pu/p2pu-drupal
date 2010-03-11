@@ -1,0 +1,68 @@
+# $Id: de.po,v 1.1.2.2 2008/06/06 23:57:32 quicksketch Exp $
+# -----------------------------------------------------------------------------
+# Japanese translation of Drupal (extlink.module)
+#
+# Copyright (c) 2006-2007  Drupal Japan  ( http://drupal.jp/ )  /
+#                          Drupal Nippon ( http://drupon.org/ ) /
+#                          Takafumi      ( jp.drupal@imagine **reverse order**)
+#
+# Generated from file:
+#  extlink.module,v 1.1 2007/03/29 00:31:55 quicksketch
+#  extlink.info,v 1.1 2007/03/29 00:31:55 quicksketch
+#
+# -----------------------------------------------------------------------------
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2007-05-06 23:09+0900\n"
+"Last-Translator: Mario Perabo <mario@einfach-trainieren.de>\n"
+"Language-Team: Einfach-Trainieren.de <mario@einfach-trainieren.de>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"Project-Id-Version: \n"
+"PO-Revision-Date: \n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: extlink.module:9
+msgid "External links"
+msgstr "Externe Links"
+
+#: extlink.module:10
+msgid "Alter the display of external links on the site."
+msgstr "Darstellung externer Links auf der Site ändern."
+
+#: extlink.module:32
+msgid "Add icon to external links"
+msgstr "Icon zu externen Links hinzufügen"
+
+#: extlink.module:35
+msgid "Places an !icon icon next to external links."
+msgstr "Plaziert dieses !icon Icon neben den externen Links."
+
+#: extlink.module:40
+msgid "Open external links in a new window"
+msgstr "Externe Links in neuem Fenster öffnen"
+
+#: extlink.module:43
+msgid "Should all external links be opened in a new window?"
+msgstr "Sollten alle externen Links in einem neuen Fenster geöffnet werden?"
+
+#: extlink.info:0
+msgid "External Links"
+msgstr "Externe Links"
+
+#: extlink.info:0
+msgid "Adds icon next to external links on the site."
+msgstr "Fügt ein Icon neben dem externen Link auf der Site hinzu."
+
+#: extlink.info:0
+msgid "User interface"
+msgstr "Benutzeroberfläche"
+
+#: extlink.info:0
+msgid "extlink"
+msgstr "extlink"
+

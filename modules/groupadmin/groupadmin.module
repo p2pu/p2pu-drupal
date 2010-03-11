@@ -1,0 +1,530 @@
+<?php
+// $Id: groupadmin.module,v 1.2.2.3 2010/02/23 12:37:39 netgenius Exp $
+
+/********************************************************
+
+groupadmin module for Drupal 6.x
+
+Original development by: netgenius.co.uk
+Commercial support is available from www.netgenius.co.uk
+Contact: drupal(a)netgenius.co.uk
+
+*********************************************************/
+
+/*****
+// --------- Debug support functions, can be removed when debug is finished ---------
+function _groupadmin_set_message($message = NULL, $type = 'status', $repeat = TRUE) {
+  //return; ///////////////////////////////
+  return drupal_set_message($message, $type, $repeat);
+}
+
+if (!function_exists('sprint_r')) {
+  function sprint_r($var) {
+    //return; ///////////////////////////////
+    ob_start();
+    print_r($var);
+    $ret = ob_get_contents();
+    ob_end_clean();
+    return $ret;
+ }
+}
+// END --------- Debug support functions, can be removed when debug is finished ---------
+*****/
+
+
+/**
+ * Check if a required function exists, display an error message if not.
+ */
+function _groupadmin_checkfunc($func_name) {
+  if(is_callable($func_name))  return true;
+
+  $msg = sprintf('[groupadmin] %s: %s()', t('Required function does not exist'), $func_name);
+  drupal_set_message($msg, 'error');
+  return false;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function groupadmin_perm() {
+  return array('administer groupadmin');
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function groupadmin_menu() {
+  $items = array();
+  $items['admin/settings/groupadmin'] = array('title' => 'Group admin',
+                                             'access arguments' => array('administer groupadmin'),
+                                             'description' => 'Configure the groupadmin module.',
+                                             'page callback' => 'drupal_get_form',
+                                             'page arguments' => array('_groupadmin_settings'),
+                                            );
+
+  $items['og/users/%/groupadmin'] = array('title' => 'Manage members',
+                                          'access callback' => '_groupadmin_check_access',
+                                          'access arguments' => array(2),
+                                          'description' => 'Manage members.',
+                                          'page callback' => 'drupal_get_form',
+                                          'page arguments' => array('_groupadmin_manage', 2),
+                                          'type' => MENU_LOCAL_TASK,
+                                         );
+
+  $items['og/groupadmin/%/%/%/%'] = array('title' => 'Update group membership',
+                                          'access callback' => '_groupadmin_check_access',
+                                          'access arguments' => array(2),
+                                          'page callback' => 'drupal_get_form',
+                                          'page arguments' => array('_groupadmin_confirm', 2, 3, 4, 5),
+                                          'type' => MENU_CALLBACK,
+                                         );
+  return $items;
+}
+
+
+/**
+ * Get/set config. values.
+ */
+function _groupadmin_settings($form_state) {
+  // Array of variable names with their default values.
+
+  $fields = array(  'n_help_node'=> array('Node (nid) to use for help text.', 0),
+                    'x_help_collapsed'=> array('Help sections default to collapsed.', 0),
+                    'n_pagelen'=> array('Page length for user list.', 10),
+                    'x_hide_email'=> array('Do not display/search email addresses.', 0),
+                    'x_noredirect'=> array('Do not hide/redirect standard <em>Add Members</em> page.', 0),
+                 );
+
+  // Load settings
+  $configname = 'groupadmin';
+  $config = variable_get($configname, FALSE);
+
+  // Being called to read an individual setting?
+  if (is_string($form_state)) {
+    $key = $form_state;
+    return isset($config[$key])? $config[$key] : $fields[$key][1];
+  }
+
+  // Set a flag if we are currently posting the form.
+  $posting = (count($form_state['post']) != 0);
+
+  // Build the form...
+  $elements = array(
+                    'n' => array('#type'=>'textfield', '#size'=>4),
+                    'x' => array('#type'=>'checkbox'),
+                    's' => array('#type'=>'textfield', '#size'=>80)
+                  );
+
+
+  foreach($fields as $key => $field) {
+    if ($posting)
+      $value = $config[$key] = $form_state['post'][$key];
+    else
+      $value = isset($config[$key])? $config[$key] : $field[1];
+
+    $element = &$form[$key];
+    $k = explode('_', $key, 2);
+    $element = $elements[$k[0]];
+    $element['#title'] = ucfirst(t(str_replace('_', ' ', $k[1])));
+    $element['#description'] = t($field[0]);
+    $element['#value'] = $element['#default_value'] = $value;
+  }
+
+  $form['submit'] = array('#type' => 'submit', '#title' => $key, '#value' => 'save');
+
+  // If the form has been posted, clear path cache and save current config.
+  if($posting) {
+    // We *need* to clear path cache when x_noredirect changes, but we do it anyway.
+    drupal_clear_path_cache();
+    variable_set($configname, $config);
+    drupal_set_message('Saved.');
+  }
+  return $form;
+}
+
+/**
+ * Generate a list of users who can be added or removed and links.
+ * See also Druapl user_search - http://api.drupal.org/api/function/user_search/6
+ */
+function _groupadmin_manage_getuserlist($gid, $search = null, $filter = 'all') {
+
+  $output = '';
+  // At iofc, node profile module is used to store users' first and last names, so things are more complicated.
+  $use_node_profile = db_table_exists('content_type_contact_profile');
+  // Get config setting to decide whther to display and search email addresses.
+  $show_email = !_groupadmin_settings('x_hide_email');
+
+  // Query to get all records (using firstname/lastname)
+  if ($use_node_profile)
+  {
+    $headers[] = array('data' => t('last name'),    'field' => 'field__lastname_value', 'sort' => 'asc');
+    $headers[] = array('data' => t('first name'),   'field' => 'field__firstname_value');
+    $query_all = 'SELECT p.field__lastname_value, p.field__firstname_value, u.name, mail, u.uid FROM {users} u, {node} n, {content_type_contact_profile} p';
+    $query_all .= ' WHERE u.uid = n.uid AND n.vid = p.vid AND n.type = "contact_profile"';
+  }
+  else
+  {
+    // NB: WHERE TRUE is needed so that we may append 'AND ...' below.
+    $query_all = 'SELECT u.name, u.uid, mail, u.uid FROM {users} u WHERE TRUE';
+  }
+
+  // Add headers for user-name and email address.
+  $headers[] = array('data' => t('user name'),    'field' => 'name');
+  if ($show_email) {
+    $headers[] = array('data' => t('email address'),'field' => 'mail');
+  }
+  else
+  {
+    // Remove email column from the query.
+    $query_all = str_replace('mail, ', '', $query_all);
+  }
+
+  // Header for 'add/remove' links.
+  $headers[] = array('data' => t('manage'));
+
+  // Filter the query for users in (or not in) og_uid with 'is_active' status.
+  $query_filter = ' AND u.uid %s (SELECT uid FROM {og_uid} WHERE nid = %d AND is_active != 0)';
+
+  // Build a query depending on $filter setting.
+  switch($filter) {
+    case 'all':
+      $query = $query_all;
+      $status_query = 'SELECT is_active FROM {og_uid} WHERE uid = %d AND nid = %d LIMIT 1';
+      $action = '';
+      break;
+
+    case 'members':
+      $query = $query_all . sprintf($query_filter, 'IN', $gid);
+      $action = 'remove';
+      break;
+
+    case 'non-members':
+      $query = $query_all . sprintf($query_filter, 'NOT IN', $gid);
+      $action = 'add';
+      break;
+
+    default:
+      // Shouldn't happen!
+      return _groupadmin_manage_getuserlist($list, $search, 'all');
+   }
+
+  // If a text-search is specified, add conditions to search on all relevant fields.
+  if ($search) {
+    $search = '%%'.db_escape_string(strtolower($search)).'%%';
+    // If display email is allowed, search both name and email address, otherwise only name.
+    if ($show_email) {
+      $condition1 = sprintf('LOWER(name) LIKE "%s" OR LOWER(mail) LIKE "%s"', $search, $search);
+    }
+    else {
+      $condition1 = sprintf('LOWER(name) LIKE "%s"', $search);
+    }
+
+    // If using node profile, add conditions to search on first and last name stored there.
+    if ($use_node_profile) {
+      $condition2 = sprintf('LOWER(p.field__firstname_value) LIKE "%s" OR LOWER(p.field__lastname_value) LIKE "%s"', $search, $search);
+      $query .= sprintf(' AND (%s OR %s)', $condition1, $condition2);
+    }
+    else {
+      $query .= sprintf(' AND (%s)', $condition1);
+    }
+  }
+
+  // Finally, add ORDER criteria based on user selection.
+  $query .= tablesort_sql($headers);
+
+  // Do the main query.
+  $pagelen = _groupadmin_settings('n_pagelen');
+  $result = pager_query($query, $pagelen);
+  //_groupadmin_set_message('QUERY: ' . $query . ' --- affected rows: ' . db_affected_rows());
+
+  $members = array();
+  // Set up some things needed for the loop below (for minor performance improvement)...
+  $linkt = array('add'=>t('add'), 'remove'=>t('remove'));
+
+  while ($account = db_fetch_array($result)) {
+    //_groupadmin_set_message('account: ' . sprint_r($account));
+
+    // When filter=='all', we need to check if user is currently added or not.
+    // @todo Should probably be done in the main query by fetching the needed column, but done this way for simplicity.
+    if($filter == 'all') {
+      $is_active = db_result(db_query($status_query, $account['uid'], $gid));
+      $action = ($is_active == 0)? 'add':'remove';
+    }
+
+    // Show name and current status as links to add/remove.
+    $linktext = $linkt[$action];
+
+    if ($use_node_profile) {
+      $full_name = $account['field__firstname_value'].' '.$account['field__lastname_value'];
+    }
+    else {
+      $full_name = $account['name'];
+    }
+
+    $url = sprintf('og/groupadmin/%d/%s/%d/%s', $gid, $action, $account['uid'], urlencode($full_name));
+    $account['name'] = l($account['name'], sprintf('user/%d', $account['uid']));
+    $account['lstatus'] = l($linktext, $url);
+    // Append row to the output list.
+    unset($account['uid']); $members[] = $account;
+  }
+
+  // Output header and data.
+  $output .= theme('table', $headers, $members);
+  // Add pager links.
+  $output .= theme('pager', $pagelen);
+  return $output;
+}
+
+/**
+ * Handle session data, used to store "sticky" values on the search form.
+ */
+function _groupadmin_session($key, $value = null) {
+  global $_SESSION;
+  $session_data = &$_SESSION['groupadmin'];
+  if (!isset($session_data))  $session_data = array();
+  if ($value === null)
+    $value = $session_data[$key];
+  elseif ($value === 'DELETE')
+    unset($session_data[$key]);
+  else
+    $session_data[$key] = $value;
+  return $value;
+}
+
+/**
+ * Load and statically cache the group node.
+ */
+function _groupadmin_node_load($gid) {
+  static $node;
+  if ($node->gid != $gid)  $node = node_load($gid);
+  return $node;
+}
+
+/**
+ * Check that current user can perform admin tasks for this group.
+ */
+function _groupadmin_check_access($gid) {
+  global $user;
+  $node = _groupadmin_node_load($gid);
+  // special cases for site-admin or group-node author ("group manager");
+  if ($user->uid == 1 || $node->uid == $user->uid)  return TRUE;
+
+  // Otherwise, check via og function (safe call).
+  $access = _groupadmin_checkfunc('og_is_group_admin')? og_is_group_admin($node) : FALSE;
+  //if (!$access)  drupal_access_denied(); // Don't do this here - use a wrapper function if needed.
+  return $access;
+}
+
+/**
+ * Submit function for the search form.
+ */
+function _groupadmin_manage_submit($form, &$form_state) {
+  //_groupadmin_set_message('submit formstate: ' . sprint_r($form_state));
+
+  $action = $form_state['clicked_button']['#value'];
+  $values = $form_state['values'];
+  $sticky = $form_state['values']['sticky'];
+
+  //_groupadmin_set_message('submit action: ' . $action);
+  switch($action) {
+    case $values['members']:
+      $sticky['filter'] = 'members';
+      break;
+    case $values['non-members']:
+      $sticky['filter'] = 'non-members';
+      break;
+    case $values['all']:
+      $sticky['filter'] = 'all';
+      break;
+  }
+
+  // Save 'sticky' values in session.
+  $sticky['search'] = $values['search'];
+  _groupadmin_session('sticky', $sticky);
+}
+
+/**
+ * Build the search form.
+ */
+function _groupadmin_manage(&$form_state, $gid = 0) {
+  //_groupadmin_set_message('formstate: ' . sprint_r($form_state));
+  //_groupadmin_set_message('post: ' . sprint_r($form_state['post']));
+  //_groupadmin_set_message('values: ' . sprint_r($form_state['values']));
+
+  if (!_groupadmin_check_access($gid)) return;
+
+  // Show name of Group.
+  $node = _groupadmin_node_load($gid);
+  $form['info'] = array('#type' => 'markup', '#value' => sprintf('<h4>%s</h4>', $node->title));
+
+  // Show help text.
+  $help = _groupadmin_get_helptext();
+  if ($help) {
+    $form['help'] = array('#type' => 'fieldset', '#title' => t('Help'), '#collapsible' => 1,
+                  '#collapsed' => _groupadmin_settings('x_help_collapsed'));
+    $form['help']['info'] = array('#type' => 'markup', '#value' => $help);
+  }
+
+  // Retrieve 'sticky' form settings (from session) - search and filter settings.
+  $sticky = _groupadmin_session('sticky');
+  if(!$sticky['filter'])  $sticky['filter'] = 'non-members';
+  //_groupadmin_set_message('reloaded sticky: ' . sprint_r($sticky));
+
+  // Get the list of users for display (don't bother if we're just processing an earlier submit.)
+  if(!count($form_state['post']))
+    $users_html = _groupadmin_manage_getuserlist($gid, $sticky['search'], $sticky['filter']);
+
+  // Build the form.
+  $form['filter'] = array('#type' => 'fieldset', '#title' => t('Search for users'));
+
+  $desc = _groupadmin_settings('x_hide_email')? 'Partial name.' : 'Partial name or email address.';
+  $form['filter']['search'] = array(
+                       '#type' => 'textfield', '#size' => 20,
+                       //'#title' => t('Search for users'),
+                       '#description' => t($desc),
+                       '#default_value' => $sticky['search'],
+                       );
+  $form['filter']['non-members']=  array('#type' => 'submit', '#value' => t('non-members'));
+  $form['filter']['members'] =   array('#type' => 'submit', '#value' => t('members'));
+  $form['filter']['all'] =          array('#type' => 'submit', '#value' => t('all'));
+  $form['users_html'] =   array('#type' => 'markup', '#value' => $users_html);
+
+  // Indicate the current filter by setting adding an asterisk to the button text.
+  $form['filter'][$sticky['filter']]['#value'] .= ' *';
+  return $form;
+}
+
+/**
+ * Build a form for confirmation of add/remove ($action).
+ */
+function _groupadmin_confirm(&$form_state, $gid, $action, $uid, $name) {
+  //_groupadmin_set_message('formstate: ' . sprint_r($form_state));
+  if (!_groupadmin_check_access($gid)) return;
+
+  // Load the group node (needed to get title.)
+  $group_node = _groupadmin_node_load($gid);
+  // Get the user name if not specified.
+  if (!$name) {
+    $account = user_load($uid);
+    $name = $account->name;
+  }
+
+  $form['action'] = array('#type' => 'value', '#value' => $action);
+  $form['gid'] = array('#type' => 'value', '#value' => $gid);
+  $form['uid'] = array('#type' => 'value', '#value' => $uid);
+
+  $fmt = t('Are you sure you want to') . ' <strong>%s</strong> <em>%s</em> %s <em>%s</em>?<br>';
+  $tofrom = ($action == 'add')? 'to' : 'from';
+  $message = sprintf($fmt, t($action), $name, t($tofrom), $group_node->title);
+
+  $form['message'] = array('#type' => 'markup', '#value' => $message);
+  $form['confirm'] = array(
+                          '#type' => 'submit', '#value' => t($action),
+                          '#submit' => array('_groupadmin_update_execute'),
+                          );
+  $form['cancel'] = array(
+                          '#type' => 'submit', '#value' => t('cancel'),
+                          '#submit' => array('_groupadmin_update_cancel'),
+                          );
+  return $form;
+}
+
+/**
+ * Cancel an update - just return to the 'Manage Mailing List' page.
+ */
+function _groupadmin_update_cancel($form, &$form_state) {
+  //_groupadmin_set_message('formstate: ' . sprint_r($form_state));
+  extract($form_state['values']);
+  $form_state['redirect'] = sprintf('og/users/%d/groupadmin', $gid);
+}
+
+/**
+ * Process an update - add or remove member via calls to OG internals.
+ * Note: OG functions used do not provide access control nor error checking, so we need to do that here.
+ */
+function _groupadmin_update_execute($form, &$form_state) {
+  //_groupadmin_set_message('formstate: ' . sprint_r($form_state));
+
+  // Get $action, $uid, $gid
+  extract($form_state['values']);
+  if (!_groupadmin_check_access($gid)) return;
+  $form_state['redirect'] = sprintf('og/users/%d/groupadmin', $gid);
+
+  if ($action == 'add') {
+    // Just in case, make sure user is not already a member.
+    if (og_is_group_member($gid, FALSE, $uid))  return;
+    og_save_subscription($gid, $uid, array('is_active' => 1));
+    drupal_set_message('Member added to group.');
+
+    // Remove the search critieria now, and reset to view "members"
+    // (this was a request by Edward, not sure if it should be generic, maybe config option.)
+    $sticky['filter'] = 'members';
+    _groupadmin_session('sticky', $sticky);
+  }
+  elseif ($action == 'remove') {
+    // Just in case, make sure user is already a member.
+    if (! og_is_group_member($gid, FALSE, $uid))  return;
+    og_delete_subscription($gid, $uid);
+    drupal_set_message('Member removed from group.');
+  }
+}
+
+/**
+ * Get helptext stored in nodes (or translated versions.)
+ */
+function _groupadmin_get_helptext($topic = '') {
+  global $language;
+  $vname = $topic? 'n_help_node'.$topic : 'n_help_node';
+  $nid = _groupadmin_settings($vname);
+  if (!$nid)  return;
+
+  $tnid = db_result(db_query_range("SELECT nid from {node} WHERE tnid=%d AND language='%s'", $nid, $language->language, 0, 1));
+  $node = node_load($tnid? $tnid:$nid);
+  $object = node_prepare($node);
+	return $object->body;
+}
+
+/**
+* Implementation of hook_menu_alter().
+* If enabled, remove the standard "add users" tab.
+*/
+function groupadmin_menu_alter(&$items) {
+  if (!_groupadmin_settings('x_noredirect')) {
+    unset($items['og/users/%node/add_user']);
+  }
+}
+
+/**
+ * If enabled, redirect standard "add users" form to groupadmin.
+ * We have removed the "add users" menu tab - if we get here it must be via some other link,
+ * so redirect to the groupadmin page instead.
+ */
+
+function _groupadmin_alter_og_add_users(&$form, $form_state) {
+  if (!_groupadmin_settings('x_noredirect')) {
+    $gid = $form['gid']['#value'];
+    drupal_goto('og/users/'.$gid.'/groupadmin');
+  }
+  return;
+}
+
+/**
+ * Implement hook_form_alter to process forms we need to deal with.
+ * @todo Now only one form, so this could be simplified, but left this way for possible future needs.
+ */
+function groupadmin_form_alter(&$form, $form_state, $form_id) {
+  //$dbmsg = sprintf('form_alter, id: %s --- form: %s', $form_id, sprint_r($form));
+  //_groupadmin_set_message($dbmsg);
+
+  // Define an array of form_ids for forms we want to modify.
+  $forms = array('og_add_users');
+  // If this is not one of the forms we want to process, quick exit.
+  if (!in_array($form_id, $forms))  return;
+
+  // Call the matching form alter function.
+  $alter = '_groupadmin_alter_' . $form_id;
+  if (_groupadmin_checkfunc($alter))  $alter($form, $form_state);
+  return;
+}
+
+// --- End --- Drupal docs advise NOT closing the PHP tags.

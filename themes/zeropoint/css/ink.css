@@ -1,0 +1,63 @@
+#top_bg {
+	background: transparent url(../images/ink/fill_top.png) 0 100% repeat-x;
+}
+#top_left {
+	background: transparent url(../images/ink/fill_top_left.png) 0 100% no-repeat;
+}
+#top_right {
+	background: transparent url(../images/ink/fill_top_right.png) 100% 100% no-repeat;
+}
+
+a, a:link,
+.title, .title a,
+.node .terms,
+#aggregator .news-item .categories, #aggregator .source, #aggregator .age,
+#forum td .name,
+div.admin-panel .description {
+	color: #005a84;
+}
+
+.block.themed-block {
+	background: #fff url(../images/ink/fill_block.png) 0 100% repeat-x;
+}
+
+h1, h2, h3 {
+	color: #005a84;
+}
+
+
+#navlist.links a, #navlinks ul li a {
+	background-color: #005a84;
+}
+#navlist li a:hover, #navlinks ul li a:hover {
+	color: #fff !important;
+	background-color: #407697 !important;
+}
+
+/* SUCKERFISHMENU */
+
+body.sfish #navlinks ul li.expanded a {
+	background: #005a84 url(../images/nav-down.png) 95% 50% no-repeat;
+}
+body.sfish #navlinks li ul a:link, 
+body.sfish #navlinks li ul a:visited {
+	background: #457fa2;
+	border-left: 1px solid #4987ab;
+	border-top: 1px solid #4987ab;
+	border-right: 1px solid #005a84;
+	border-bottom: 1px solid #005a84;
+}
+body.sfish #navlinks ul.menu li ul.menu li.expanded a,
+body.sfish #navlinks ul.menu li ul.menu li ul.menu li.expanded a,
+body.sfish #navlinks ul.menu li ul.menu li ul.menu li ul.menu li.expanded a {
+	background: #457fa2 url(../images/nav-right.png) 100% 50% no-repeat;
+}
+body.sfish #navlinks ul.menu li li.expanded ul.menu a, 
+body.sfish #navlinks ul.menu li li.expanded ul.menu li.expanded ul.menu a,
+body.sfish #navlinks ul.menu li li.expanded ul.menu li.expanded ul.menu li.expanded ul.menu a {
+	background: #457fa2;
+}
+body.sfish #navlinks li ul a:hover {
+	color: #fff !important;
+	background-color: #3f7494 !important;
+}

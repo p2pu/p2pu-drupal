@@ -1,0 +1,124 @@
+# Hungarian translation of viewfield (6.x-1.x-dev)
+# Copyright (c) 2009 by the Hungarian translation team
+# Generated from files:
+#  viewfield.module,v 1.16 2009/04/07 19:03:41 darrenoh
+#  viewfield.info,v 1.3 2009/04/07 18:42:31 darrenoh
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: viewfield (6.x-1.x-dev)\n"
+"POT-Creation-Date: 2009-04-28 09:56+0200\n"
+"PO-Revision-Date: 2009-02-08 19:15+0100\n"
+"Last-Translator: Balogh Zoltán\n"
+"Language-Team: Hungarian http://forditas.mindworks.hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#: viewfield.module:17
+msgid "View field"
+msgstr "View field"
+
+#: viewfield.module:18 viewfield.info:0
+msgid "Defines a field type that displays the contents of a view in a node."
+msgstr "Olyan mezőtípust ad, amely megjelenít egy nézetet a tartalomban."
+
+#: viewfield.module:40
+msgid "Allowed views"
+msgstr "Megengedett nézetek"
+
+#: viewfield.module:43
+msgid "Only allow users to select from the specified views. If no views are selected, all will be available. If only one is selected, the user will only be able to specify the arguments."
+msgstr ""
+"A felhasználó csak a megadott nézetek közül választhat. Ha "
+"nincsenek nézetek kiválasztva, akkor mindegyik elérhető. Ha csak "
+"egy van kiválasztva, akkor a felhasználó csak az argumentumokat "
+"adhatja meg."
+
+#: viewfield.module:47
+msgid "Use a common default value for all nodes if the user does not override it on the node form."
+msgstr ""
+"Használjon egy közös, alapértelmezett értéket minden "
+"tartalomhoz, ha a felhasználó nem írja felül a tartalom űrlapon."
+
+#: viewfield.module:53
+msgid "Enable token replacements."
+msgstr "Vezérjel-helyettesítések engedélyezése."
+
+#: viewfield.module:54
+msgid "Token replacements will affect the site performance if using a Viewfield inside a View that has <em>field</em> row style."
+msgstr ""
+"A vezérjel-helyettesítések befolyásolják a webhely "
+"teljesítményét, ha egy nézetmező olyan nézetben van használva, "
+"melynek <em>mező</em> sorstílusa van."
+
+#: viewfield.module:66
+msgid "Multiple views are not supported if force default is enabled."
+msgstr ""
+"A többszörös nézetek nem támogatottak, ha az alapértelmezés "
+"kényszerítése engedélyezett."
+
+#: viewfield.module:159
+msgid "Force default"
+msgstr "Alapértelmezés kényszerítése"
+
+#: viewfield.module:161
+msgid "If checked, the user will not be able to change anything about the view at all. It will not even be shown on the edit node page. The default value will be used instead."
+msgstr ""
+"Bekapcsolva a felhasználó nem tud semmit sem megváltoztatni a "
+"nézeten. Ezért nem fog megjelenni a tartalom szerkesztő oldalon "
+"sem. Az alapértelmezett értékek lesznek felhasználva."
+
+#: viewfield.module:231
+msgid "Override default"
+msgstr "Alapértelmezés felülírása"
+
+#: viewfield.module:248;257
+msgid "Arguments"
+msgstr "Argumentumok"
+
+#: viewfield.module:257;265
+msgid "arguments"
+msgstr "argumentumok"
+
+#: viewfield.module:264
+msgid "Provide a comma separated list of arguments to pass to the view. These arguments will be passed to EACH selected view. If an argument contains commas or double quotes, enclose it in double quotes. Replace double quotes that are part of the argument with pairs of double quotes."
+msgstr ""
+"A nézetnek átadandó argumentumok vesszővel elválasztott listája. "
+"Ezek az argumentumok lesznek átadva MINDEN kiválasztott nézetnek. "
+"Ha egy argumentum vesszőt, vagy idézőjelet tartalmaz, azt "
+"idézőjelek közé kell zárni. Ki kell cserélni az argumentum "
+"részét képező idézőjeleket idézőjel párokra."
+
+#: viewfield.module:271
+msgid "Use the syntax [token] if you want to insert a replacement pattern."
+msgstr "[token] formátumban helyettesítési minta is használható."
+
+#: viewfield.module:272
+msgid "You may use %nid for the node id of the current node. %author for the node author and %viewer for user viewing the node."
+msgstr ""
+"Használható a %nid, mint az aktuális tartalom azonosítója, az "
+"%author, mint a tartalom szerzője, illetve a %viewer, mint a "
+"tartalmat megtekintő felhasználó."
+
+#: viewfield.module:314
+msgid "none"
+msgstr "nincs"
+
+#: viewfield.module:326
+msgid "Token replacement patterns"
+msgstr "Vezérjel helyettesítési minták"
+
+#: viewfield.module:0
+msgid "viewfield"
+msgstr "viewfield"
+
+#: viewfield.info:0
+msgid "Viewfield"
+msgstr "Viewfield"
+
+#: viewfield.info:0
+msgid "CCK"
+msgstr "CCK"
+

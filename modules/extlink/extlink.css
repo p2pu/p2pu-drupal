@@ -1,0 +1,10 @@
+span.ext {
+  background: url(extlink.png) right center no-repeat;
+  padding-right: 12px;
+  zoom: 1;
+}
+span.mailto {
+  background: url(mailto.png) right center no-repeat;
+  padding-right: 12px;
+  zoom: 1;
+}

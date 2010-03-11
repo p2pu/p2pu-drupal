@@ -1,0 +1,1608 @@
+<?php
+// $Id: mass_contact.module,v 1.9.2.10 2008/10/23 20:14:12 oadaeh Exp $
+
+/**
+ * @file
+ * This is the main code file for the Mass Contact module. This module
+ * enables users to contact multiple users through selected roles.
+ */
+
+
+/* ************************************************
+ *
+ * Functions for implementing various Drupal hooks.
+ *
+ * ***********************************************/
+
+
+/**
+ * Implementation of hook_help().
+ *   http://api.drupal.org/api/function/hook_help
+ *
+ * @param path
+ *   The menu router path the help is being requested for.
+ * @param arg
+ *   An array that corresponds to the return of the arg() function.
+ * @return
+ *   A localized string containing the help text.
+ */
+function mass_contact_help($path, $arg) {
+  $output = '';
+  switch ($path) {
+    case 'admin/help#mass_contact':
+      $output .= '<p><b>'. t('Related tasks:') .'</b><br /><ol>'.
+        '<li>'. l('Set Permissions', 'admin/user/permissions', array('fragment' => 'module-mass_contact')) .'</li>'.
+        '<li>'. l('List current categories', 'admin/build/mass_contact') .'</li>'.
+        '<li>'. l('Add new category', 'admin/build/mass_contact/add') .'</li>'.
+        '<li>'. l('Configure the module', 'admin/build/mass_contact/settings') .'</li>'.
+        '<li>'. l('Send mass e-mail', 'mass_contact') .'</li></ol>';
+      $output .= '<p>'. t('The Mass Contact module is simply a modified version of the core contact module. It works opposite the latter, in that it allows site moderators (or anyone with permission), to <a href="mass_contact">send mass e-mail</a> to a set role or group of roles or even to all registered users.') .'</p>';
+      $output .= '<p>'. t("The sender's own address may be placed in the 'To:' field and all recipients placed in the 'BCC:' field, or the recipients simply placed in the 'To:' field. Note that the latter option leaves all recipients open to abuse due to their e-mail addresses being visible to all other recipients.") .'</p>';
+      $output .= '<p>'. t("The e-mail may be sent as HTML or plain text, and may include a single binary file attachment (if permitted by admin).") .'</p>';
+      $output .= '<p>'. t("At the option of the sender (if permitted by admin), a node may be created in order to keep a record of the e-mail sent. Do not try to send e-mails by creating nodes; it will not work.") .'</p>';
+      $output .= '<p>'. t('Users may opt-out of mass mailings on their profile page, but this may be overridden by the admin (or respected). The entire opt-out system may be disabled on the <a href="@settings-page">settings page</a>.', array('@settings-page' => url('admin/build/mass_contact/settings'))) .'</p>';
+      $output .= '<p>'. t('Make sure to add at least one category and configure the module before trying to send mass e-mails.') .'</p>';
+
+      if (!module_exists('menu')) {
+        $menu_note = t('The menu item can be customized and configured only once the menu module has been <a href="@modules-page">enabled</a>.', array('@modules-page' => url('admin/build/modules')));
+      }
+      else {
+        $menu_note = '';
+      }
+
+      $output .= '<p>'. t('The Mass Contact module also adds a <a href="@menu-settings">menu item</a> (disabled by default) to the navigation block.', array('@menu-settings' => url('admin/build/menu'))) .' '. $menu_note .'</p>';
+      return ($output);
+  }
+}  //  End of mass_contact_help().
+
+
+
+/**
+ * Implementation of hook_perm().
+ *   http://api.drupal.org/api/function/hook_perm
+ *
+ * @return
+ *   An array of permissions strings.
+ */
+function mass_contact_perm() {
+  $permissions = array('administer mass contact', 'choose whether to archive mass contact messages', 'create mass_contact content', 'send mass contact attachments', 'send mass contact e-mails');
+
+  $result = db_query('SELECT category FROM {mass_contact}');
+  while ($category = db_fetch_object($result)) {
+    $permissions[] = 'send to users in the '. $category->category .' category';
+  }
+
+  return $permissions;
+}  //  End of mass_contact_perm().
+
+
+
+/**
+ * Implementation of hook_menu().
+ *   http://api.drupal.org/api/function/hook_menu
+ *
+ * @return
+ *   An array of menu items.
+ */
+function mass_contact_menu() {
+  $items = array();
+
+  $items['admin/build/mass_contact'] = array(
+    'title'            => 'Mass Contact form',
+    'page callback'    => 'mass_contact_admin_categories',
+    'access arguments' => array('administer mass contact'),
+    'description'      => 'Create a mass contact form and set up categories for the form to use.',
+  );
+  $items['admin/build/mass_contact/list'] = array(
+    'title'            => 'Category list',
+    'page callback'    => 'mass_contact_admin_categories',
+    'access arguments' => array('administer mass contact'),
+    'type'             => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/build/mass_contact/add'] = array(
+    'title'            => 'Add category',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('mass_contact_admin_edit'),
+    'access arguments' => array('administer mass contact'),
+    'type'             => MENU_LOCAL_TASK,
+    'weight'           => 1,
+  );
+  $items['admin/build/mass_contact/edit'] = array(
+    'title'            => 'Edit Mass Contact category',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('mass_contact_admin_edit'),
+    'access arguments' => array('administer mass contact'),
+    'type'             => MENU_CALLBACK,
+  );
+  $items['admin/build/mass_contact/delete'] = array(
+    'title'            => 'Delete Mass Contact category',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('mass_contact_admin_delete'),
+    'access arguments' => array('administer mass contact'),
+    'type'             => MENU_CALLBACK,
+  );
+  $items['admin/build/mass_contact/settings'] = array(
+    'title'            => 'Settings',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('mass_contact_admin_settings'),
+    'access arguments' => array('administer mass contact'),
+    'type'             => MENU_LOCAL_TASK,
+    'weight'           => 2,
+  );
+  $items['mass_contact'] = array(
+    'title'            => 'Mass Contact',
+    'page callback'    => 'mass_contact_site_page',
+    'access arguments' => array('send mass contact e-mails'),
+    'type'             => MENU_SUGGESTED_ITEM,
+  );
+
+  return $items;
+}  //  End of mass_contact_menu().
+
+
+
+/**
+ * Implementation of hook_menu_alter().
+ *   http://api.drupal.org/api/function/hook_menu_alter
+ *
+ * @param callbacks
+ *   Associative array of menu router definitions returned from hook_menu().
+ */
+function mass_contact_menu_alter(&$callbacks) {
+  $callbacks['node/add/mass-contact']['access callback'] = FALSE;
+}
+
+
+
+/**
+ * Implementation of hook_user().
+ *   http://api.drupal.org/api/function/hook_user
+ *
+ * Provide form element to opt in to content mailouts.
+ *
+ * @param type
+ *   The type of action being performed.
+ * @param edit
+ *   The array of form values submitted by the user.
+ * @param user
+ *   The user object on which the operation is being performed.
+ * @param category
+ *   The active category of user information being edited.
+ */
+function mass_contact_user($type, $edit, &$user, $category = NULL) {
+  if (variable_get('mass_contact_optout_d', 0) == 1) {
+    if ($type == 'register' || ($type == 'form' && $category == 'account')) {
+      $form['mail'] = array(
+        '#type'        => 'fieldset',
+        '#title'       => t('Group e-mail settings'),
+        '#weight'      => 5,
+        '#collapsible' => TRUE,
+      );
+      $form['mail']['mass_contact_optout'] = array(
+        '#type'          => 'checkbox',
+        '#title'         => t('Opt-out of Mass E-mails'),
+        '#default_value' => $edit['mass_contact_optout'],
+        '#description'   => t('Allows you to opt-out of group e-mails from privileged users. Note that site administrators are able to include you in mass e-mails even if you choose not to enable this feature, and the ability to opt-out may be removed by the administrator at any time.'),
+      );
+      return $form;
+    }
+    elseif ($type == 'validate') {
+      return array('mass_contact_optout' => $edit['mass_contact_optout']);
+    }
+  }
+}  //  End of mass_contact_user().
+
+
+
+/**
+ * Implementation of hook_nodeapi().
+ *   http://api.drupal.org/api/function/hook_nodeapi
+ *
+ * @param node
+ *   The node the action is being performed on.
+ * @param op
+ *   The action that is being performed.
+ * @param a3
+ *   The third argument. Has specific functions based on $op.
+ * @param a4
+ *   The fourth argument. Has specific functions based on $op.
+ * @return
+ *   Varies depending on the operation.
+ */
+function mass_contact_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  // If this is a delete operation and the node type is mass_contact, then
+  // check for an attachment and delete the file if one exists.
+  if ($op == 'delete' && $node->type == 'mass_contact') {
+    // Look for the key phrase in the node body. If it exists, then there is
+    // an attachment that needs to be deleted.
+    $offset1 = strpos($node->body, '<hr>Attachment:<br />');
+    if ($offset1) {
+
+      // Using the saved attachment path, find the file name.
+      $file_location       = variable_get('mass_contact_attachment_location', file_directory_path() .'/mass_contact_attachments');
+      $file_location_start = strpos($node->body, $file_location, $offset1);
+      if ($file_location_start) {
+        // Get the attachment file name.
+        $file_location_end = strpos($node->body, '">', $file_location_start);
+        $file_path_name    = drupal_substr($node->body, $file_location_start, $file_location_end - $file_location_start);
+
+        if (file_exists($file_path_name)) {
+          if (!file_delete($file_path_name)) {
+            // Log an error.
+            watchdog('mass_contact', 'There was an error deleting the attachment.', WATCHDOG_ERROR);
+          }
+        }
+        else {
+          // Log an error.
+          watchdog('mass_contact', 'There was an indication of an attachment within the node body, but the attachment was not found. If the attachment is still there, it was NOT deleted.', WATCHDOG_WARNING);
+        }
+      }
+      else {
+        // Log an error.
+        watchdog('mass_contact', 'There was an indication of an attachment within the node body, but the attachment path was not found. If the attachment is still there, it was NOT deleted.', WATCHDOG_WARNING);
+      }
+    }
+  }
+}  //  End of mass_contact_nodeapi().
+
+
+
+/**
+ * Implementation of hook_mail().
+ *   http://api.drupal.org/api/function/hook_mail
+ *
+ * @param key
+ *   An identifier of the mail.
+ * @param message
+ *   An array to be filled in. Keys in this array include: mail_id, to, subject, body, from & headers.
+ * @param params
+ *   An arbitrary array of parameters set by the caller to drupal_mail.
+ */
+function mass_contact_mail($key, &$message, $params) {
+  if (!empty($params['headers'])) {
+    foreach ($params['headers'] as $key => $value) {
+      $message['headers'][$key] = $params['headers'][$key];
+    }
+  }
+  $message['subject'] = $params['subject'];
+  $message['body']    = $params['body'];
+}  //  End of mass_contact_mail().
+
+
+
+/* **************************************************************
+ *
+ * Functions for listing, adding/editing and deleting categories.
+ *
+ * *************************************************************/
+
+
+
+/**
+ * Displays a list of all existing categories.
+ *
+ * @return
+ *   The themed page listing all current categories.
+ */
+function mass_contact_admin_categories() {
+  $result = db_query("SELECT cid, category, recipients, selected FROM {mass_contact}");
+  $rows = array();
+  while ($category = db_fetch_object($result)) {
+    $rolenamesa = array();
+    foreach (explode(',', $category->recipients) as $rid) {
+      $namerole = db_fetch_object(db_query("SELECT name FROM {role} WHERE rid = %d", $rid));
+      $rolenamesa[] = ($namerole->name);
+    }
+    $rolenames = implode(', ', $rolenamesa);
+    $rows[] = array($category->category, $rolenames, ($category->selected ? t('Yes') : t('No')), l(t('edit'), 'admin/build/mass_contact/edit/'. $category->cid), l(t('delete'), 'admin/build/mass_contact/delete/'. $category->cid));
+  }
+  $header = array(t('Category'), t('Recipients'), t('Selected'), array('data' => t('Operations'), 'colspan' => 2));
+
+  return theme('table', $header, $rows);
+}  //  End of mass_contact_admin_categories().
+
+
+
+/**
+ * Displays a form to add or edit a category.
+ *
+ * @param form_state
+ *   A keyed array containing the current state of the form.
+ * @param cid
+ *   The id of the category to edit. If NULL, then add rather than edit.
+ * @return
+ *   An associative array that defines the form to be built.
+ */
+function mass_contact_admin_edit($form_state, $cid = NULL) {
+  $edit = array('category' => '', 'recipients' => '', 'selected' => '', 'cid' => '');
+
+  if (arg(3) == "edit" && $cid > 0) {
+    $edit = db_fetch_array(db_query("SELECT * FROM {mass_contact} WHERE cid = %d", $cid));
+  }
+
+  $form['category'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Category'),
+    '#maxlength'     => 255,
+    '#default_value' => $edit['category'],
+    '#description'   => t("Will appear in the subject of your e-mail as [category]."),
+    '#required'      => TRUE,
+  );
+
+  // get all roles except anonymous
+  $allroles = db_query("SELECT rid, name FROM {role} WHERE rid > %d", 1);
+  while ($roleobj = db_fetch_object($allroles)) {
+    $onerid = $roleobj->rid;
+    $onename = $roleobj->name;
+    $rolesarray[$onerid] = $onename;
+  }
+
+  $form['recipients'] = array(
+    '#type'          => 'checkboxes',
+    '#title'         => t('Roles to receive e-mail'),
+    '#options'       => $rolesarray,
+    '#default_value' => explode(',', $edit['recipients']),
+    '#description'   => t('These roles will be added to the mailing list. Note: if you check "authenticated users", other roles will not be added, as they will receive the e-mail anyway.'),
+  );
+
+  $form['selected_categories'] = array(
+    '#type'        => 'fieldset',
+    '#title'       => t('Selected categories'),
+  );
+  $form['selected_categories']['selected'] = array(
+    '#type'          => 'select',
+    '#title'         => t('Selected'),
+    '#options'       => array('0' => t('No'), '1' => t('Yes')),
+    '#default_value' => $edit['selected'],
+    '#description'   => t('Set this to <em>Yes</em> if you would like this category to be selected by default.'),
+  );
+  $form['selected_categories']['reset_selected'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Reset all previously selected categories to <em>No</em>.'),
+  );
+
+  $form['cid'] = array(
+    '#type'  => 'value',
+    '#value' => $edit['cid'],
+  );
+
+  $form['submit'] = array(
+    '#type'  => 'submit',
+    '#value' => t('Save'),
+  );
+
+  return $form;
+}  //  End of mass_contact_admin_edit().
+
+
+
+/**
+ * Validates the submission of the category add/edit page.
+ *
+ * @param form
+ *   An associative array containing the structure of the form.
+ * @param form_state
+ *   A keyed array containing the current state of the form.
+ */
+function mass_contact_admin_edit_validate($form, &$form_state) {
+  $recipients = $form_state['values']['recipients'];
+  foreach ($recipients as $checkr) {
+    if ($checkr > 1) {
+      return;
+    }
+  }
+  form_set_error('recipients', t('You must check one or more recipients.'));
+}  //  End of mass_contact_admin_edit_validate().
+
+
+
+/**
+ * Processes the adding or editing of a category.
+ *
+ * @param form
+ *   An associative array containing the structure of the form.
+ * @param form_state
+ *   A keyed array containing the current state of the form.
+ */
+function mass_contact_admin_edit_submit($form, &$form_state) {
+  if ($form_state['values']['reset_selected']) {
+    // Unselect all other contact categories.
+    db_query("UPDATE {mass_contact} SET selected = %d", 0);
+  }
+
+  // Remove 0s for unselected roles, convert to csv.
+  $recipients = $form_state['values']['recipients'];
+
+  // If all authenticated users are already added, remove all roles.
+  if ($recipients[2] == 2)  {
+    foreach ($recipients as $checkr) {
+      if ($checkr > 2) {
+        $recipients[$checkr] = 0;
+      }
+    }
+  }
+
+  // Remove roles that were not selected.
+  foreach ($recipients as $recip) {
+    if ($recip != 0) {
+      $newformrec[] = $recip;
+    }
+  }
+  $form_state['values']['recipients'] = implode(',', $newformrec);
+
+  if (!isset($form_state['values']['reply'])) {
+    $form_state['values']['reply'] = '';
+  }
+  if (!isset($form_state['values']['weight'])) {
+    $form_state['values']['weight'] = 0;
+  }
+
+  if (arg(3) == 'add') {
+    db_query("INSERT INTO {mass_contact} (category, recipients, reply, weight, selected) VALUES ('%s', '%s', '%s', %d, %d)", $form_state['values']['category'], $form_state['values']['recipients'], $form_state['values']['reply'], $form_state['values']['weight'], $form_state['values']['selected']);
+    drupal_set_message(t('Category %category has been added.', array('%category' => $form_state['values']['category'])));
+    watchdog('mass_contact', 'Mass Contact form: category %category added.', array('%category' => $form_state['values']['category']), WATCHDOG_NOTICE, l(t('view'), 'admin/build/mass_contact'));
+  }
+  else {
+    db_query("UPDATE {mass_contact} SET category = '%s', recipients = '%s', reply = '%s', weight = %d, selected = %d WHERE cid = %d", $form_state['values']['category'], $form_state['values']['recipients'], $form_state['values']['reply'], $form_state['values']['weight'], $form_state['values']['selected'], $form_state['values']['cid']);
+    drupal_set_message(t('Category %category has been updated.', array('%category' => $form_state['values']['category'])));
+    watchdog('mass_contact', 'Mass Contact form: category %category updated.', array('%category' => $form_state['values']['category']), WATCHDOG_NOTICE, l(t('view'), 'admin/build/mass_contact'));
+  }
+
+  $form_state['redirect'] = 'admin/build/mass_contact';
+}  //  End of mass_contact_admin_edit_submit().
+
+
+
+/**
+ * Displays a form to select a category to delete.
+ *
+ * @param form_state
+ *   A keyed array containing the current state of the form.
+ * @param cid
+ *   The id of the category to delete.
+ * @return
+ *   A confirmation form for the user to acknowledge.
+ */
+function mass_contact_admin_delete($form_state, $cid = NULL) {
+  if ($info = db_fetch_object(db_query("SELECT category FROM {mass_contact} WHERE cid = %d", $cid))) {
+    $form['category'] = array(
+      '#type'  => 'value',
+      '#value' => $info->category,
+    );
+
+    return confirm_form($form, t('Are you sure you want to delete %category?', array('%category' => $info->category)), 'admin/build/mass_contact', t('This action cannot be undone.'), t('Delete'), t('Cancel'));
+  }
+  else {
+    drupal_set_message(t('Category not found.'), 'error');
+    drupal_goto('admin/build/mass_contact');
+  }
+}  //  End of mass_contact_admin_delete().
+
+
+
+/**
+ * Does the actual deleting of the category.
+ *
+ * @param form
+ *   An associative array containing the structure of the form.
+ * @param form_state
+ *   A keyed array containing the current state of the form.
+ */
+function mass_contact_admin_delete_submit($form, &$form_state) {
+  db_query("DELETE FROM {mass_contact} WHERE cid = %d", arg(4));
+  drupal_set_message(t('Category %category has been deleted.', array('%category' => $form_state['values']['category'])));
+  watchdog('mass_contact', 'Mass Contact form: category %category deleted.', array('%category' => $form_state['values']['category']));
+  $form_state['redirect'] = 'admin/build/mass_contact';
+}  //  End of mass_contact_admin_delete_submit().
+
+
+
+/* ***********************************************
+ *
+ * Functions for handling administtative settings.
+ *
+ * **********************************************/
+
+
+
+/**
+ * Administration settings form.
+ *
+ * @param form_state
+ *   A keyed array containing the current state of the form.
+ * @return
+ *   An associative array that defines the form to be built.
+ */
+function mass_contact_admin_settings($form_state) {
+  $form['mass_contact_form_information'] = array(
+    '#type'          => 'textarea',
+    '#title'         => t('Additional information for Mass Contact form'),
+    '#default_value' => variable_get('mass_contact_form_information', t('Send e-mails using the following form.')),
+    '#description'   => t('Information to show on the <a href="@form">Mass Contact page</a>.', array('@form' => url('mass_contact'))),
+  );
+
+  $form['mass_contact_character_set'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Character set'),
+    '#default_value' => variable_get('mass_contact_character_set', ''),
+    '#description'   => t('You may specify an alternate character set to use when sending e-mails. If left blank, the default of UTF-8 will be used. If you are unsure of what to put here, then leave it blank. Caution: setting this may not get you the results you desire. Other modules may come along and change that value after it has been set by this module.'),
+  );
+
+  $form['mass_contact_default_sender'] = array(
+    '#type'        => 'fieldset',
+    '#title'       => t('Default sender information'),
+    '#description' => t('If anything is specified in here, it is used in place of the "Your name" and "Your e-mail address" fileds when sending the mass e-mail. Otherwise, the sender\'s name and e-mail address will be the default values. You must fill in both values, if you want to specify a default.'),
+  );
+  $form['mass_contact_default_sender']['mass_contact_default_sender_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Default sender name'),
+    '#default_value' => variable_get('mass_contact_default_sender_name', ''),
+    '#size' => 60,
+    '#maxlength' => 128,
+    '#description' => t('The optional user name to send e-mail as. Replaces the "Your name" value when sending mass e-mails.'),
+  );
+  $form['mass_contact_default_sender']['mass_contact_default_sender_email'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Default sender e-mail address'),
+    '#default_value' => variable_get('mass_contact_default_sender_email', ''),
+    '#size' => 60,
+    '#maxlength' => 128,
+    '#description' => t('The optional user e-mail address to send e-mail as. Replaces the "Your e-mail address" value when sending mass e-mails.'),
+  );
+  $form['mass_contact_default_sender']['mass_contact_default_sender_changable'] = array(
+    '#type'        => 'checkbox',
+    '#title'       => t('Allow the sender to change these values.'),
+    '#default_value' => variable_get('mass_contact_default_sender_changable', 0),
+    '#description' => t('If checked, gives the sender the ability of changing the default sender and e-mail address when creating the message. If unchecked, the fields will be disabled.'),
+  );
+
+  $form['mass_contact_recipient_limit'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Maximum number of recipients before splitting up the e-mail'),
+    '#size'          => 4,
+    '#default_value' => variable_get('mass_contact_recipient_limit', 0),
+    '#description'   => t('This is a workaround for server-side limits on the number of recipients in a single mail message. Once this limit is reached, the recipient list will be broken up and multiple copies of the message will be sent out until all recipients receive the mail. Setting this to "0" will turn off this feature.'),
+    '#required'      => TRUE,
+  );
+
+  $form['mass_contact_optout_d'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Allow users to opt-out of mass e-mails.'),
+    '#default_value' => variable_get('mass_contact_optout_d', 0),
+  );
+
+  $form['mass_contact_bcc_d'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Send as BCC (hide recipients) by default.'),
+    '#default_value' => variable_get('mass_contact_bcc_d', 1),
+  );
+  $form['mass_contact_bcc_d_override'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Allow sender to override BCC setting.'),
+    '#default_value' => variable_get('mass_contact_bcc_d_override', 1),
+  );
+
+  $form['mass_contact_category_override'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Include category in subject line.'),
+    '#default_value' => variable_get('mass_contact_category_override', 1),
+  );
+
+  $form['mass_contact_supplemental_texts'] = array(
+    '#type'        => 'fieldset',
+    '#title'       => t('Supplemental message body texts'),
+    '#description' => t('You may specify additional text to insert before and/or after the message text of every mass e-mail that is sent.'),
+  );
+  if (module_exists('token')) {
+    $form['mass_contact_supplemental_texts']['mass_contact_message_prefix'] = array(
+      '#type'          => 'textarea',
+      '#title'         => t('Text to be prepended to all messages'),
+      '#default_value' => variable_get('mass_contact_message_prefix', t('[user-name] has sent you a group e-mail from [site-name].')),
+      '#description'   => t('The text you specify above will be added to all e-mails sent out. The text will be placed before the message text enetered in by the sender.'),
+    );
+    $form['mass_contact_supplemental_texts']['mass_contact_message_suffix'] = array(
+      '#type'          => 'textarea',
+      '#title'         => t('Text to be appended to all messages'),
+      '#default_value' => variable_get('mass_contact_message_suffix', t('')),
+      '#description'   => t('The text you specify above will be added to all e-mails sent out. The text will be placed after the message text enetered in by the sender.'),
+    );
+    $form['mass_contact_supplemental_texts']['mass_contact_replacement_tokens'] = array(
+      '#type'        => 'fieldset',
+      '#title'       => t('Replacement tokens'),
+      '#collapsible' => TRUE,
+      '#collapsed'   => TRUE,
+      '#description' => t('You may use any of the following replacements tokens for use in the prefix and/or suffix texts above.'),
+    );
+    $form['mass_contact_supplemental_texts']['mass_contact_replacement_tokens']['token_help'] = array(
+      '#value' => theme('token_help', 'global'),
+    );
+  }
+  else {
+    $form['mass_contact_supplemental_texts']['mass_contact_message_prefix'] = array(
+      '#type'          => 'textarea',
+      '#title'         => t('Text to be prepended to all messages'),
+      '#default_value' => variable_get('mass_contact_message_prefix', t('You were sent a group e-mail from !site.', array('!site' => url(NULL, array('absolute' => TRUE))))),
+      '#description'   => t('The text you specify above will be added to all e-mails sent out. The text will be placed before the message text enetered in by the sender.'),
+    );
+    $form['mass_contact_supplemental_texts']['mass_contact_message_suffix'] = array(
+      '#type'          => 'textarea',
+      '#title'         => t('Text to be appended to all messages'),
+      '#default_value' => variable_get('mass_contact_message_suffix', t('')),
+      '#description'   => t('The text you specify above will be added to all e-mails sent out. The text will be placed after the message text enetered in by the sender.'),
+    );
+  }
+
+  $form['mass_contact_html_d'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Send as HTML by default.'),
+    '#default_value' => variable_get('mass_contact_html_d', 1),
+    '#description'   => t('This will use the default input filter as specified on the <a href="@formats_settings">Input formats settings</a> page.', array('@formats_settings' => url('admin/settings/filters'))),
+  );
+  $form['mass_contact_html_d_override'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Allow sender to override HTML setting.'),
+    '#default_value' => variable_get('mass_contact_html_d_override', 1),
+  );
+
+  $form['mass_contact_attachment_location'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Attachment location'),
+    '#default_value' => variable_get('mass_contact_attachment_location', file_directory_path() .'/mass_contact_attachments'),
+    '#description'   => t('If a copy of the message is saved as a node, this is the file path where to save the attachment so it can be viewed later.'),
+  );
+
+  $form['mass_contact_nodecc_d'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Save a copy as a node by default.'),
+    '#default_value' => variable_get('mass_contact_nodecc_d', 1),
+  );
+  $form['mass_contact_nodecc_d_override'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Allow sender to override node copy setting.'),
+    '#default_value' => variable_get('mass_contact_nodecc_d_override', 1),
+  );
+
+  $form['mass_contact_hourly_threshold'] = array(
+    '#type'          => 'select',
+    '#title'         => t('Hourly threshold'),
+    '#options'       => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 40, 50, 75, 100)),
+    '#default_value' => variable_get('mass_contact_hourly_threshold', 3),
+    '#description'   => t('The maximum number of Mass Contact form submissions a user can perform per hour.'),
+  );
+
+  return system_settings_form($form);
+}  //  End of mass_contact_admin_settings().
+
+
+
+/**
+ * Validates the administration settings form.
+ *
+ * @param form
+ *   An associative array containing the structure of the form.
+ * @param form_state
+ *   A keyed array containing the current state of the form.
+ */
+function mass_contact_admin_settings_validate($form, &$form_state) {
+  if (!empty($form_state['values']['mass_contact_default_sender_name'])) {
+    if (empty($form_state['values']['mass_contact_default_sender_email'])) {
+      form_set_error('mass_contact_default_sender_email', t('If you are going to specify default user settings, you must specify both a user name and a user e-mail address.'));
+    }
+  }
+
+  if (!empty($form_state['values']['mass_contact_default_sender_email'])) {
+    if (empty($form_state['values']['mass_contact_default_sender_name'])) {
+      form_set_error('mass_contact_default_sender_name', t('If you are going to specify default user settings, you must specify both a user name and a user e-mail address.'));
+    }
+  }
+}  //  End of mass_contact_admin_settings_validate().
+
+
+
+/* ********************************
+ *
+ * Functions for sending a message.
+ *
+ * *******************************/
+
+
+
+/**
+ * The mail page
+ *
+ * @return
+ *   Either an error, if flood control is active and triggered, or a
+ *   rendered form.
+ */
+function mass_contact_site_page() {
+  global $user;
+
+  if (!user_access('administer mass contact') && !flood_is_allowed('mass_contact', variable_get('mass_contact_hourly_threshold', 3))) {
+    $output = t("You cannot send more than %number messages per hour. Please try again later.", array('%number' => variable_get('mass_contact_hourly_threshold', 3)));
+  }
+  else {
+    $output = drupal_get_form('mass_contact_mail_page');
+  }
+
+  return $output;
+}  //  End of mass_contact_site_page().
+
+
+
+/**
+ * Generates the main Mass Contact mail form.
+ *
+ * @param form_state
+ *   A keyed array containing the current state of the form.
+ * @return
+ *   An associative array that defines the form to be built.
+ */
+function mass_contact_mail_page($form_state) {
+  global $user;
+  $categories = array();
+  $default_category = array();
+  $default_category_name = '';
+
+  $result = db_query("SELECT cid, category, selected FROM {mass_contact} ORDER BY weight, category");
+  while ($category = db_fetch_object($result)) {
+    if (user_access('send to users in the '. $category->category .' category')) {
+      $categories[$category->cid] = $category->category;
+
+      if ($category->selected) {
+        $default_category[] = $category->cid;
+        $default_category_name = $category->category;
+      }
+    }
+  }
+
+  if (count($categories) == 1) {
+    $default_category[] = $category->cid;
+    $default_category_name = $category->category;
+  }
+
+  if (count($categories) > 0) {
+    $form['#attributes'] = array(
+      'enctype' => "multipart/form-data"
+    );
+    $form['#token'] = $user->name . $user->mail;
+    $form['contact_information'] = array(
+      '#value' => filter_xss_admin(variable_get('mass_contact_form_information', t('Send an e-mail message using the contact form below.')))
+    );
+
+    $mass_contact_default_sender_name = variable_get('mass_contact_default_sender_name', '');
+    if ($mass_contact_default_sender_name) {
+      if (variable_get('mass_contact_default_sender_changable', 0)) {
+        $form['name'] = array(
+          '#type'          => 'textfield',
+          '#title'         => t('Your name'),
+          '#maxlength'     => 255,
+          '#default_value' => $mass_contact_default_sender_name,
+          '#required'      => TRUE,
+        );
+      }
+      else {
+        $form['name'] = array(
+          '#type'  => 'item',
+          '#title' => t('Your name'),
+          '#value' => $mass_contact_default_sender_name,
+        );
+      }
+    }
+    else {
+      $form['name'] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Your name'),
+        '#maxlength'     => 255,
+        '#default_value' => $user->uid ? $user->name : '',
+        '#required'      => TRUE,
+      );
+    }
+
+    $mass_contact_default_sender_email = variable_get('mass_contact_default_sender_email', '');
+    if ($mass_contact_default_sender_email) {
+      if (variable_get('mass_contact_default_sender_changable', 0)) {
+        $form['mail'] = array(
+          '#type'          => 'textfield',
+          '#title'         => t('Your e-mail address'),
+          '#maxlength'     => 255,
+          '#default_value' => $mass_contact_default_sender_email,
+          '#required'      => TRUE,
+        );
+      }
+      else {
+        $form['mail'] = array(
+          '#type'  => 'item',
+          '#title' => t('Your e-mail address'),
+          '#value' => $mass_contact_default_sender_email,
+        );
+      }
+    }
+    else {
+      $form['mail'] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Your e-mail address'),
+        '#maxlength'     => 255,
+        '#default_value' => $user->uid ? $user->mail : '',
+        '#required'      => TRUE,
+      );
+    }
+
+    if ((count($categories) > 1) || !isset($default_category)) {
+      // Display a choice when one is needed.
+      $form['cid'] = array(
+        '#type'          => 'select',
+        '#title'         => t('Category'),
+        '#default_value' => $default_category,
+        '#options'       => $categories,
+        '#required'      => TRUE,
+        '#multiple'      => TRUE,
+      );
+    }
+    else {
+      // Otherwise, just use the default category.
+      $form['cid'] = array(
+        '#type'  => 'value',
+        '#value' => $default_category, // This must be an array, otherwise the code breaks upon submit.
+      );
+      $form['cid-info'] = array(
+        '#type'  => 'markup',
+        '#value' => '<p>Sending to all users subscribed to the '. $default_category_name .' category.</p>',
+      );
+    }
+
+    if (variable_get('mass_contact_optout_d', 0) == 1) {
+      // Allow to override or respect opt-outs if admin, otherwise use default.
+      if (user_access('administer mass contact')) {
+        $form['optout'] = array(
+          '#type'          => 'checkbox',
+          '#title'         => t('Respect user opt-outs.'),
+          '#default_value' => 1,
+        );
+      }
+      else {
+        $form['optout'] = array(
+          '#type'          => 'hidden',
+          '#default_value' => 1,
+        );
+      }
+    }
+
+    // Check if the user can override the BCC setting.
+    if (variable_get('mass_contact_bcc_d_override', 1)) {
+      $form['bcc'] = array(
+        '#type'          => 'checkbox',
+        '#title'         => t('Send as BCC (hide recipients).'),
+        '#default_value' => variable_get('mass_contact_bcc_d', 1),
+      );
+    }
+    // If not, then just display the BCC info.
+    else {
+      $form['bcc'] = array(
+        '#type'  => 'value',
+        '#value' => variable_get('mass_contact_bcc_d', 1),
+      );
+      $form['bcc-info'] = array(
+        '#type'  => 'markup',
+        '#value' => '<p>'. (variable_get('mass_contact_bcc_d', 1) ? t('Recipients will be hidden.') : t('Recipients will NOT be hidden.')) .'</p>',
+      );
+    }
+
+    $form['subject'] = array(
+      '#type'      => 'textfield',
+      '#title'     => t('Subject'),
+      '#maxlength' => 255,
+      '#required'  => TRUE,
+    );
+
+    $form['body_filter']['message'] = array(
+      '#type'     => 'textarea',
+      '#title'    => t('Message'),
+      '#rows'     => 12,
+      '#required' => TRUE,
+    );
+
+    $form['body_filter']['format'] = filter_form(FILTER_FORMAT_DEFAULT);
+
+    if (user_access('send mass contact attachments')) {
+      $form['attachment'] = array(
+        '#type'  => 'file',
+        '#title' => t('Attachment'),
+        '#size'  => 40,
+      );
+    }
+
+    // Check if the user can override the HTML setting.
+    if (variable_get('mass_contact_html_d_override', 1)) {
+      $form['html'] = array(
+        '#type'          => 'checkbox',
+        '#title'         => t('Send as HTML.'),
+        '#default_value' => variable_get('mass_contact_html_d', 1),
+        '#description'   => t('This will use the settings for the default input filter. More information about what is available is on the <a href="@formats_settings">Input formats</a> page.', array('@formats_settings' => url('filter/tips'))),
+      );
+    }
+    // If not, then just display the HTML info.
+    else {
+      $form['html'] = array(
+        '#type'  => 'value',
+        '#value' => variable_get('mass_contact_html_d', 1),
+      );
+      $form['html-info'] = array(
+        '#type'  => 'markup',
+        '#value' => '<p>'. (variable_get('mass_contact_html_d', 1) ? t('The message will be sent as HTML.') : t('The message will be sent as plain text.')) .'</p>',
+      );
+    }
+
+    // We do not allow anonymous users to send themselves a copy because it
+    // can be abused to spam people.
+    if ($user->uid) {
+      $form['copy'] = array(
+        '#type'   => 'checkbox',
+        '#title'  => t('Send yourself a copy.'),
+        '#weight' => $i,
+      );
+    }
+
+    if (user_access('choose whether to archive mass contact messages')) {
+      // Check if the user can override the node copy setting.
+      if (variable_get('mass_contact_nodecc_d_override', 1)) {
+        $form['nodecc'] = array(
+          '#type'          => 'checkbox',
+          '#title'         => t('Save a copy as a node.'),
+          '#default_value' => variable_get('mass_contact_nodecc_d', 1),
+        );
+      }
+      // If not, then do it or not based on the administrative setting.
+      else {
+        $form['nodecc'] = array(
+          '#type'          => 'hidden',
+          '#default_value' => variable_get('mass_contact_nodecc_d', 1),
+        );
+      }
+    }
+    // If not, then do it or not based on the administrative setting.
+    else {
+      $form['nodecc'] = array(
+        '#type'          => 'hidden',
+        '#default_value' => variable_get('mass_contact_nodecc_d', 1),
+      );
+    }
+
+/*
+    // Place holder for future use.
+    $form['preview'] = array(
+      '#type' => 'button',
+      '#value' => t('Preview')
+    );
+ */
+    $form['submit'] = array(
+      '#type'  => 'submit',
+      '#value' => t('Send e-mail'),
+    );
+  }
+  else {
+    $form['error'] = array(
+      '#value' => '<p><b>'. t('Either you have not created any categories, or you are not allowed to send to any of the existing categories.') .'<br /><br />'. t('Either create at least one category of users to send to, or contact your system administer for access to the existing categories.') .'</b>',
+    );
+  }
+
+  if (user_access('administer mass contact')) {
+    $form['tasklist'] = array(
+      '#type'        => 'fieldset',
+      '#title'       => t('Related tasks'),
+      '#collapsible' => TRUE,
+      '#collapsed'   => FALSE,
+      '#prefix'      => '<p>',
+    );
+    $form['tasklist']['list'] = array(
+      '#value' => '<p><ol>'.
+        '<li>'. l('Set Permissions', 'admin/user/permissions', array('fragment' => 'module-mass_contact')) .'</li>'.
+        '<li>'. l('List current categories', 'admin/build/mass_contact') .'</li>'.
+        '<li>'. l('Add new category', 'admin/build/mass_contact/add') .'</li>'.
+        '<li>'. l('Configure the module', 'admin/build/mass_contact/settings') .'</li>'.
+        '<li>'. l('Help', 'admin/help/mass_contact') .'</li></ol>',
+    );
+  }
+
+  return $form;
+}  //  End of mass_contact_mail_page().
+
+
+
+/**
+ * Validates the main Mass Contact mail form.
+ *
+ * @param form
+ *   An associative array containing the structure of the form.
+ * @param form_state
+ *   A keyed array containing the current state of the form.
+ */
+function mass_contact_mail_page_validate($form, &$form_state) {
+  if (!$form_state['values']['cid']) {
+    form_set_error('category', t('You must select a valid category.'));
+  }
+
+  if (variable_get('mass_contact_default_sender_changable', 0) == 1 && !valid_email_address($form_state['values']['mail'])) {
+    form_set_error('mass_contact', t('You must enter a valid e-mail address.'));
+  }
+}  //  End of mass_contact_mail_page_validate().
+
+
+
+/**
+ * Processes the main Mass Contact mail form.
+ *
+ * @param form
+ *   An associative array containing the structure of the form.
+ * @param form_state
+ *   A keyed array containing the current state of the form.
+ */
+function mass_contact_mail_page_submit($form, &$form_state) {
+  $bcc        = $form_state['values']['bcc'];
+  $nodecc     = $form_state['values']['nodecc'];
+  $send_error = 0;
+
+  $from_name = ($form_state['values']['name']) ? $form_state['values']['name'] : variable_get('mass_contact_default_sender_name', '');
+  $from_email = ($form_state['values']['mail']) ? $form_state['values']['mail'] : variable_get('mass_contact_default_sender_email', '');
+
+  $boundary_attachment = md5(uniqid(mt_rand()));
+  $boundary_html       = md5(uniqid(mt_rand()));
+  $character_set       = (variable_get('mass_contact_character_set', '')) ? variable_get('mass_contact_character_set', '') : 'UTF-8';
+  $params              = array();
+
+  $body_plain          = '';
+  $body_html           = '';
+  $message             = '';
+//  $message             = array();
+  $message_attachment  = array();
+
+
+  // Set the "Content-Type" header based on the presence or absence of an
+  // attachment and the HTML setting.
+  if ($_FILES['files']['size']['attachment'] > 0) {
+    $params['headers']['Content-Type'] = 'multipart/mixed; boundary="'. $boundary_attachment .'"';
+  }
+  elseif ($form_state['values']['html']) {
+    $params['headers']['Content-Type'] = 'multipart/alternative; boundary="'. $boundary_html .'"';
+  }
+  else {
+    $params['headers']['Content-Type'] = 'text/plain; charset='. $character_set .'; format=flowed';
+  }
+
+
+  // Create the body part(s) of the message.
+  // Create the plain text body. We now always create a plain text body.
+  if ($form_state['values']['html']) {
+    // If this is supposed to be an HTML e-mail, we need to process the plain
+    // text part differently.
+    // Start with the message prefix.
+    if (variable_get('mass_contact_message_prefix', '')) {
+      if (module_exists('token')) {
+        $body_plain .= drupal_html_to_text(check_markup(token_replace(variable_get('mass_contact_message_prefix', '')), $form_state['values']['format'])) ."\n";
+      }
+      else {
+        $body_plain .= drupal_html_to_text(check_markup(variable_get('mass_contact_message_prefix', ''), $form_state['values']['format'])) ."\n";
+      }
+    }
+
+    // Add in the actual message.
+    $body_plain .= drupal_html_to_text(check_markup($form_state['values']['message'], $form_state['values']['format'])) ."\n";
+
+    // End with the message suffix.
+    if (variable_get('mass_contact_message_suffix', '')) {
+      if (module_exists('token')) {
+        $body_plain .= drupal_html_to_text(check_markup(token_replace(variable_get('mass_contact_message_suffix', '')), $form_state['values']['format']));
+      }
+      else {
+        $body_plain .= drupal_html_to_text(check_markup(variable_get('mass_contact_message_suffix', ''), $form_state['values']['format']));
+      }
+    }
+  }
+  // This was not specified as an HTML message.
+  else {
+    // Start with the message prefix.
+    if (variable_get('mass_contact_message_prefix', '')) {
+      if (module_exists('token')) {
+        $body_plain .= wordwrap(token_replace(variable_get('mass_contact_message_prefix', ''))) ."\n\n";
+      }
+      else {
+        $body_plain .= wordwrap(variable_get('mass_contact_message_prefix', '')) ."\n\n";
+      }
+    }
+
+    // Add in the actual message.
+    $body_plain .= wordwrap($form_state['values']['message']) ."\n";
+
+    // End with the message suffix.
+    if (variable_get('mass_contact_message_suffix', '')) {
+      if (module_exists('token')) {
+        $body_plain .= wordwrap(token_replace(variable_get('mass_contact_message_suffix', '')));
+      }
+      else {
+        $body_plain .= wordwrap(variable_get('mass_contact_message_suffix', ''));
+      }
+    }
+  }
+
+
+  // If this is an HTML message, create the HTML body part.
+  if ($form_state['values']['html']) {
+    // Start with the message prefix.
+    if (variable_get('mass_contact_message_prefix', '')) {
+      if (module_exists('token')) {
+        $body_html .= check_markup(token_replace(variable_get('mass_contact_message_prefix', '')), $form_state['values']['format']);
+      }
+      else {
+        $body_html .= check_markup(variable_get('mass_contact_message_prefix', ''), $form_state['values']['format']);
+      }
+    }
+
+    // Add a spacer.
+    $body_html .= '<p>';
+
+    // Add in the actual message.
+    $body_html .= check_markup($form_state['values']['message'], $form_state['values']['format']);
+
+    // Add a spacer.
+    $body_html .= '</p>';
+
+    // End with the message suffix.
+    if (variable_get('mass_contact_message_suffix', '')) {
+      if (module_exists('token')) {
+        $body_html .= check_markup(token_replace(variable_get('mass_contact_message_suffix', '')), $form_state['values']['format']);
+      }
+      else {
+        $body_html .= check_markup(variable_get('mass_contact_message_suffix', ''), $form_state['values']['format']);
+      }
+    }
+  }
+
+
+  // Put it all together.
+  // Check to see if we have either an attachment or an HTML message.
+  if (($_FILES['files']['size']['attachment'] > 0) || $form_state['values']['html']) {
+    // If we have either, we need the following.
+    $message .= "\nThis is a multi-part message in MIME format.\n";
+
+    // Add our boundary, based on the content.
+    if ($_FILES['files']['size']['attachment'] > 0) {
+      $message .= "\n--". $boundary_attachment ."\n";
+    }
+    else {
+      $message .= "\n--". $boundary_html ."\n";
+    }
+
+    // If we have both an attachment and an HTML message, we need the following.
+    if (($_FILES['files']['size']['attachment'] > 0) && $form_state['values']['html']) {
+      $message .= 'Content-Type: multipart/alternative; boundary="'. $boundary_html .'"'."\n";
+      $message .= "\n--". $boundary_html ."\n";
+    }
+
+    // Add the plain text part to the message.
+    $message .= "Content-Type: text/plain; charset=$character_set; format=flowed\n";
+    $message .= "Content-Transfer-Encoding: 7bit\n\n";
+    $message .= $body_plain;
+
+    // If there is an HTML part, add it to the message.
+    if ($form_state['values']['html']) {
+      $message .= "\n--". $boundary_html ."\n";
+      $message .= "Content-Type: text/html; charset=$character_set; format=flowed\n";
+      $message .= "Content-Transfer-Encoding: 7bit\n\n";
+      $message .= $body_html;
+    }
+  }
+  else {
+    // There is neither an attachment nor an HTML message, so this is not a
+    // multipart message, and we just add the plain text part.
+    $message .= $body_plain;
+  }
+
+
+  // For the node copy, we want to handle attachments differently, so we'll
+  // save the message as it currently stands.
+  if (variable_get('mass_contact_nodecc_d', 1)) {
+    $node_message = $message;
+  }
+
+
+  // If there is an attachment, add it.
+  if ($_FILES['files']['size']['attachment'] > 0) {
+//  There is currently no Mime Mail module for D6.
+//  Update: now that there is a D6 version of Mime Mail, I'll have to fix
+//  this, but not right now.
+/*
+    if (module_exists('mimemail') && variable_get('mimemail_alter', 0) == 1) {
+      $message_attachment = array(
+        array(
+          'filepath' => $_FILES['files']['tmp_name']['attachment'],
+          'filename' => $_FILES['files']['name']['attachment'],
+          'filemime' => $_FILES['files']['type']['attachment'],
+        )
+      );
+    }
+    else {
+*/
+      $message_attachment  = "\n--". $boundary_attachment ."\n";
+      $message_attachment .= 'Content-Type: '. $_FILES['files']['type']['attachment'] .'; name="'. basename($_FILES['files']['name']['attachment']) .'"'."\n";
+      $message_attachment .= "Content-Transfer-Encoding: base64\n";
+      $message_attachment .= 'Content-Disposition: attachment; filename="'. basename($_FILES['files']['name']['attachment']) .'"'."\n\n";
+      $message_attachment .= chunk_split(base64_encode(file_get_contents($_FILES['files']['tmp_name']['attachment'])));
+      $message_attachment .= "\n--". $boundary_attachment ."--\n";
+
+      $message            .= $message_attachment;
+//    }
+  }
+
+  $params['body'] = $message;
+
+
+  ///////////////////////////////////////////////////////////////////////////
+  //
+  //  @TODO:  The whole rest of this function needs to be re-thought out and
+  //          refactored, possibly separating some of it out into other
+  //          functions.
+  //
+  ///////////////////////////////////////////////////////////////////////////
+
+/*
+  Task order:
+    Create the e-mail message, starting w/the header
+    Get the list of categories
+    Create the list of recipients
+    Add the list of recipients to the e-mail message
+ */
+
+
+
+  // Load the category information.
+  $cids = array();
+  foreach ($form_state['values']['cid'] as $cid) {
+    $cids[] = $cid;
+  }
+
+  $result = db_query("SELECT * FROM {mass_contact} WHERE cid IN(". db_placeholders($cids) .")", $cids);
+  while ($contact = db_fetch_object($result)) {
+    // Format the subject line.
+    if (variable_get('mass_contact_category_override', 1)) {
+      $params['subject'] = t('[!category] !subject', array('!category' => $contact->category, '!subject' => $form_state['values']['subject']));
+    }
+    else {
+      $params['subject'] = $form_state['values']['subject'];
+    }
+
+    $uidooa    = array();
+
+    // Check for opt-out unless overridden by admin.
+    if (variable_get('mass_contact_optout_d', 0) == 1) {
+      $allow_oo = $form_state['values']['optout'];
+      if ($allow_oo == 1) {
+        $ooresult = db_query("SELECT uid FROM {users} WHERE status <> %d", 0);
+        while ($oouid = db_fetch_object($ooresult)) {
+          $account = user_load(array('uid' => $oouid->uid, 'status' => 1));
+          if ($account->mass_contact_optout) {
+            $uidoo = $oouid->uid;
+            $uidooa[$uidoo] = 1;
+          }
+        }
+      }
+    }
+
+    global $user;
+
+    // Create the recipient list.
+    $recipientouta = array();
+    $roles = explode(',', $contact->recipients);
+    foreach ($roles as $r) {
+      if ($r == 2) { // all users
+        $recipients = db_query("SELECT name, mail, uid FROM {users} WHERE status <> %d AND uid > %d", 0, 0);
+        while ($obj = db_fetch_object($recipients)) {
+          $rname = $obj->name;
+          $rmail = $obj->mail;
+          $ruid = $obj->uid;
+          if ($rname != $user->name && !$uidooa[$ruid]) {
+            $recipientouta[$rname] = $rmail;
+          }
+        }
+        break;
+      }
+      else {
+        // Get from users_roles, then role -> user.
+        $uids = db_query("SELECT ur.uid FROM {users_roles} ur LEFT JOIN {users} u ON ur.uid = u.uid WHERE ur.rid = %d AND u.status <> %d", $r, 0);
+        while ($obj = db_fetch_object($uids))  {
+          $ruid = $obj->uid;
+          $userobj = db_fetch_object(db_query("SELECT name, mail FROM {users} WHERE uid = %d", $ruid));
+          $rname = $userobj->name;
+          $rmail = $userobj->mail;
+          if (isset($uidooa[$ruid])) {
+            if ($rname != $user->name && !$uidooa[$ruid]) {
+              $recipientouta[$rname] = $rmail;
+            }
+          }
+          else {
+            if ($rname != $user->name) {
+              $recipientouta[$rname] = $rmail;
+            }
+          }
+        }
+      }
+    }
+
+    // Check for empty recipient list.
+    if (count($recipientouta) == 0) {
+      drupal_set_message(t('There are no users in this category. The message was not sent.'));
+      $form_state['redirect'] = '';
+    }
+
+    $recipientout = array();
+    // Check for recipient limit and break up recipient list, if necessary.
+    $recip_limit = variable_get('mass_contact_recipient_limit', 0);
+    if (count($recipientouta) > $recip_limit && $recip_limit != 0) {
+      $countrecip = 0;
+      $ccc = 0;
+      foreach ($recipientouta as $rnamea => $rmaila) {
+//        $recipientout[] = $rnamea . " <" . $rmaila . ">";
+        $recipientout[] = $rmaila;
+//        $recipient_temp[] = $rnamea . " <" . $rmaila . ">";
+        $recipient_temp[] = $rmaila;
+        $countrecip = count($recipient_temp);
+
+        if ($countrecip == $recip_limit) {
+          $recipient_send = implode(', ', $recipient_temp);
+
+          // set bcc
+          if ($bcc == 1) { // hidden recipients
+            $params['headers']['Bcc'] = $recipient_send;
+            $to = $from_email;
+          }
+          else {
+            $to = $recipient_send;
+          }
+
+          ++$ccc;
+
+          // Send the e-mail to the recipients:
+/*
+          if (module_exists('mimemail') && variable_get('mimemail_alter', 0) == 1) {
+            $body = implode("\n\n", $params['body']);
+            if ($form_state['values']['html'] == 1) {
+              $success = mimemail($from_email, $to, $params['subject'], $body, NULL, $params['headers'], NULL, $message_attachment);
+            }
+            else {
+              $success = mimemail($from_email, $to, $params['subject'], $body, TRUE, $params['headers'], $body, $message_attachment);
+            }
+          }
+          else {
+*/
+            $success = drupal_mail('mass_contact', 'mail_page', $to, language_default(), $params, $from_email);
+//          }
+
+          if ($success['result']) {
+            drupal_set_message(t('[Success] Send #!ccc: -e-mails', array('!ccc' => $ccc, '-e-mails' => $recipient_send)));
+          }
+          else {
+            ++$send_error;
+          }
+
+          // reset array
+          $recipient_temp = array();
+          $countrecip = 0;
+        }
+      }
+
+      // Send the remainder.
+      if ($countrecip != 0) {
+        $recipient_send = implode(', ', $recipient_temp);
+        if ($bcc == 1) { // hidden recipients
+          $params['headers']['Bcc'] = $recipient_send;
+          $to = $from_email;
+        }
+        else {
+          $to = $recipient_send;
+        }
+
+        ++$ccc;
+
+        // Send the e-mail to the recipients:
+/*
+        if (module_exists('mimemail') && variable_get('mimemail_alter', 0) == 1) {
+          $body = implode("\n\n", $params['body']);
+          if ($form_state['values']['html'] == 1) {
+            $success = mimemail($from_email, $to, $params['subject'], $body, NULL, $params['headers'], NULL, $message_attachment);
+          }
+          else {
+            $success = mimemail($from_email, $to, $params['subject'], $body, TRUE, $params['headers'], $body, $message_attachment);
+          }
+        }
+        else {
+*/
+          $success = drupal_mail('mass_contact', 'mail_page', $to, language_default(), $params, $from_email);
+//        }
+
+        // Send a copy to self, if requested.
+        if ($form_state['values']['copy'] && !$bcc) {
+          drupal_mail('mass_contact', 'user-copy', $from_email, language_default(), $params, $from_email);
+        }
+
+        if ($success['result']) {
+          drupal_set_message(t('[Success] Send Remainder: -e-mails', array('-e-mails' => $recipient_send)));
+        }
+        else {
+          ++$send_error;
+        }
+      }
+      $total_recip = count($recipientout);
+      $recipientout = implode(', ', $recipientout);
+    }
+    else {
+      foreach ($recipientouta as $rnamea => $rmaila) {
+//        $recipientout[] = $rnamea . " <" . $rmaila . ">";
+        $recipientout[] = $rmaila;
+      }
+      $total_recip = count($recipientout);
+      $recipientout = implode(', ', $recipientout);
+
+      // set bcc
+      if ($bcc == 1) { // hidden recipients
+        $params['headers']['Bcc'] = $recipientout;
+        $to = $from_email;
+      }
+      else {
+        $to = $recipientout;
+      }
+
+      // Send the e-mail to the recipients.
+/*
+      if (module_exists('mimemail') && variable_get('mimemail_alter', 0) == 1) {
+        $body = implode("\n\n", $params['body']);
+        if ($form_state['values']['html'] == 1) {
+          $success = mimemail($from_email, $to, $params['subject'], $body, NULL, $params['headers'], NULL, $message_attachment);
+        }
+        else {
+          $success = mimemail($from_email, $to, $params['subject'], $body, TRUE, $params['headers'], $body, $message_attachment);
+        }
+      }
+      else {
+*/
+        $success = drupal_mail('mass_contact', 'mail_page', $to, language_default(), $params, $from_email);
+//      }
+
+      // Send a copy to self, if requested.
+      if ($form_state['values']['copy'] && !$bcc) {
+        drupal_mail('mass_contact', 'user-copy', $from_email, language_default(), $params, $from_email);
+      }
+
+      if ($success['result']) {
+        drupal_set_message(t('[Success] Send Once: -e-mails', array('-e-mails' => $recipientout)));
+      }
+      else {
+        ++$send_error;
+      }
+    }
+
+
+    // Error checking & reporting and node saving.
+    // Check for errors.
+    if ($send_error == 0) {
+      // If there are no errors, check to see if we need to save the message as a node.
+      if ($nodecc == 1) {
+        // Check to see if the node type exists.
+        $check = db_fetch_array(db_query("SELECT * FROM {node_type} WHERE type = 'mass_contact'"));
+        if (!$check) {
+          // If the node type does not exist, create it.
+          _mass_contact_create_node_type();
+        }
+
+        // Add the attachment, if it exists.
+        if ($_FILES['files']['size']['attachment'] > 0) {
+          $file_data  = fread(fopen($_FILES['files']['tmp_name']['attachment'], 'r'), filesize($_FILES['files']['tmp_name']['attachment']));
+
+          $file_dest  = variable_get('mass_contact_attachment_location', file_directory_path() .'/mass_contact_attachments');
+          file_check_directory($file_dest, FILE_CREATE_DIRECTORY);
+
+          $file_path  = file_save_data($file_data, $file_dest .'/'. $_FILES['files']['name']['attachment'], FILE_EXISTS_RENAME);
+          $file_url   = file_create_url($file_path);
+
+          $node_message = '<hr>Attachment:<br />'. l($_FILES['files']['name']['attachment'], $file_url);
+        }
+
+        // Save the message as a node.
+        _mass_contact_save_node($params['subject'], $node_message, $recipientout, $contact->category, $roles, $user->uid);
+        // Get new node id.
+        $nidobj = db_fetch_object(db_query("SELECT nid FROM {node} WHERE type = 'mass_contact' ORDER BY changed DESC"));
+        $nid = $nidobj->nid;
+
+        // Log node creation.
+        watchdog('content', 'Mass Contact content added "%title".', array('%title' => $params['subject']), WATCHDOG_NOTICE, l(t('View.'), "node/$nid"));
+
+        // Inform the user.
+        drupal_set_message(t('A carbon copy has been created as a node.'));
+      }
+
+      // Log the operation.
+      flood_register_event('mass_contact');
+      watchdog('mass_contact', '%name-from sent an e-mail to the %category group.', array('%name-from' => $from_name .' <'. $from_email .'>', '%category' => $contact->category));
+
+      // Inform the user.
+      drupal_set_message(t('Message sent successfully to !total users: -e-mails', array('!total' => $total_recip, '-e-mails' => $recipientout)));
+    }
+    else {
+      drupal_set_message(t('!errors error(s) encountered sending message. Please check the logs and try again.', array('!errors' => $send_error)));
+    }
+  }
+
+  // Redirect to the home page, rather than back to the mail page, to avoid
+  // contradictory messages if flood control has been activated.
+  $form_state['redirect'] = '';
+}  //  End of mass_contact_mail_page_submit().
+
+
+
+/* *************************
+ *
+ * Private helper functions.
+ *
+ * ************************/
+
+
+
+/**
+ * Create the mass_contact node type.
+ */
+function _mass_contact_create_node_type() {
+  $info->type           = "mass_contact";
+  $info->name           = "Mass Contact Message";
+  $info->module         = "node";
+  $info->description    = "Archived copy of mass e-mails sent from this site";
+  $info->help           = "";
+  $info->has_title      = 1;
+  $info->title_label    = "Subject";
+  $info->has_body       = 1;
+  $info->body_label     = "Message Body";
+  $info->min_word_count = 0;
+  $info->custom         = 1;
+  $info->modified       = 0;
+  $info->locked         = 0;
+  $info->orig_type      = 'mass_contact';
+  db_query("INSERT INTO {node_type} (type, name, module, description, help, has_title, title_label, has_body, body_label, min_word_count, custom, modified, locked, orig_type) VALUES ('%s', '%s', '%s', '%s', '%s', %d, '%s', %d, '%s', %d, %d, %d, %d, '%s')", $info->type, $info->name, $info->module, $info->description, $info->help, $info->has_title, $info->title_label, $info->has_body, $info->body_label, $info->min_word_count, $info->custom, $info->modified, $info->locked, $info->orig_type);
+  module_invoke_all('node_type', 'insert', $info);
+  drupal_set_message(t('Node type created.'));
+}  //  End of _mass_contact_create_node_type().
+
+
+
+/**
+ * Save a copy of the sent message as a node.
+ *
+ * @param subject
+ *   The subject of the message and the title of the node.
+ * @param body
+ *   The body of the message and node.
+ * @param recipients
+ *   The users who received a copy of the message.
+ * @param category
+ *   The category of users sent to.
+ * @param roles
+ *   The various roles the category represents.
+ * @param uid
+ *   The user who sent the message is also the user who owns the node.
+ */
+function _mass_contact_save_node($subject, $body, $recipients, $category, $roles, $uid) {
+  // get role names
+  foreach ($roles as $role) {
+    $roletemp = db_fetch_object(db_query("SELECT name FROM {role} WHERE rid = %d", $role));
+    $rolesenta[] = $roletemp->name;
+  }
+  $rolesent = implode(', ', $rolesenta);
+
+  $node->title   = $subject;
+  $node->body    = '<p><i>'. t('Category: ') . $category .'</i><p><i>'. t('Roles: ') . $rolesent .'</i><p><i>'. t('Recipients: ') . $recipients .'</i><p>'. $body;
+  $node->teaser  = node_teaser($node->body);
+  $node->type    = 'mass_contact';
+  $node->uid     = $uid;
+  $node->format  = 3;
+  $node->status  = 0;
+  $node->comment = 2;
+  $node->promote = 0;
+  $node->sticky  = 0;
+
+  node_save($node);
+}  //  End of _mass_contact_save_node().

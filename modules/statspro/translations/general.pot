@@ -1,0 +1,174 @@
+# $Id: general.pot,v 1.1 2008/12/31 19:53:29 mr3dblond Exp $
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  statspro.inc: n/a
+#  statspro.module: n/a
+#  graphstat.info,v 1.2 2007/11/14 22:29:56 profix898
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2008-11-18 12:46+0100\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: statspro.inc:38;38
+msgid "User registrations"
+msgstr ""
+
+#: statspro.inc:39
+msgid "User online"
+msgstr ""
+
+#: statspro.inc:40;40
+msgid "New nodes"
+msgstr ""
+
+#: statspro.inc:41;41
+msgid "Changed nodes"
+msgstr ""
+
+#: statspro.inc:42;42
+msgid "Comments"
+msgstr ""
+
+#: statspro.inc:43
+msgid "Page impressions"
+msgstr ""
+
+#: statspro.inc:44
+msgid "Page impressions, users"
+msgstr ""
+
+#: statspro.inc:45;45
+msgid "Errors"
+msgstr ""
+
+#: statspro.inc:46;46
+msgid "Errors, users"
+msgstr ""
+
+#: statspro.inc:47;47
+msgid "Warnings"
+msgstr ""
+
+#: statspro.inc:48;48
+msgid "Warnings, users"
+msgstr ""
+
+#: statspro.module:76
+msgid "never"
+msgstr ""
+
+#: statspro.module:78
+msgid "Last statistics update: !updated"
+msgstr ""
+
+#: statspro.module:101
+msgid "Content common"
+msgstr ""
+
+#: statspro.module:107;130
+msgid "Name"
+msgstr ""
+
+#: statspro.module:107;130
+msgid "Value"
+msgstr ""
+
+#: statspro.module:111
+msgid "No content data available for specified period."
+msgstr ""
+
+#: statspro.module:123
+msgid "PIs, errors and warnings"
+msgstr ""
+
+#: statspro.module:134
+msgid "No access and log files available for specified period."
+msgstr ""
+
+#: statspro.module:177
+msgid "Today"
+msgstr ""
+
+#: statspro.module:178
+msgid "Yesterday"
+msgstr ""
+
+#: statspro.module:179
+msgid "Week, current"
+msgstr ""
+
+#: statspro.module:180
+msgid "Week, last"
+msgstr ""
+
+#: statspro.module:181
+msgid "Week, before last"
+msgstr ""
+
+#: statspro.module:182
+msgid "Month, current"
+msgstr ""
+
+#: statspro.module:183
+msgid "Month, last"
+msgstr ""
+
+#: statspro.module:184
+msgid "Month, last 3"
+msgstr ""
+
+#: statspro.module:185
+msgid "Month, last 6"
+msgstr ""
+
+#: statspro.module:187
+msgid "Quarter, current"
+msgstr ""
+
+#: statspro.module:188
+msgid "Quarter, last"
+msgstr ""
+
+#: statspro.module:190
+msgid "Year, current"
+msgstr ""
+
+#: statspro.module:191
+msgid "Year, last"
+msgstr ""
+
+#: statspro.module:206
+msgid "Time period"
+msgstr ""
+
+#: statspro.module:60;0
+msgid "statspro"
+msgstr ""
+
+#: statspro.module:60
+msgid "New statistics available"
+msgstr ""
+
+#: statspro.module:33 statspro.info:0
+msgid "Statistics pro"
+msgstr ""
+
+#: statspro.module:34
+msgid "Content statistics"
+msgstr ""
+
+#: statspro.info:0
+msgid "Statistics for nodes, comments, users and lots more"
+msgstr ""
+

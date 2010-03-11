@@ -1,0 +1,1017 @@
+<?php
+
+if (!function_exists('sprint_r')) {
+  function sprint_r($var) {
+    ob_start();
+    print_r($var);
+    $ret = ob_get_contents();
+    ob_end_clean();
+    return $ret;
+  }
+}
+
+
+/*
+ * Defines
+ */
+
+/*
+ * Hook implementations
+ */
+
+/*
+ * Implementation hook_init
+ */
+function p2pu_init() {
+  //Evil hack to set the group context on my panel paths
+  $item = menu_get_item();
+
+  // Use the menu system to get the path.
+  $path = $item['path'];
+
+  // Check if this is an existing node.
+  if ($path == 'node/%/document' || $path == 'node/%/course/admin' || $path == 'node/%/shoutbox' || $path == 'node/%/dashboard' || $path == 'node/%/discussions') {
+    $node = menu_get_object('pm_arg', 1);
+    $node = $node->data;
+  }
+
+  if (!empty($node) && ($group_node = og_determine_context_get_group($node))) {
+    og_set_group_context($group_node);
+  }
+}
+
+/**
+ * Implementation of hook_perm
+ */
+function p2pu_perm() {
+  return array('administer p2pu settings','schedule courses');
+}
+
+/**
+ * Implementation of hook_block().
+ *
+ * Displays the book table of contents in a block when the current page is a
+ * single-node view of a book node.
+ */
+//function p2pu_block($op = 'list', $delta = 0, $edit = array()) {
+//  $block = array();
+//  switch ($op) {
+//    case 'list':
+//      $block[0]['info'] = t('OG Book navigation');
+//      $block[0]['cache'] = BLOCK_CACHE_PER_PAGE | BLOCK_CACHE_PER_ROLE;
+//      return $block;
+//    case 'view':
+//      $current_bid = 0;
+//      if ($node = menu_get_object()) {
+//        $current_bid = empty($node->book['bid']) ? 0 : $node->book['bid'];
+//      }
+//      if (variable_get('og_book_block_mode', 'all pages') == 'all pages') {
+//        $block['subject'] = t('Book navigation');
+//        $book_menus = array();
+//        $pseudo_tree = array(0 => array('below' => FALSE));
+//        foreach (p2p_og_get_books() as $book_id => $book) {
+//          if ($book['bid'] == $current_bid) {
+//            // If the current page is a node associated with a book, the menu
+//            // needs to be retrieved.
+//            watchdog('debug', 'Retrieve menu');
+//            $book_menus[$book_id] = menu_tree_output(menu_tree_all_data($node->book['menu_name'], $node->book));
+//          }
+//          else {
+//            // Since we know we will only display a link to the top node, there
+//            // is no reason to run an additional menu tree query for each book.
+//            watchdog('debug', 'In pseudo tree');
+//            $book['in_active_trail'] = FALSE;
+//            $pseudo_tree[0]['link'] = $book;
+//            $book_menus[$book_id] = menu_tree_output($pseudo_tree);
+//          }
+//        }
+//
+//        $block['content'] = theme('book_all_books_block', $book_menus);
+//      }
+//      elseif ($current_bid) {
+//        // Only display this block when the user is browsing a book.
+//        $title = db_result(db_query(db_rewrite_sql('SELECT n.title FROM {node} n WHERE n.nid = %d'), $node->book['bid']));
+//        // Only show the block if the user has view access for the top-level node.
+//        if ($title) {
+//          $tree = menu_tree_all_data($node->book['menu_name'], $node->book);
+//          // There should only be one element at the top level.
+//          $data = array_shift($tree);
+//          $block['subject'] = theme('book_title_link', $data['link']);
+//          $block['content'] = ($data['below']) ? menu_tree_output($data['below']) : '';
+//        }
+//      }
+//      return $block;
+//    case 'configure':
+//        $options = array(
+//        'all pages' => t('Show block on all pages'),
+//        'book pages' => t('Show block only on book pages'),
+//      );
+//      $form['book_block_mode'] = array(
+//        '#type' => 'radios',
+//        '#title' => t('Book navigation block display'),
+//        '#options' => $options,
+//        '#default_value' => variable_get('og_book_block_mode', 'all pages'),
+//        '#description' => t("If <em>Show block on all pages</em> is selected, the block will contain the automatically generated menus for all of the site's books. If <em>Show block only on book pages</em> is selected, the block will contain only the one menu corresponding to the current page's book. In this case, if the current page is not in a book, no block will be displayed. The <em>Page specific visibility settings</em> or other visibility settings can be used in addition to selectively display this block."),
+//        );
+//      return $form;
+//    case 'save':
+//      variable_set('og_book_block_mode', $edit['book_block_mode']);
+//      break;
+//  }
+//}
+//
+///**
+// * Returns an array of all books.
+// *
+// * This list may be used for generating a list of all the books, or for building
+// * the options for a form select.
+// */
+//function p2p_og_get_books() {
+//  static $all_books;
+//  
+//  //$node =  node_load(arg(1));
+//  $node = og_get_group_context();
+//  
+//  if (!isset($node->og_selective)) {
+//    return array();
+//  }
+//  $group_id = $node->nid;
+//
+//  if (!isset($all_books)) {
+//    $all_books = array();
+//    $result = db_query("SELECT DISTINCT(bid) FROM {book}");
+//    $nids = array();
+//    while ($book = db_fetch_array($result)) {
+//      $nids[] = $book['bid'];
+//    }
+//    if ($nids) {
+//      $result2 = db_query(db_rewrite_sql("SELECT n.type, n.title, b.*, ml.* FROM {book} b INNER JOIN {node} n on b.nid = n.nid INNER JOIN {menu_links} ml ON b.mlid = ml.mlid INNER JOIN {og_ancestry} oa ON oa.nid = n.nid WHERE n.nid IN (". implode(',', $nids) .") AND n.status = 1 AND oa.group_nid = %d ORDER BY ml.weight, ml.link_title"), $group_id);
+//      while ($link = db_fetch_array($result2)) {
+//        $link['href'] = $link['link_path'];
+//        $link['options'] = unserialize($link['options']);
+//        $all_books[$link['bid']] = $link;
+//      }
+//    }
+//  }
+//  return $all_books;
+//}
+
+// This is not yet used, should replace the subscribe block when we have time to change it
+function p2pu_signup_link_for_block () {
+  $group = og_get_group_context();
+  global $user;
+  if ($user->uid == 0) {
+    $register = l('register', 'user/register', array('query' => 'distination=node/'.$group->nid));
+    $login = l('login', 'user/login', array('query' => 'distination=node/'.$group->nid));
+    print ('You must '.$register.' or '.$login.' in order to post into this group.');
+    return;  
+  }
+  if (!og_is_group_member($group->nid,FALSE) && $group->og_selective <= 1) {
+    $label = 'Sign up';
+    if ($group->og_selective == 0) {
+      $label = 'Join';
+    }
+    $link = l($label, 'og/subscribe/'.$group->nid, array('query' => 'distination=node/'.$group->nid));
+    print ($link);
+    return;
+  }
+}
+
+/**
+ * Implementation of hook_nodeapi
+ */
+function p2pu_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+
+  switch ($op) {
+    case 'view':
+      switch($node->type) {
+        case 'document':
+          if (isset($node->og_groups)) {
+            $og_groups = array_values($node->og_groups);
+            if (arg(2) != 'document' && arg(1) == $node->nid) {
+              drupal_goto('node/'.$og_groups[0].'/document/'.$node->nid);
+            }
+          }
+        break;
+        case 'discussion':
+          if (isset($node->og_groups)) {
+            $og_groups = array_values($node->og_groups);
+            if (arg(2) != 'discussion' && arg(1) == $node->nid) {
+              drupal_goto('node/'.$og_groups[0].'/discussions/'.$node->nid);
+            }
+          }
+        break;
+      }
+      break;
+    case 'insert':
+      switch ($node->type) {
+        case 'announcement':
+        case 'assignment':
+        case 'assignment_template':
+        case 'discussion':
+        case 'document':
+        case 'event':
+        case 'report_card':
+        case 'submission':
+          $group_node = og_get_group_context();
+          $node->og_groups = array( $group_node->nid);
+          og_save_ancestry($node);
+          
+        break;
+//        case 'submission':
+//          if (!isset($node->og_groups)  || count($node->og_groups) == 0) {
+//            $group_node = og_get_group_context();
+//            $node->og_groups = array($node->field_submission_assignment[0]['nid']);
+//            og_save_ancestry($node);
+//          }
+//          break;
+      }
+      //adw: this is a hack to fix og_access setting nodes to private. Everything should be public
+      db_query("update og_access_post set og_public=1 where og_public=0"); 
+      break;
+    case 'update':
+      switch ($node->type) {
+        case 'announcement':
+        case 'assignment':
+        case 'assignment_template':
+        case 'discussion':
+        case 'document':
+        case 'event':
+        case 'report_card':
+          $group_node = og_get_group_context();
+          $node->og_groups = array( $group_node->nid);
+          og_save_ancestry($node);
+          
+        break;
+      }
+      //adw: this is a hack to fix og_access setting nodes to private. Everything should be public
+      db_query("update og_access_post set og_public=1 where og_public=0"); 
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function p2pu_menu() {
+  $items = array();
+
+  //Administration form
+  $items['admin/settings/p2pu'] = array(
+    'title' => t('P2PU Settings'),
+    'description' => t('Settings and configuration for the P2PU System'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('p2pu_settings_form'),
+  	'access arguments' => array('administer p2pu settings'),
+  );
+
+  // Course create function
+  $items['course/create'] = array(
+    'title' => t('Create Course'),
+    'description' => t('Create a course from a course template'),
+    'page callback' => 'p2pu_course_create_course',
+    'access arguments' => array('schedule courses'),
+    'type' => MENU_CALL_BACK,
+  );
+
+  // Show application form for user
+  $items['course/application'] = array(
+    'title' => t('Course application'),
+    'description' => t('Course application'),
+    'page callback' => 'p2pu_course_application',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALL_BACK,
+  );
+  
+  // Shout form
+  $items['shout-form'] = array(
+    'title' => t('Shout Form'),
+    'description' => t('Shout Form'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('p2pu_shout_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+   );
+  // My dashboard
+  $items['user/me/dashboard'] = array(
+    'title' => 'My dashboard',
+    'page callback' => 'p2pu_my_dashboard_redirect',
+    'access callback' => TRUE,
+    'type' => MENU_CALL_BACK,
+  );
+  // Keypage redirect
+  $items['node/%node/keypage'] = array(
+    'title' => 'Node keypage redirect',
+    'page callback' => 'p2pu_keypage_redirect',
+    'page arguments' => array(1),
+    'access callback' => TRUE,
+    'type' => MENU_CALL_BACK,
+  );
+  // Toggle signup type
+  $items['toggle-signup/%node'] = array(
+    'title' => 'Change Group Signup',
+    'page callback' => 'p2pu_toggle_signup',
+    'page arguments' => array(1),
+    'access callback' => 'og_is_group_admin',
+    'access arguments' => array(1),
+    'type' => MENU_CALL_BACK,
+  );
+  return $items;
+}
+
+function p2pu_keypage_redirect($node) {
+  if ($node->type == 'course') {
+    if (og_is_group_member($node->nid)) {
+      drupal_goto('node/'.$node->nid.'/dashboard');
+    } else {
+      drupal_goto('node/'.$node->nid);
+    }
+  } else {
+    drupal_goto('node/'.$node->nid);
+  }
+}
+
+// redirect to my dashboard 
+function p2pu_my_dashboard_redirect() {
+  global $user;
+  drupal_goto('user/'.$user->uid.'/dashboard');
+}
+
+/*
+ * Implement hook_menu_alter(&$items)
+ */
+
+function p2pu_menu_alter(&$items) {
+  unset($items['user/%user/imce']);
+  $items['user/register']['weight'] = 1;
+  $items['user/password']['weight'] = 2;
+}
+
+//function p2pu_link_alter(&$links, $node) {
+//  echo '<pre>';
+//  print_r($links);
+//  print '</pre>';
+//}
+
+/**
+ * Implementation of hook_cron
+ */
+function p2pu_cron() {
+  //adw: this may start running slow later, will need to find the bug sometime
+  db_result(db_query("insert into node_access (nid,gid,realm,grant_view,grant_update,grant_delete)  select nid,0,'all',1,0,0 from node where nid not in (select nid from node_access where realm='all')"));
+}
+
+/**
+ * Implementation of hook_link
+ */
+function p2pu_link($type, $object, $teaser = FALSE) {
+  $links = array();
+  if ($type == 'node' && $object->type == 'course' && og_is_group_admin($object)) {
+    if ($object->og_selective != OG_CLOSED) {
+      $text = 'Close Applications';
+    } else {
+      $text = 'Re-open Applications';
+    }
+    $links[''] = array(
+      'title' => t($text),
+      'href' => "toggle-signup/".$object->nid,
+    );
+  }
+  return $links;
+}
+
+/**
+ * Implementation of hook_form_alter
+ */
+function p2pu_form_alter(&$form, $form_state, $form_id) {
+
+  global $user;
+//  echo '<pre>';
+//  print ($form_id.'<br>');
+//  print_r($form);
+//  echo '</pre>';
+//  exit;
+
+//  watchdog('debug', $form_id.'<br>'.var_export($form, TRUE));
+
+  //Extra validation on the admin settings form
+  if ($form_id == 'p2pu_settings_form') {
+    $form['#validate'][] = 'p2pu_settings_form_validate';
+  }
+  
+  //To restrict book ouline only to book page types
+  if (isset($form['book']) && $form['type']['#value'] != 'book') {
+    $form['book']['#type'] = 'hidden';
+  }  
+  
+  //Hide and set the defaults for og fields when creating a course or course template
+  if ($form_id == 'course_node_form' && $form['nid']['#value'] == '' && $user->uid != 1) {
+    //Hide all the og settings and give them specific default values
+
+    $form['og_language']['#type'] = 'hidden';
+    $form['og_language']['#value'] = 'p2pu';
+    $form['og_language']['#default_value'] = 'p2pu';
+    
+    $form['og_selective']['#type'] = 'hidden';
+    $form['og_selective']['#value'] = 1;
+    $form['og_selective']['#default_value'] = 1  ;
+
+    $form['og_register']['#type'] = 'hidden';
+    $form['og_register']['#value'] = 0;
+    $form['og_register']['#default_value'] = 0;
+
+    $form['og_directory']['#type'] = 'hidden';
+    $form['og_directory']['#value'] = 1;
+    $form['og_directory']['#default_value'] = 1;
+
+    $form['og_private']['#type'] = 'hidden';
+    $form['og_private']['#value'] = 0;
+    $form['og_private']['#default_value'] = 0;
+
+    $form['og_description']['#type'] = 'hidden';
+    $form['og_description']['#value'] = 'course';
+    $form['og_description']['#default_value'] = 'course';
+
+    $form['themes']['#type'] = 'hidden';
+
+  }
+  
+  //Hide and set the defaults for og fields when creating course template
+  if ( $form_id == 'course_template_node_form' && $form['nid']['#value'] == '' && $user->uid != 1) {
+    //Hide all the og settings and give them specific default values
+    
+//  echo '<pre>';
+//  print ($form_id.'<br>');
+//  print_r($form);
+//  echo '</pre>';
+//  exit;
+    
+    $form['og_language']['#type'] = 'hidden';
+    $form['og_language']['#value'] = 'p2pu';
+    $form['og_language']['#default_value'] = 'p2pu';
+    
+    $form['og_selective']['#type'] = 'hidden';
+    $form['og_selective']['#value'] = 0;
+    $form['og_selective']['#default_value'] = 0;
+
+    $form['og_register']['#type'] = 'hidden';
+    $form['og_register']['#value'] = 0;
+    $form['og_register']['#default_value'] = 0;
+
+    $form['og_directory']['#type'] = 'hidden';
+    $form['og_directory']['#value'] = 1;
+    $form['og_directory']['#default_value'] = 1;
+
+    $form['og_private']['#type'] = 'hidden';
+    $form['og_private']['#value'] = 0;
+    $form['og_private']['#default_value'] = 0;
+
+    $form['og_description']['#type'] = 'hidden';
+    $form['og_description']['#value'] = 'course_template';
+    $form['og_description']['#default_value'] = 'course_template';
+
+    $form['themes']['#type'] = 'hidden';
+
+    
+  }
+  // fix assignment list for filtering assignments for a course
+  // Exposed filters is not working for views in panels. We may still need some of this code if we make an "Assignment Finder" view later
+  //if ($form['#id'] == 'views-exposed-form-course-submissions-default') {
+    //print "<pre>";
+    //echo "Before";
+    //print_r($form);
+    //print_r($form['field_submission_assignment_nid']['#options']);
+    //print "</pre>";
+
+    //$group = og_get_group_context();
+    //firep( "group is ".$group->nid."<br/>\n");
+    //$form['field_submission_assignment_nid']['#options'] = array();
+    //foreach (p2pu_get_assignments_for_course($group->nid) as $nid => $title) {
+    //  $form['field_submission_assignment_nid']['#options'][$nid] = $title;
+   // }
+    //print "<pre>";
+    //echo "After";
+    //print_r($form['field_submission_assignment_nid']['#options']);
+    //print "</pre>";
+  //}
+
+
+  //Hide og fields when editing a course or course template
+  if ($form_id == 'course_node_form' || $form_id == 'course_template_node_form' && $user->uid != 1) {
+    //Hide all the og settings and give them specific default values
+    $form['og_selective']['#type'] = 'hidden';
+    $form['og_register']['#type'] = 'hidden';
+    $form['og_directory']['#type'] = 'hidden';
+    $form['og_private']['#type'] = 'hidden';
+    $form['themes']['#type'] = 'hidden';
+  }
+
+  if (isset($form['og_nodeapi']) && $user->uid != 1) {
+    $form['og_nodeapi']['#type'] = 'hidden';
+  }
+
+  //Redirect these submits to the dashboard view of group
+  if ($form_id == 'announcement_node_form' ||
+      $form_id == 'assignment_node_form' ||
+      $form_id == 'submission_node_form' ||
+      $form_id == 'assignment_template_node_form' ||
+      $form_id == 'discussion_node_form' ||
+      $form_id == 'shout_box_node_form' ) {
+
+    $group = og_get_group_context();
+    $form['#redirect'] = array('node/'.$group->nid);
+  }
+
+  //Redirect the submit of a discussion to the discussion page on the group
+  if ($form_id == 'discussion_node_form' ) { 
+    $group = og_get_group_context();
+    $form['#redirect'] = array('node/'.$group->nid.'/discussions');
+   }
+  
+  //Redirect the submit of an event to the calendar on the group
+  if ($form_id == 'event_node_form') {
+    $group = og_get_group_context();
+    $form['#redirect'] = array('node/'.$group->nid.'/calendar/'.date('Y-m'));
+    
+  }
+  
+  //Redirect comments
+  if ($form_id == 'comment_form') {
+    $node = node_load($form['nid']['#value']);
+    
+    //Discussions
+    if ($node->type == 'discussion') {
+      $group = og_get_group_context();
+      $form['#redirect'] = array('node/'.$group->nid.'/discussions');
+    }
+  }
+
+  //Modify the organic group subscribe form to ask for the submission requirement and save the application
+  if ($form_id == 'og_confirm_subscribe') {
+    $group = og_get_group_context();
+    if ($group->type != 'course_template') {
+
+//      print "<pre>";
+//      print_r($form);
+//      print "</pre>";
+//      $template = $form['#parameters'][3];
+      
+      
+      $form['actions']['submit']['#value'] = 'Sign-Up';
+      $form['message']['#value'] = variable_get('p2pu_course_signup_message', '');
+      $form['message']['#weight'] = -10;
+  
+      $template = $form['#parameters'][3];
+      $form['request']['#title'] = 'Sign-up requirement: '.$template->field_course_sign_up_req[0]['value'];
+      $form['request']['#description'] = '';
+      $form['request']['#weight'] = -3;
+      $form['request']['#required'] = true;
+      $form['#submit'][] = 'p2pu_og_confirm_subscribe';
+  
+      //Background
+      $form['background']['#type'] = 'textarea';
+      $form['background']['#title'] = 'Background';
+      $form['background']['#weight'] = -2;
+      $form['background']['#rows'] = 5;
+      $form['background']['#required'] = true;
+  
+      //Motivation field
+      $form['motivation']['#type'] = 'textarea';
+      $form['motivation']['#title'] = 'Motivation';
+      $form['motivation']['#weight'] = -1;
+      $form['motivation']['#rows'] = 5;
+      $form['motivation']['#required'] = true;
+      //print "<pre>";
+      //print_r($form);
+      //print "</pre>";
+    }
+  }
+}
+
+/*
+ * Custom functions
+ */
+// Finding the assignment nid/titles for a specific group for exposed filters
+function p2pu_get_assignments_for_course($gid) {
+  $result = db_query("select n.nid,n.title from node n, og_ancestry oga where n.nid=oga.nid and oga.group_nid=%d and n.type='assignment'",$gid);
+  $assignments = array();
+  while ($row = db_fetch_object($result)) {
+     $assignments[$row->nid] = $row->title;
+  }
+  return $assignments;
+}
+
+/**
+ * Settings page
+ */
+function p2pu_settings_form() {
+  $form = array();
+
+  $form['p2pu_site_name'] = array (
+    '#type' => 'textfield',
+    '#title' => 'P2PU Site Name',
+    '#description' => 'Which site is this.  Added to messages to identify them better. Put in a proper name.  The name is send via sms to the customer as well.',
+    '#default_value' => variable_get('p2pu_site_name', 'Unknown'),
+    '#weight' => -5,
+  );
+
+  $form['p2pu_course_signup_message'] = array (
+    '#type' => 'textarea',
+    '#title' => 'Course Signup Message',
+    '#description' => 'The text to display at the top of the course signup form.',
+    '#default_value' => variable_get('p2pu_course_signup_message', ''),
+    '#weight' => -4,
+  );
+
+  $form['next_course_open_date'] = array(
+    '#type' => 'date_popup',
+    '#title' => t("New date when courses open for application."),
+    '#date_format' => 'Y-m-d',
+    '#date_year_range' => '-0:+1',
+    '#required' => TRUE,
+  	'#weight' => -3,
+    '#date_increment' => 1,
+    '#default_value' => variable_get('next_course_open_date', date('Y-m-d')), 
+  );
+
+  $form['next_course_start_date'] = array(
+    '#type' => 'date_popup',
+    '#title' => t("New course start date - must be greater than opening date"),
+    '#date_format' => 'Y-m-d',
+    '#date_year_range' => '-0:+1',
+    '#required' => TRUE,
+  	'#weight' => -2,
+    '#date_increment' => 1,
+    '#default_value' => variable_get('next_course_start_date', date('Y-m-d')), 
+  );
+
+
+  return system_settings_form($form);
+}
+
+function p2pu_settings_form_validate($form, &$form_state) {
+
+  if (strtotime($form['next_course_open_date']['#value']['date']) > strtotime($form['next_course_start_date']['#value']['date'])) {
+    form_set_error('error', 'The opening date must be smaller than the start date.');
+  }
+
+  if (strtotime($form['next_course_open_date']['#value']['date']) < time() ) {
+    form_set_error('error', 'The opening date must be in the future.');
+  }
+
+  if (strtotime($form['next_course_start_date']['#value']['date']) < time() ) {
+    form_set_error('error', 'The start date must be in the future.');
+  }
+
+}
+
+function p2pu_og_confirm_subscribe($form, &$form_state) {
+//    echo '<pre>';
+//    print_r($form);
+//    print_r($form_state);
+//    exit;
+
+  //  if (strlen($form['request']['#value']) == 0 || strlen($form['background']['#value']) == 0 || strlen($form['motivation']['#value']) == 0) {
+  //    return;
+  //  }
+  global $user;
+
+  $application = array (
+    'title' => 'Application: '.$user->name,
+    'uid' => $user->uid,
+    'name' => $user->name,
+    'type' => 'course_application',
+	'promote' => 0,
+    'status' => 1,
+    'comment' =>2,
+    'og_public' => 0, 
+    'og_groups' => array( $course->nid),
+    'field_application_applicant' => array( 0 => array('uid' => $user->uid)),
+    'field_application_assignme' => array( 0 => array('value' => $form['request']['#value'])),
+    'field_application_background' => array( 0 => array('value' => $form['background']['#value'])),
+    'field_application_motivation' => array( 0 => array('value' => $form['motivation']['#value'])),
+  );
+
+  $application = (object)$application;
+
+  if ($application = node_submit($application)) {
+    node_save($application);
+  }
+
+  $application->og_groups = array( $form['gid']['#value']);
+  og_save_ancestry($application);
+
+}
+
+function p2pu_og($op, $nid, $uid, $message) {
+  $node = node_load($nid);
+  if ($op == 'user approve' && $node->type == 'course') {
+    $user = user_load(array('uid'=>$uid));
+    p2pu_create_report_card($user,$node);
+  }
+}
+
+function p2pu_create_report_card($user,$course) {
+  $report_card = array (
+    'title' => 'Report: '.$user->name,
+    'uid' => $user->uid,
+    'name' => $user->name,
+    'type' => 'report_card',
+	  'promote' => 0,
+    'status' => 1,
+    'comment' =>2,
+    'og_public' => 0, 
+    'og_groups' => array( $course->nid),
+    'field_report_card_user' => array( 0 => array('uid' => $user->uid)),
+    'field_report_card_result' => array( 0 => array('value' => 'ungraded')),
+  );
+
+  $report_card = (object)$report_card;
+
+  if ($report_card = node_submit($report_card)) {
+    node_save($report_card);
+  }
+
+  $report_card->og_groups = array($course->nid);
+  og_save_ancestry($report_card);
+
+}
+
+/**
+ * Implementation of hook_og_link_alter().
+ */
+function p2pu_og_links_alter(&$links, $node) {
+//      echo '<pre>';
+//      print_r($links);
+//      print_r($node);
+//      exit;
+
+  if (isset($node) && $node->type == 'course_template') {
+    unset($links['create_announcement']);
+    unset($links['create_assignment']);
+    unset($links['create_course_application']);
+    unset($links['create_event']);
+    unset($links['create_report_card']);
+    unset($links['create_submission']);
+  }
+
+  if (isset($node) && $node->type == 'course') {
+    unset($links['create_assignment_template']);
+    //unset($links['create_assignment']);
+    unset($links['create_course_application']);
+    unset($links['create_report_card']);
+    unset($links['create_submission']);
+    unset($links['create_shout_box']);
+  }
+
+}
+
+/*
+ * Make a copy of a course template as a course
+ */
+function p2pu_course_create_course() {
+  $course_template = node_load(arg(2));
+
+  $user = user_load($course_template->uid);
+
+  //  echo '<pre>';
+  $start_date = variable_get('next_course_start_date', date('Y-m-d'));
+  $end_date = date('Y-m-d', strtotime(variable_get('next_course_start_date', date('Y-m-d')).' +'.$course_template->field_course_duration[0]['value'].'weeks'));
+
+  $course = array (
+    'title' => $course_template->title.' - '. date('M Y', strtotime(variable_get('next_course_start_date', date('M Y')))),
+    'uid' => $user->uid,
+    'name' => $user->name,
+    'type' => 'course',
+	'promote' => 0,
+    'status' => 1,
+  	'comment' =>2,
+    'og_selective' =>1,
+    'og_register' => 0,
+    'og_directory' => 1,
+    'og_private' => 0,
+    'og_description' => $course_template->og_description,  
+    'field_course_summary' => array( 0 => array('value' => $course_template->field_course_summary[0]['value'])),
+    'field_course_prerequisites' => array( 0 => array('value' => $course_template->field_course_prerequisites[0]['value'])),
+    'field_course_sign_up_req' => array( 0 => array('value' => $course_template->field_course_sign_up_req[0]['value'])),
+    'field_course_no_of_seats' => array( 0 => array('value' => $course_template->field_course_no_of_seats[0]['value'])),
+    'field_course_dates' => array( 0 => array('value' => $start_date, 'value2' => $end_date)),
+    'field_course_opening_date' => array( 0 => array('value' => variable_get('next_course_open_date', date('Y-m-d')))),
+    'field_course_status' => array( 0 => array('value' => '10_open')),
+  );
+
+  //  echo '<pre>';
+  //  print $start_date.'<br>';
+  //  print $end_date.'<br>';
+  //  print_r($course);
+  //  exit;
+
+  $course = (object)$course;
+
+  if ($course = node_submit($course)) {
+    node_save($course);
+  }
+
+  $sql = "SELECT o.nid FROM {og_ancestry} o WHERE o.group_nid = %d";
+
+  $result = db_query(db_rewrite_sql($sql), $course_template->nid);
+  while ($data = db_fetch_object($result)) {
+    $node = node_load($data->nid);
+    if ($node->type == 'assignment_template') {
+      $assignment_template = $node;
+      $assignment = array (
+        'title' => $assignment_template->title,
+        'uid' => $user->uid,
+        'name' => $user->name,
+        'type' => 'assignment',
+    	'promote' => 0,
+        'status' => 1,
+        'comment' =>2,
+        'og_public' => 0,
+        'og_group' => $course->nid,
+        'field_assignment_detail' => array( 0 => array('value' => $assignment_template->field_assignment_detail[0]['value'])),
+      );
+      foreach($assignment_template->field_assignment_attachments as $attachment) {
+        $assignment[field_assignment_attachments] = $attachment;
+      }
+
+      $assignment = (object)$assignment;
+
+      if ($assignment = node_submit($assignment)) {
+        node_save($assignment);
+      }
+      $assignment->og_groups = array( $course->nid);
+      og_save_ancestry($assignment);
+
+    }
+    else if ($node->type == 'document') {
+      $document_template = $node;
+      $document = array (
+        'title' => $document_template->title,
+        'uid' => $user->uid,
+        'name' => $user->name,
+        'type' => 'document',
+    	'promote' => 0,
+        'status' => 1,
+        'comment' =>2,
+        'og_public' => 0, 
+        'og_group' => $course->nid,
+        'field_document_body' => array( 0 => array('value' => $document_template->field_document_body[0]['value'])),
+        //'field_document_attachment' => array( 0 => array('value' => $document_template->field_document_attachment[0]['value'])),
+      );
+
+      $document = (object)$document;
+//      echo '<pre>';
+//      print_r($document);
+
+      if ($document = node_submit($document)) {
+//        print_r($document);
+//        exit;
+        node_save($document);
+      }
+
+      $document->og_groups = array( $course->nid);
+      og_save_ancestry($document);
+
+    }
+  }
+  
+  drupal_set_message('The '.$course_template->title.' course has been scheduled');
+  drupal_goto('node/'.$course->nid);
+  
+
+}
+
+/*
+ * Used in view og_members -> p2pu
+ */
+function p2pu_course_application() {
+  $uid = arg(2);
+  $group_id = arg(3);
+  $sql = "SELECT max(n.nid)  FROM {content_type_course_application} ca INNER JOIN {node} n on n.nid = ca.nid INNER JOIN {og_ancestry} oa on oa.nid = ca.nid WHERE field_application_applicant_uid = %d and oa.group_nid = %d";
+  $nid = db_result(db_query(db_rewrite_sql($sql), $uid, $group_id));
+  if ($nid == NULL) {
+    drupal_set_message('No application for this user');
+    drupal_goto('og/users/'.$uid.'/list_p2pu');
+  }
+  drupal_goto('node/'.$nid);
+
+}
+
+/*
+ * Shout form
+ */
+function p2pu_shout_form() {
+  $form = array();
+  
+  $form['shout_box'] = array(
+    '#type' => 'textfield',
+    '#weight' => 2,
+      '#size' => 100,
+    );
+
+   $form['shout'] = array(
+    '#type' => 'submit',
+    '#value' => t("Shout"),
+    '#submit' => array('p2pu_shout_form_submit'),
+    '#weight' => 2,
+  );
+
+   $form['group'] = array(
+    '#type' => 'hidden',
+    '#value' => arg(1),
+    '#default_value' => arg(1),
+    '#weight' => 3,
+  );
+  
+  return $form;
+}
+
+function p2pu_shout_form_submit($form,&$form_state) {
+    global $user;
+    $shoutbox = array (
+      'title' => 'Shout Box: '.$form['group']['#value'].date('Y-m-d H:s') ,
+      'uid' => $user->uid,
+      'name' => $user->name,
+      'type' => 'shout_box',
+  	  'promote' => 0,
+      'status' => 1,
+      'comment' =>2,
+      'og_public' => 0, 
+      'field_shoutbox_shout' => array( 0 => array('value' => $form['shout_box']['#value'])),
+    );
+
+    $shoutbox = (object)$shoutbox;
+
+//  echo '<pre>';
+//  print_r($shoutbox);
+//  exit;
+    
+    if ($shoutbox = node_submit($shoutbox)) {
+      node_save($shoutbox);
+    }
+    $shoutbox->og_groups = array($form['group']['#value']);
+    og_save_ancestry($shoutbox);
+    
+    $form['#redirect'][] = 'node/'.$form['group']['#value'].'/shoutbox';
+}
+
+
+function p2pu_views_pre_execute(&$view) {
+  
+  if ($view->name == 'course_events' ) {
+    $group_id = $view->args[2];
+    $group = node_load($group_id);
+    $view->title = $group->title;
+  }
+  
+}
+
+function p2pu_realname_from_uid($uid) {
+  global $user;
+  if ($uid == $user->$uid) {
+    $account = $user; 
+  } else {
+    $account = user_load($uid);
+  }
+  return theme('username',$account,array('plain' => TRUE));
+}
+
+//$group = og_get_group_context();
+//global $user;
+//if ($user->uid == 0) {
+//  $register = l('register', 'user/register', array('query' => 'destination=node/'.$group->nid));
+//  $login = l('login', 'user/login', array('query' => 'destination=node/'.$group->nid));
+//  print ('You must '.$register.' or '.$login.' in order to post into this group.');
+//  return;  
+//}
+//if (!og_is_group_member($group->nid)) {
+//  $link = l('Sign-up', 'og/subscribe/'.$group->nid, array('query' => 'destination=node/'.$group->nid));
+//  print ($link);
+//  return;
+//}
+//$link = l('Add a document', 'node/add/document', array('query' => 'gids[]='.$group->nid));
+//print ($link);
+
+function p2pu_toggle_signup_link($nid) {
+  $current = db_result(db_query("select og_selective from og where nid=%d",$nid));
+  if ($current != OG_CLOSED) {
+    print l(t('Close Applications'),"toggle-signup/$nid");
+  } else {
+    print l(t('Re-open Applications'),"toggle-signup/$nid");
+  }
+}
+
+function p2pu_toggle_signup($node) {
+  #$current = db_result(db_query("select og_selective from og where nid=%d",$node->nid));
+  $current = $node->og_selective;
+  if ($current != OG_CLOSED) {
+    $new = OG_CLOSED;
+    $text = "Closed";
+  } else {
+    $new = OG_MODERATED;
+    $text = "Re-Opened";
+  }
+  db_result(db_query("update og set og_selective=%d where nid=%d",$new,$node->nid));
+  return 'Applications for <a href="/node/'.$node->nid.'">'.$node->title.'</a> is now '.$text;
+}

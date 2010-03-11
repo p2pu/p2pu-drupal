@@ -1,0 +1,108 @@
+<?php
+// $Id: markup.module,v 1.2.2.1 2009/07/21 14:14:02 cyu Exp $
+
+/**
+ * @file
+ * Defines a field type for displaying markup on the node/edit form.
+ */
+
+/**
+ * Implementation of hook_field_info().
+ */
+function markup_field_info() {
+  return array(
+    'markup' => array('label' => 'Markup'),
+  );
+}
+
+/**
+ * Implementation of hook_field_settings().
+ */
+function markup_field_settings($op, $field) {
+  switch ($op) {
+    case 'form':
+      $form = array();
+      $form['markup'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Markup'),
+        '#default_value' => isset($field['markup']) ? $field['markup'] : '',
+        '#required' => TRUE,
+        '#rows' => 15,
+        '#description' => t('The markup to be displayed. Any HTML is legal here, so be careful not to break your page layout.'),
+      );
+      $form['instructions'] = array(
+        '#type' => 'markup',
+        '#value' => htmlentities(t('This is a special field. It will output the markup below, unfiltered by the system, on the node/edit form for this content type. Consider wrapping any visible output in <div class="form-item"></div> to follow form standards.')),
+        '#weight' => -1,
+      );
+      return $form;
+
+    case 'validate':
+      break;
+
+    case 'save':
+      return array('markup');
+    case 'database columns':
+      return array();
+  }
+}
+
+/**
+ * Implementation of hook_widget_info().
+ */
+function markup_widget_info() {
+  return array(
+    'markup' => array(
+      'label' => 'Markup',
+      'field types' => array('markup'),
+      'multiple values' => CONTENT_HANDLE_MODULE,
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_content_multigroup_allowed_widgets().
+ */
+function markup_content_multigroup_allowed_widgets() {
+  return array('markup');
+}
+
+/**
+ * Implementation of hook_content_multigroup_no_remove_widgets().
+ */
+function markup_content_multigroup_no_remove_widgets() {
+  return array('markup');
+}
+
+/**
+ * Implementation of hook_widget().
+ */
+function markup_widget(&$form, &$form_state, $field, $items, $delta = 0) {
+  $element = array(
+    '#type' => 'markup',
+    '#title' => '',
+    '#value' => $field['markup']
+  );
+  return $element;
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function markup_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'content_field_edit_form' && $form['module']['#value'] == 'markup') {
+    $form['widget']['label']['#description'] = t('This label is for internal use. If you would like to put a headline on your form markup, you should put HTML for that in the markup area itself.');
+    // Remove non-applicable fields on the widget settings form.
+    unset($form['widget']['description']);
+    unset($form['field']['required']);
+    unset($form['field']['multiple']);
+    unset($form['field']['#description']);
+  }
+}
+
+/**
+ * Implementation of cck hook_content_is_empty().
+ */
+function markup_content_is_empty($item, $field) {
+  return TRUE;
+}

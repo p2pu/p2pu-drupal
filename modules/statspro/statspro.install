@@ -1,0 +1,88 @@
+<?php
+// $Id: statspro.install,v 1.1 2008/12/31 19:53:28 mr3dblond Exp $
+
+/**
+ * @file
+ *   Install file for statistics pro module
+ *
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function statspro_install() {
+
+  variable_set('statspro_last_run', 0);
+  variable_set('statspro_start', 0);
+  variable_set('statspro_end', 0);
+
+  variable_set('statspro_term_rebuild', TRUE);
+
+  drupal_install_schema('statspro');
+
+  drupal_set_message(t('You have to run cron to recreate statistics. !url',
+                          array('!url' => l('You can run cron manually.', 'admin/reports/status/run-cron'))));
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function statspro_uninstall() {
+
+  variable_del('statspro_last_run');
+  variable_del('statspro_start');
+  variable_del('statspro_end');
+
+  drupal_uninstall_schema('statspro');
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function statspro_schema() {
+
+  $schema['statspro'] = array(
+      'fields' => array(
+           'day' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'disp-width' => '10'),
+           'nuser' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
+           'auser' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
+           'nnode' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
+           'cnode' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
+           'comment' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
+           'pi' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
+           'upi' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
+           'error' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
+           'uerror' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
+           'warning' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
+           'uwarning' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10')),
+      'primary key' => array('day'),
+  );
+
+  $schema['statspro_term'] = array(
+      'fields' => array(
+           'tid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
+           'ncount' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10')),
+      'primary key' => array('tid'),
+      'indexes' => array('ncount' => array('ncount')),
+  );
+
+  return $schema;
+}
+
+function statspro_update_1() {
+
+  statspro_reset_stats();
+
+  return array();
+}
+
+function statspro_update_2() {
+
+  $ret = array();
+  $schema = statspro_schema();
+  db_create_table($ret, 'statspro_term', $schema['statspro_term']);
+
+  variable_set('statspro_term_rebuild', TRUE);
+
+  return $ret;
+}

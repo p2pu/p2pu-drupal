@@ -1,0 +1,9 @@
+/* $Id: gravatar.css,v 1.1.2.1 2008/11/17 03:39:20 davereid Exp $ */
+
+.hide, .js-show {
+  display: none;
+}
+
+html.js .js-show {
+  display: block !important;
+}

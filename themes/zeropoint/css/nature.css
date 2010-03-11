@@ -1,0 +1,75 @@
+#top_bg {
+	background: transparent url(../images/nature/fill_top.png) 0 100% repeat-x;
+}
+#top_left {
+	background: transparent url(../images/nature/fill_top_left.png) 0 100% no-repeat;
+}
+#top_right {
+	background: transparent url(../images/nature/fill_top_right.png) 100% 100% no-repeat;
+}
+
+a, a:link,
+.title, .title a,
+.node .terms,
+#aggregator .news-item .categories, #aggregator .source, #aggregator .age,
+#forum td .name,
+div.admin-panel .description {
+	color: #4f7f5b;
+}
+
+.block.themed-block {
+	background: #fff url(../images/nature/fill_block.png) 0 100% repeat-x;
+}
+
+h1, h2, h3 {
+	color: #4f7f5b;
+}
+
+
+#navlist.links a, #navlinks ul li a {
+	background: #4f7f5b;
+}
+#navlist li a:hover,  #navlinks ul li a:hover {
+	color: #4f7f5b !important;
+}
+
+/*
+#navlist.links a, #navlinks ul li a {
+	border: 1px solid #4f7f5b;
+	border-bottom: none;
+	padding: 5px 24px;
+	background-color: #4f7f5b;
+}
+#navlist li a:hover, #navlinks ul li a:hover {
+	color: #fff !important;
+	background-color: #63a3d1  !important;
+}
+*/
+
+/* SUCKERFISHMENU */
+
+body.sfish #navlinks ul li.expanded a {
+	background: #4f7f5b url(../images/nav-down.png) 95% 50% no-repeat;
+}
+body.sfish #navlinks li ul a:link, 
+body.sfish #navlinks li ul a:visited {
+	background: #619c70;
+	border-left: 1px solid #77aa84;
+	border-top: 1px solid #77aa84;
+	border-right: 1px solid #41674a;
+	border-bottom: 1px solid #41674a;
+}
+body.sfish #navlinks ul.menu li ul.menu li.expanded a,
+body.sfish #navlinks ul.menu li ul.menu li ul.menu li.expanded a,
+body.sfish #navlinks ul.menu li ul.menu li ul.menu li ul.menu li.expanded a {
+	background: #619c70 url(../images/nav-right.png) 100% 50% no-repeat;
+}
+body.sfish #navlinks ul.menu li li.expanded ul.menu a, 
+body.sfish #navlinks ul.menu li li.expanded ul.menu li.expanded ul.menu a,
+body.sfish #navlinks ul.menu li li.expanded ul.menu li.expanded ul.menu li.expanded ul.menu a {
+	background: #619c70;
+}
+body.sfish #navlinks li ul a:hover {
+	color: #fff !important;
+	background-color: #4f7f5b !important;
+}

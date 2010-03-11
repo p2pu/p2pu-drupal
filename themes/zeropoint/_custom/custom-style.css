@@ -1,0 +1,142 @@
+/****************************/
+/* CUSTOM STYLE CSS         */
+/****************************/
+/* 
+Put your custom css and css overrides in this file.  By restricting 
+your css changes to custom-style.css, your changes will not be overwritten 
+when upgrading to a new version of this theme.
+
+Steps to customize your 0Point theme:                       
+1. Add your custom css to this file                
+2. Rename this file to local.css                   
+3. Uncomment different examples and modify data as you wish 
+4. Clear cached data at admin/settings/performance 
+*/
+/****************************/
+
+/* Erase or comment the lines below to get rid of the image in the right sidebar 
+ * and the brand image or choose another image and path instead. */
+
+#wrapper {
+	background: transparent url(../images/all/_sidebarimg.png) 99% 99% no-repeat;
+}
+
+#brand {
+	background: url(../images/all/_brand.png) 50% 30% no-repeat;
+	position: relative;
+	margin: 5px auto 0;
+	width: 250px;
+	height: 50px;
+}
+
+/* put a background image in the header */
+/*
+#headimg {
+	background: transparent url(drupal_x.png) 90% 70% no-repeat;
+}
+*/
+
+/* Uncomment the first declaration below to hide the titles on the front page 
+ * Addapt the second declaration to hide a certain title. */
+/*
+.front h2 a {
+	display: none;
+}
+.front #node-XXX h2 a {
+	display: none;
+}
+*/
+
+
+/*******************************/
+/* CUSTOM FIXED or FLUID WIDTH */
+/*******************************/ 
+/* First choose "Custom Layout width" in 0 Point settings page.
+ * Uncomment the lines below and modify the value as you wish. 
+ * E.g. 1000px for fixed width or 85% for fluid width */
+/*
+body.layout-fluid .sizer {
+	width: 90%;
+}
+body.layout-fixed .sizer {
+	width: 980px;
+}
+*/
+
+
+/*******************************/
+/* CUSTOM Equal width sidebars */
+/*******************************/ 
+/* First choose "Equal width sidebars" in 0 Point settings page.
+ * Uncomment the lines below and modify the values keeping pair values. */
+/*
+body.l-m-r-eq .colleft, body.m-r-eq .colleft, body.l-m-eq .colleft {
+	width: 199px;
+	margin-left: -199px;
+}
+body.l-m-r-eq .colright, body.m-r-eq .colright, body.l-m-eq .colright {
+	width: 199px;
+	margin-right: -199px;
+}
+body.l-m-r-eq .outer, body.l-m-eq .outer, body.l-m-eq .outer {
+	margin-left: 199px;
+}
+body.l-m-r-eq .outer, body.m-r-eq .outer, body.m-r-eq .outer {
+	margin-right: 199px;
+}
+body.l-m-eq .colleft {
+	width: 199px;
+	margin-left: -199px;
+}
+body.m-r-eq .colright {
+	width: 199px;
+	margin-right: -199px;
+}
+*/
+
+
+/******************************/
+/* SPECIAL STATIC-MENU COLORS */
+/******************************/
+
+/* Uncomment this to have different colors (and chooose them) for first and last menu items. */
+/*
+#navlist li.first a {
+	background: #D0932C;
+}
+#navlist li.last a {
+	background: #BF5D8C;
+}
+*/
+
+
+/* Change the values below accordingly: XXX=menu numer; YYY=background color. */
+/*
+#navlist li.menu-XXX a {
+	background: #YYY;
+}
+*/
+
+
+/*******************************/
+/* UPDATE ICONS FOR NEW BLOCKS */
+/*******************************/
+/* where XXX is the block number */
+
+/*
+#block-block-XXX .block-icon {
+background: transparent url(../images/contact_48.png) no-repeat;
+}
+*/
+
+
+.sitemap-box h2 {
+	display: none;
+}
+.views-exposed-widget #edit-submit {
+	border: 1px solid #555;
+	margin-top: 15px !important;
+}
+.pane-content h2.title a {
+	font-size: 140%;
+}

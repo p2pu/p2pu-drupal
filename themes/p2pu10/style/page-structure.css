@@ -1,0 +1,56 @@
+@CHARSET "UTF-8";
+
+/* -- Column widths -- */
+
+/* Change the left column width by replacing the values here */
+body.two-sidebars div#sidebar-left,
+body.sidebar-left div#sidebar-left{ width: 200px; margin-right: -200px;}
+body.two-sidebars div#content-column,
+body.sidebar-left div#content-column{ margin-left: 200px;}
+
+/* Change the right column width by replacing the values here */
+body.two-sidebars div#sidebar-right,
+body.sidebar-right div#sidebar-right{ width: 200px; margin-left: -200px;}
+body.two-sidebars div#page-sub-body,
+body.sidebar-right div#page-sub-body{ margin-right: 200px;}
+
+/* Change the page width by replacing the value here */
+div#page{ margin: 0 auto; width: 926px;}
+
+/* Change the content column width by replacing the values here */
+body.no-sidebars div#content-column{ width: 926px;}
+body.one-sidebar div#content-column{ width: 726px;}
+body.two-sidebars div#content-column{ width: 526px;}
+
+/* Spacing */
+body.two-sidebars div#content-column .inner{ padding: 10px;}
+body.no-sidebars div#content-column .inner{ padding: 10px;}
+body.sidebar-left div#content-column .inner{ padding: 10px 10px 10px 0;}
+body.sidebar-right div#content-column .inner{ padding: 10px 0 10px 10px;}
+div#sidebar-left .inner{ padding: 0 10px;}
+div#sidebar-right .inner{ padding: 0 10px;}
+
+/* -- Column floating -- */
+
+div#sidebar-left{ float: left;}
+div#content-column{ float: right;}
+div#sidebar-right{ float: right;}
+div#page-sub-body{ float: left;}
+div#page-sub-body:after { clear: both; content: "."; display: block; font-size: 0px; height: 0px; line-height: 0px; visibility: hidden; margin: 0px; padding: 0px;}
+
+body div#page-footer,
+div#page-sub-header,
+div#page-body{ clear: both; height: 100%;}
+
+/* -- Page header -- */
+
+div#page-header{ position: relative;}
+
+/* -- Float containment -- */
+
+.float-localiser { float: left; width: 100%;}
+
+div.tabs ul:after,
+.float-container:after { clear: both; content: "."; display: block; font-size: 0px; height: 0px; line-height: 0px; visibility: hidden; margin: 0px; padding: 0px;}
+div.tabs ul,
+.float-container { display: inline-block; margin: 0px; padding: 0px; width: 100%;}

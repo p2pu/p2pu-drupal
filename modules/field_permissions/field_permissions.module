@@ -1,0 +1,93 @@
+<?php
+// $Id: field_permissions.module,v 1.1.2.9 2009/11/14 12:38:20 markuspetrux Exp $
+
+/**
+ * @file
+ * This is the main script for the Field Permissions module. It merely contains
+ * the implementation of hooks invoked by Drupal core and CCK.
+ * All common functions are externalized into several scripts that are included
+ * on demand to save memory consumption during normal site operation.
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function field_permissions_menu() {
+  module_load_include('inc', 'field_permissions', 'includes/admin');
+  return _field_permissions_menu();
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function field_permissions_theme() {
+  return array(
+    'field_permissions_troubleshooting_form' => array('arguments' => array('form' => NULL), 'file' => 'includes/admin.inc'),
+  );
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function field_permissions_perm() {
+  module_load_include('inc', 'field_permissions', 'includes/admin');
+  return _field_permissions_perm();
+}
+
+/**
+ * Implementation of hook_field_settings_alter().
+ */
+function field_permissions_field_settings_alter(&$settings, $op, $field) {
+  if ($op == 'form' || $op == 'save') {
+    module_load_include('inc', 'field_permissions', 'includes/admin');
+    return _field_permissions_field_settings_alter($settings, $op, $field);
+  }
+}
+
+/**
+ * Implementation of hook_field_access().
+ *
+ * @param $op
+ *   The operation to be performed. Possible values:
+ *   - 'edit'
+ *   - 'view'
+ * @param $field
+ *   The field on which the operation is to be performed.
+ * @param $account
+ *   The account to check.
+ *   Note that this argument is optional to content_access(), but it is
+ *   always passed to hook_field_access(), with current user if not supplied.
+ *   This is an argument that was added to CCK in 6.x-2.2 release.
+ * @param $node
+ *   (optional) The node on which the operation is to be performed.
+ *   Note that this argument is optional to content_access(), but it is
+ *   always passed to hook_field_access(), with NULL if not supplied.
+ *   This is an argument that was added to CCK in 6.x-2.5 release.
+ *
+ * @return
+ *   FALSE if the operation is not allowed.
+ *   Note when content_access() is invoked, access is granted unless one
+ *   implementation of hook_field_access() explicitly returns FALSE.
+ *
+ * @see content_access()
+ */
+function field_permissions_field_access($op, $field, $account, $node) {
+  // Ignore the request if permissions have not been enabled for this field.
+  $field_permissions = (isset($field['field_permissions']) && is_array($field['field_permissions']) ? array_filter($field['field_permissions']) : array());
+  if (empty($field_permissions)) {
+    return;
+  }
+
+  if ($op == 'view') {
+    if (!empty($field_permissions['view']) || !empty($field_permissions['view own'])) {
+      module_load_include('inc', 'field_permissions', 'includes/field_access');
+      return _field_permissions_field_view_access($field['field_name'], $field_permissions, $account, $node);
+    }
+  }
+  elseif ($op == 'edit') {
+    if (!empty($field_permissions['edit']) || !empty($field_permissions['edit own']) || !empty($field_permissions['create'])) {
+      module_load_include('inc', 'field_permissions', 'includes/field_access');
+      return _field_permissions_field_edit_access($field['field_name'], $field_permissions, $account, $node);
+    }
+  }
+}

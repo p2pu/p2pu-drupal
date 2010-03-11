@@ -1,0 +1,29 @@
+<?php
+// $Id: groupadmin.install,v 1.1 2009/09/23 14:26:01 netgenius Exp $
+
+/**
+ * Implementation of hook_uninstall().
+ */
+ 
+function groupadmin_uninstall() {
+  variable_del('groupadmin');
+}
+
+/**
+ * Implementation of hook_install().
+ */
+/*
+
+function groupadmin_install() {
+}
+*/
+
+/**
+ * Implementation of hook_update()
+ */
+
+/*
+function groupadmin_update_1() {
+}
+*/
+

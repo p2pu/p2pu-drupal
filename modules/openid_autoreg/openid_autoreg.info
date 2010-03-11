@@ -1,0 +1,13 @@
+; $Id: openid_autoreg.info,v 1.1 2009/04/09 17:27:01 valthebald Exp $
+name = OpenID autoregistration
+description = "Allows OpenID users to be automatically registered in drupal even if some required fields in user data are missing"
+version = 1.0
+core = 6.x
+
+dependencies[] = openid
+; Information added by drupal.org packaging script on 2009-04-10
+version = "6.x-1.1"
+core = "6.x"
+project = "openid_autoreg"
+datestamp = "1239340549"
+

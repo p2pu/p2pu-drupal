@@ -1,0 +1,257 @@
+<?php
+$view = new view;
+$view->name = 'statspro_user';
+$view->description = 'Statistics about new user and online user';
+$view->tag = 'Statistics pro';
+$view->view_php = '';
+$view->base_table = 'statspro';
+$view->is_cacheable = FALSE;
+$view->api_version = 2;
+$view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+$handler = $view->new_display('default', 'Defaults', 'default');
+$handler->override_option('fields', array(
+  'day' => array(
+    'label' => 'Date',
+    'date_format' => 'custom',
+    'custom_date_format' => 'd. F Y',
+    'exclude' => 0,
+    'id' => 'day',
+    'table' => 'statspro',
+    'field' => 'day',
+    'relationship' => 'none',
+  ),
+  'nuser' => array(
+    'label' => 'User registrations',
+    'set_precision' => FALSE,
+    'precision' => 0,
+    'decimal' => '.',
+    'separator' => '.',
+    'prefix' => '',
+    'suffix' => '',
+    'exclude' => 0,
+    'id' => 'nuser',
+    'table' => 'statspro',
+    'field' => 'nuser',
+    'override' => array(
+      'button' => 'Override',
+    ),
+    'relationship' => 'none',
+    'display_mode' => 'graph',
+    'graph_size' => '350',
+  ),
+  'nuser_1' => array(
+    'label' => 'Trend',
+    'set_precision' => FALSE,
+    'precision' => 0,
+    'decimal' => '.',
+    'separator' => '.',
+    'prefix' => '',
+    'suffix' => '',
+    'exclude' => 0,
+    'id' => 'nuser_1',
+    'table' => 'statspro',
+    'field' => 'nuser',
+    'override' => array(
+      'button' => 'Override',
+    ),
+    'relationship' => 'none',
+    'display_mode' => 'trend',
+    'graph_size' => '',
+  ),
+  'nuser_2' => array(
+    'label' => 'Amount',
+    'set_precision' => FALSE,
+    'precision' => 0,
+    'decimal' => '.',
+    'separator' => '.',
+    'prefix' => '',
+    'suffix' => '',
+    'exclude' => 0,
+    'id' => 'nuser_2',
+    'table' => 'statspro',
+    'field' => 'nuser',
+    'override' => array(
+      'button' => 'Override',
+    ),
+    'relationship' => 'none',
+    'display_mode' => 'text',
+    'graph_size' => '',
+  ),
+));
+$handler->override_option('sorts', array(
+  'day' => array(
+    'order' => 'DESC',
+    'id' => 'day',
+    'table' => 'statspro',
+    'field' => 'day',
+    'override' => array(
+      'button' => 'Override',
+    ),
+    'relationship' => 'none',
+  ),
+));
+$handler->override_option('access', array(
+  'type' => 'perm',
+  'perm' => 'access statistics',
+));
+$handler->override_option('title', 'Statistics pro');
+$handler->override_option('header', 'Overview for new user registrations.');
+$handler->override_option('header_format', '1');
+$handler->override_option('header_empty', 0);
+$handler->override_option('use_ajax', TRUE);
+$handler->override_option('items_per_page', 20);
+$handler->override_option('use_pager', '1');
+$handler->override_option('style_plugin', 'table');
+$handler->override_option('style_options', array(
+  'grouping' => '',
+  'override' => 1,
+  'sticky' => 0,
+  'order' => 'desc',
+  'columns' => array(
+    'day' => 'day',
+    'nuser' => 'nuser',
+    'nuser_1' => 'nuser_1',
+    'nuser_2' => 'nuser_2',
+  ),
+  'info' => array(
+    'day' => array(
+      'sortable' => 1,
+      'separator' => '',
+    ),
+    'nuser' => array(
+      'sortable' => 0,
+      'separator' => '',
+    ),
+    'nuser_1' => array(
+      'sortable' => 0,
+      'separator' => '',
+    ),
+    'nuser_2' => array(
+      'sortable' => 1,
+      'separator' => '',
+    ),
+  ),
+  'default' => 'day',
+));
+$handler = $view->new_display('page', 'Page', 'page_1');
+$handler->override_option('path', 'admin/reports/statspro/user');
+$handler->override_option('menu', array(
+  'type' => 'tab',
+  'title' => 'User',
+  'weight' => '0',
+  'name' => 'navigation',
+));
+$handler->override_option('tab_options', array(
+  'type' => 'none',
+  'title' => '',
+  'weight' => 0,
+));
+$handler = $view->new_display('attachment', 'Attachment', 'attachment_1');
+$handler->override_option('fields', array(
+  'day' => array(
+    'label' => 'Date',
+    'date_format' => 'custom',
+    'custom_date_format' => 'd. F Y',
+    'exclude' => 0,
+    'id' => 'day',
+    'table' => 'statspro',
+    'field' => 'day',
+    'relationship' => 'none',
+  ),
+  'auser' => array(
+    'label' => 'User online',
+    'set_precision' => FALSE,
+    'precision' => 0,
+    'decimal' => '.',
+    'separator' => '.',
+    'prefix' => '',
+    'suffix' => '',
+    'exclude' => 0,
+    'id' => 'auser',
+    'table' => 'statspro',
+    'field' => 'auser',
+    'override' => array(
+      'button' => 'Use default',
+    ),
+    'relationship' => 'none',
+    'display_mode' => 'graph',
+    'graph_size' => '350',
+  ),
+  'auser_1' => array(
+    'label' => 'Trend',
+    'set_precision' => FALSE,
+    'precision' => 0,
+    'decimal' => '.',
+    'separator' => '.',
+    'prefix' => '',
+    'suffix' => '',
+    'exclude' => 0,
+    'id' => 'auser_1',
+    'table' => 'statspro',
+    'field' => 'auser',
+    'override' => array(
+      'button' => 'Use default',
+    ),
+    'relationship' => 'none',
+    'display_mode' => 'trend',
+    'graph_size' => '',
+  ),
+  'auser_2' => array(
+    'label' => 'Amount',
+    'set_precision' => FALSE,
+    'precision' => 0,
+    'decimal' => '.',
+    'separator' => '.',
+    'prefix' => '',
+    'suffix' => '',
+    'exclude' => 0,
+    'id' => 'auser_2',
+    'table' => 'statspro',
+    'field' => 'auser',
+    'override' => array(
+      'button' => 'Use default',
+    ),
+    'relationship' => 'none',
+    'display_mode' => 'text',
+    'graph_size' => '',
+  ),
+));
+$handler->override_option('header', 'Overview for online user activity.');
+$handler->override_option('style_options', array(
+  'grouping' => '',
+  'override' => 1,
+  'sticky' => 0,
+  'order' => 'desc',
+  'columns' => array(
+    'day' => 'day',
+    'auser' => 'auser',
+    'auser_1' => 'auser_1',
+    'auser_2' => 'auser_2',
+  ),
+  'info' => array(
+    'day' => array(
+      'sortable' => 1,
+      'separator' => '',
+    ),
+    'auser' => array(
+      'sortable' => 0,
+      'separator' => '',
+    ),
+    'auser_1' => array(
+      'sortable' => 0,
+      'separator' => '',
+    ),
+    'auser_2' => array(
+      'sortable' => 1,
+      'separator' => '',
+    ),
+  ),
+  'default' => 'day',
+));
+$handler->override_option('attachment_position', 'after');
+$handler->override_option('inherit_arguments', TRUE);
+$handler->override_option('inherit_exposed_filters', FALSE);
+$handler->override_option('displays', array(
+  'page_1' => 'page_1',
+  'default' => 0,
+));

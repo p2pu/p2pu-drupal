@@ -1,0 +1,13 @@
+name = Menu Editor
+description = Improved interface for menu editing.
+package = Menu
+core = 6.x
+dependencies[] = menu
+
+
+; Information added by drupal.org packaging script on 2010-01-26
+version = "6.x-1.2"
+core = "6.x"
+project = "menu_editor"
+datestamp = "1264481106"
+

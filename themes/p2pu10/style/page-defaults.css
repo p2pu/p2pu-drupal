@@ -1,0 +1,52 @@
+@CHARSET "UTF-8";
+
+/* Global */
+
+a{ text-decoration: none;}
+a:hover{ text-decoration: underline;}
+
+div.table-wrapper{ overflow: auto; width: 100%;}
+div.block{ padding-bottom: 20px;}
+body form#user-login-form { text-align: left;}
+
+/* Navigation */
+div#navigation ul{ margin: 0;}
+div#navigation li{ float: left; list-style: none; margin-right: 10px;}
+div.breadcrumb{ clear: both;}
+
+/* Search */
+div#search{ float: right;}
+
+/* Sidebars */
+div.sidebar div.item-list ul{ margin: 0px; padding: 0px;}
+div.sidebar div.item-list ul li{ list-style-type: none; list-style-image: none; list-style-position: outside; margin: 0px;}
+
+/* Messages */
+div.messages{ border-style: solid; border-width: 1px; padding: 10px; margin-bottom: 18px;}
+div.messages ul{ margin: 0px 0px 0px 0px; padding: 0px;}
+div.messages ul li{ list-style-type: none; margin-bottom: 5px;}
+
+/* Fieldsets */
+fieldset legend{ padding: 0px 5px;}
+fieldset.collapsible legend{ padding-left: 0px;}
+fieldset div.fieldset-wrapper{ padding: 0px 0px 5px;}
+
+/* Tabs */
+div.tabs ul{ border-bottom-style: solid; border-bottom-width: 1px; line-height: 17px; white-space: normal;}
+div.tabs ul li { border-bottom-style: solid; border-bottom-width: 1px; display: block; float: left; margin: 5px 0 -1px 0; padding: 0;}
+div.tabs ul li a{ border-style: solid; margin: 0 4px -1px; padding: 0 5px;}
+div.tabs ul.tabs{ clear: both;}
+
+/* Tables */
+table,
+table th,
+table th td,
+table td{ vertical-align: top;}  
+
+/* Nodes */
+.field .field-label-inline, .field .field-label-inline-first { display: block; float: left; width: 35%;}
+div.node{ padding-bottom: 28px;}
+div.meta{ text-align: right;}
+
+/* Views */
+body div.view div.views-admin-links { width: auto;}

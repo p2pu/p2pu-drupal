@@ -1,0 +1,47 @@
+<?php
+// $Id: statspro.test,v 1.1 2008/12/31 19:53:29 mr3dblond Exp $
+
+/**
+ * @file
+ * Functionality tests for Statspro.
+ *
+ * @ingroup pathauto
+ */
+
+/**
+ * TODO
+ */
+class StatsproTestCase extends DrupalTestCase {
+
+  private $statspro;
+
+  function getinfo() {
+    return array(
+      'name' => t('Statistics pro basic tests'),
+      'description' => t('Test basic Statistics pro module functionality.'),
+      'group' => 'Statistics pro',
+    );
+  }
+
+  /**
+   * Implementation of setUp().
+   */
+  function setup() {
+
+    require_once drupal_get_path('module', 'statspro') .'/statspro.inc';
+
+    $this->statspro = new statspro();
+  }
+
+  function teststatspro() {
+/*
+    $test = $this->statspro->generate_results();
+
+    $some_value    = 1;
+    $another_value = 2;
+
+    // Test that the code did what it was supposed to do.
+    $this->assertEqual($some_value, $another_value, t('Period result test generated equality of values'));
+    */
+  }
+}

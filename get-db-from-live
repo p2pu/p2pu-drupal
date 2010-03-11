@@ -1,0 +1,14 @@
+#!/bin/bash
+
+hostname=$(hostname -a)
+if [ "$hostname" != "shoots" ]
+then
+  echo "You should not be running this here"
+  exit
+fi
+
+ssh anton@69.164.208.57 "cd /var/www/p2pu/sites/p2pu.org; drush sql dump| gzip " > db-from-live.sql.gz
+zcat db-from-live.sql.gz | drush sql cli
+drupal-rebuild-modules-themes-cache
+#drush -y enable devel
+drush -y enable drupalforfirebug

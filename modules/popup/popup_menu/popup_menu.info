@@ -1,0 +1,6 @@
+name = Popup menu
+description = Enable menus to be displayed as popups within block regions
+package = User interface
+version = "6.x-3.0"
+core = 6.x
+dependencies[] = popup

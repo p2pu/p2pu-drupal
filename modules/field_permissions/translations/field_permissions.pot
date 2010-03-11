@@ -1,0 +1,247 @@
+# $Id: field_permissions.pot,v 1.1.2.3 2009/11/14 16:07:02 markuspetrux Exp $
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  field_permissions.module,v 1.1.2.9 2009/11/14 12:38:20 markuspetrux
+#  field_permissions.install,v 1.1.2.4 2009/11/14 15:58:44 markuspetrux
+#  field_permissions.info,v 1.1.2.2 2009/11/06 00:55:45 markuspetrux
+#  admin.inc,v 1.1.2.5 2009/11/14 15:58:44 markuspetrux
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2009-11-14 17:05+0100\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: field_permissions.module:33
+msgid "inc"
+msgstr ""
+
+#: field_permissions.module:33;0
+msgid "field_permissions"
+msgstr ""
+
+#: field_permissions.module:33
+msgid "includes/admin"
+msgstr ""
+
+#: (duplicate) field_permissions.install:31 
+msgid "Field permissions have been enabled for field %field-name."
+msgstr ""
+
+#: (duplicate) field_permissions.install:35 
+msgid "Field Permissions module has been installed successfully."
+msgstr ""
+
+#: (duplicate) field_permissions.install:39 
+msgid "We have found that Content Permissions module (part of CCK) is installed, permissions have been enabled for all fields in your site. You can now uninstall Content Permissions module. Then you may want to enable and/or disable permissions for each field independently from the field settings form."
+msgstr ""
+
+#: (duplicate) field_permissions.install:62 
+msgid "Field permission settings have been removed from field %field-name."
+msgstr ""
+
+#: (duplicate) field_permissions.install:66 
+msgid "Field Permissions module has been uninstalled successfully."
+msgstr ""
+
+#: field_permissions.info:0
+msgid "Field Permissions"
+msgstr ""
+
+#: field_permissions.info:0
+msgid "Set field-level permissions to edit or view CCK fields in any node, edit field during node creation, and edit or view permissions for nodes owned by the current user."
+msgstr ""
+
+#: field_permissions.info:0
+msgid "CCK"
+msgstr ""
+
+#: includes/admin.inc:52
+msgid "Create field"
+msgstr ""
+
+#: includes/admin.inc:53
+msgid "Create @field (edit on node creation)."
+msgstr ""
+
+#: includes/admin.inc:56
+msgid "Edit field"
+msgstr ""
+
+#: includes/admin.inc:57
+msgid "Edit @field, regardless of node author."
+msgstr ""
+
+#: includes/admin.inc:60
+msgid "Edit own field"
+msgstr ""
+
+#: includes/admin.inc:61
+msgid "Edit own @field on node created by the user."
+msgstr ""
+
+#: includes/admin.inc:64
+msgid "View field"
+msgstr ""
+
+#: includes/admin.inc:65
+msgid "View @field, regardless of node author."
+msgstr ""
+
+#: includes/admin.inc:68
+msgid "View own field"
+msgstr ""
+
+#: includes/admin.inc:69
+msgid "View own @field on node created by the user."
+msgstr ""
+
+#: includes/admin.inc:102
+msgid "Field permissions"
+msgstr ""
+
+#: includes/admin.inc:107
+msgid "Use these options to enable role based permissions for this field.\nWhen permissions are enabled, access to this field is denied by default and explicit permissions should be granted to the proper user roles from the <a href=\"@admin-permissions\">permissions administration</a> page.\nOn the other hand, when these options are disabled, field permissions are inherited from node view and/or edit permissions. In example, users allowed to view a particular node will also be able to view this field, and so on."
+msgstr ""
+
+#: includes/admin.inc:133
+msgid "Field name"
+msgstr ""
+
+#: includes/admin.inc:133
+msgid "Field type"
+msgstr ""
+
+#: includes/admin.inc:133
+msgid "Used in"
+msgstr ""
+
+#: includes/admin.inc:147
+msgid "@field (Locked)"
+msgstr ""
+
+#: includes/admin.inc:173
+msgid "Enabled"
+msgstr ""
+
+#: includes/admin.inc:177
+msgid "Disabled"
+msgstr ""
+
+#: includes/admin.inc:192
+msgid "No fields have been defined for any content type yet."
+msgstr ""
+
+#: includes/admin.inc:236
+msgid "Report options"
+msgstr ""
+
+#: includes/admin.inc:241
+msgid "Node"
+msgstr ""
+
+#: includes/admin.inc:245
+msgid "Select the node that you want to check access to."
+msgstr ""
+
+#: includes/admin.inc:254
+msgid "Next"
+msgstr ""
+
+#: includes/admin.inc:262
+msgid "Select field"
+msgstr ""
+
+#: includes/admin.inc:264
+msgid "@field-label (@field-name)"
+msgstr ""
+
+#: includes/admin.inc:269
+msgid "Field"
+msgstr ""
+
+#: includes/admin.inc:272
+msgid "Emulate access to the given node."
+msgstr ""
+
+#: includes/admin.inc:273
+msgid "Select the field on the selected node that you want to check access to."
+msgstr ""
+
+#: includes/admin.inc:280
+msgid "User"
+msgstr ""
+
+#: includes/admin.inc:285
+msgid "Select the user that you want to check. Access to the specified node will be checked using all different roles assigned to this user. Leave blank to check for %anonymous."
+msgstr ""
+
+#: includes/admin.inc:285;307;444
+msgid "Anonymous"
+msgstr ""
+
+#: includes/admin.inc:297
+msgid "Check"
+msgstr ""
+
+#: includes/admin.inc:301;343;401
+msgid "Reset"
+msgstr ""
+
+#: includes/admin.inc:322
+msgid "Report"
+msgstr ""
+
+#: includes/admin.inc:323
+msgid "This report simulates different operations to access the field %field-label in the node %node-title (nid: @node-nid), created by %node-author (uid: @node-uid), or creation of nodes of type %node-type, for each role assigned to user %user-name (uid: @uid). Move the mouse over each status icon to review detailed information about each test."
+msgstr ""
+
+#: includes/admin.inc:353;365
+msgid "Node: found no valid post with that title."
+msgstr ""
+
+#: includes/admin.inc:361
+msgid "Node: title mismatch. Please check your selection."
+msgstr ""
+
+#: includes/admin.inc:374
+msgid "Field: please, select a field."
+msgstr ""
+
+#: includes/admin.inc:380
+msgid "Field: %field does not exist in the selected node type."
+msgstr ""
+
+#: includes/admin.inc:389
+msgid "User: user %name cannot be found."
+msgstr ""
+
+#: includes/admin.inc:431
+msgid "site administrator (uid: 1)"
+msgstr ""
+
+#: includes/admin.inc:433
+msgid "User role"
+msgstr ""
+
+#: includes/admin.inc:491
+msgid "Access allowed"
+msgstr ""
+
+#: includes/admin.inc:495
+msgid "Access denied"
+msgstr ""
+
+#: includes/admin.inc:502
+msgid "Detailed results for %role -vs- %operation"
+msgstr ""
+

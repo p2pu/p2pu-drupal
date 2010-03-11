@@ -1,0 +1,101 @@
+# $Id$
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  viewfield.module: n/a
+#  viewfield.info,v 1.2 2008/08/27 13:16:39 weitzman
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2009-04-07 14:33-0400\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: viewfield.module:17
+msgid "View field"
+msgstr ""
+
+#: viewfield.module:18 viewfield.info:0
+msgid "Defines a field type that displays the contents of a view in a node."
+msgstr ""
+
+#: viewfield.module:40
+msgid "Allowed views"
+msgstr ""
+
+#: viewfield.module:43
+msgid "Only allow users to select from the specified views. If no views are selected, all will be available. If only one is selected, the user will only be able to specify the arguments."
+msgstr ""
+
+#: viewfield.module:47
+msgid "Use a common default value for all nodes if the user does not override it on the node form."
+msgstr ""
+
+#: viewfield.module:53
+msgid "Enable token replacements."
+msgstr ""
+
+#: viewfield.module:54
+msgid "Token replacements will affect the site performance if using a Viewfield inside a View that has <em>field</em> row style."
+msgstr ""
+
+#: viewfield.module:66
+msgid "Multiple views are not supported if force default is enabled."
+msgstr ""
+
+#: viewfield.module:159
+msgid "Force default"
+msgstr ""
+
+#: viewfield.module:161
+msgid "If checked, the user will not be able to change anything about the view at all. It will not even be shown on the edit node page. The default value will be used instead."
+msgstr ""
+
+#: viewfield.module:231
+msgid "Override default"
+msgstr ""
+
+#: viewfield.module:248;257
+msgid "Arguments"
+msgstr ""
+
+#: viewfield.module:257;265
+msgid "arguments"
+msgstr ""
+
+#: viewfield.module:264
+msgid "Provide a comma separated list of arguments to pass to the view. These arguments will be passed to EACH selected view. If an argument contains commas or double quotes, enclose it in double quotes. Replace double quotes that are part of the argument with pairs of double quotes."
+msgstr ""
+
+#: viewfield.module:271
+msgid "Use the syntax [token] if you want to insert a replacement pattern."
+msgstr ""
+
+#: viewfield.module:272
+msgid "You may use %nid for the node id of the current node. %author for the node author and %viewer for user viewing the node."
+msgstr ""
+
+#: viewfield.module:314
+msgid "none"
+msgstr ""
+
+#: viewfield.module:326
+msgid "Token replacement patterns"
+msgstr ""
+
+#: viewfield.info:0
+msgid "Viewfield"
+msgstr ""
+
+#: viewfield.info:0
+msgid "CCK"
+msgstr ""
+

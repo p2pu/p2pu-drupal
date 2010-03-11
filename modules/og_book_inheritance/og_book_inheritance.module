@@ -1,0 +1,253 @@
+<?php
+// $Id: og_book_inheritance.module,v 1.3.2.1 2009/07/07 11:12:43 agileware Exp $
+
+/**
+ * @file
+ * This module provides functionality for inheritance when assigning groups to book pages.
+ *
+ * It is used along with the og module and the book module
+ */
+
+/**
+ * Implementation of hook_help()
+ */
+function og_book_inheritance_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#og_book_inheritance':
+      return '<p>' . t('The og book inheritance module provides functionality for inheritance when assigning groups to book pages. To set up this module for use see the settings page by following the link below.') . '</p>';
+  }
+}
+
+/**
+ * Implementation of hook_menu()
+ */
+function og_book_inheritance_menu() {
+  $items = array();
+
+  $items['admin/og/og-book-inheritance'] = array(
+    'title' => t('OG book inheritance settings'),
+    'description' => t('Manage settings for group inheritance for books'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('og_book_inheritance_settings_form'),
+    'access callback' => 'user_access',
+    'access arguments' => array('administer organic groups'),
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_nodeapi()
+ */
+function og_book_inheritance_nodeapi(&$node, $op, $a3, $a4) {
+  if ($node->type == 'book') {
+    switch ($op) {
+      case 'presave':
+        switch (variable_get('og_book_inheritance_inherit_when', 'if_empty')) {
+          case 'user_exclusive':
+            if ($node->inherit) {
+              if ($node->book['bid']) {
+                $parent_node = og_book_inheritance_get_parent_node($node->book);
+                $node->og_groups = $parent_node->og_groups;
+                if (variable_get('og_book_inheritance_inherit_public_exclusive', TRUE)) {
+                  $node->og_public = $parent_node->og_public;
+                }
+              }
+            }
+            break;
+          case 'user_plus':
+            if ($node->inherit) {
+              if ($node->book['bid']) {
+                $parent_node = og_book_inheritance_get_parent_node($node->book);
+                $node->og_groups = array_merge($node->og_groups, $parent_node->og_groups);
+                if (variable_get('og_book_inheritance_inherit_public_plus', TRUE)) {
+                  $node->og_public = $parent_node->og_public;
+                }
+              }
+            }
+            break;
+          case 'if_empty':
+            if ($node->book['bid'] && empty($node->og_groups)) {
+              $parent_node = og_book_inheritance_get_parent_node($node->book);
+              $node->og_groups = $parent_node->og_groups;
+              if (variable_get('og_book_inheritance_inherit_public_exclusive', TRUE)) {
+                $node->og_public = $parent_node->og_public;
+              }
+            }
+            break;
+          case 'if_parent_exclusive':
+            if ($node->book['bid']) {
+              $parent_node = og_book_inheritance_get_parent_node($node->book);
+              $node->og_groups = $parent_node->og_groups;
+              if (variable_get('og_book_inheritance_inherit_public_exclusive', TRUE)) {
+                $node->og_public = $parent_node->og_public;
+              }
+            }
+            break;
+          case 'if_parent_plus':
+            if ($node->book['bid']) {
+              $parent_node = og_book_inheritance_get_parent_node($node->book);
+              $node->og_groups = array_merge($node->og_groups, $parent_node->og_groups);
+              if (variable_get('og_book_inheritance_inherit_public_plus', TRUE)) {
+                $node->og_public = $parent_node->og_public;
+              }
+            }
+            break;
+        } // End of inherit_when switch
+        break;
+      case 'validate':
+        if (variable_get('og_book_inheritance_enabled', FALSE) && variable_get('og_book_inheritance_required', FALSE)) {
+          $inherit_when = variable_get('og_book_inheritance_inherit_when', 'if_empty');
+          if ($inherit_when == 'user_exclusive' || $inherit_when == 'if_parent_exclusive') {
+            if (!$node->book['bid'] && empty($parent_node->og_groups)) {
+              form_set_error('og_groups', 'This book page does not have a parent page.  This book page must have a parent with at least one group.');
+            }
+            else {
+              $parent_node = og_book_inheritance_get_parent_node($node->book);
+              if (empty($parent_node->og_groups)) {
+                form_set_error('og_groups', 'The parent of this book page does not have a group assigned.  The parent book page must have at least one group.');
+              }
+            }
+          }
+          else {
+            if (empty($node->og_groups)) {
+              if (!$node->book['bid']) {
+                form_set_error('og_groups', 'This book page does not have a parent page.  In this case you must select a group for this book page.');
+              }
+              else {
+                $parent_node = og_book_inheritance_get_parent_node($node->book);
+                if (empty($parent_node->og_groups)) {
+                  form_set_error('og_groups', 'The parent of this book page does not have a group assigned.  In this case you must select a group for this book page.');
+                }
+              }
+            }
+          }
+        }
+        break;
+    }
+  }
+}
+
+/**
+ * Implementation of hook_form_alter()
+ */
+function og_book_inheritance_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'book_node_form' && variable_get('og_book_inheritance_enabled', FALSE)) {
+    $inherit_when = variable_get('og_book_inheritance_inherit_when', 'if_empty');
+    switch ($inherit_when) {
+      case 'user_exclusive':
+        $value = "If you select to use this page's parent's group via the checkbox below, the parent's groups will be used.  Any groups you select here will be ignored.";
+        $value .= variable_get('og_book_inheritance_required', FALSE) ? ' If there is no parent or the parent has no groups you must select a group.' : ' If there is no parent or the parent has no groups, no groups will be selected.';
+        $title = "Use parent's groups (your selections will be ignored)";
+        break;
+      case 'user_plus':
+        $value = "If you select to use this page's parent's group via the checkbox below, the parent's groups will be added to your selection.";
+        $value .= variable_get('og_book_inheritance_required', FALSE) ? ' If there is no parent or the parent has no groups you must select a group.' : '';
+        $title = "Add parent's groups to your selection";
+        break;
+      case 'if_empty':
+        $value = "If no group is selected the parent's groups will be used.";
+        $value .= variable_get('og_book_inheritance_required', FALSE) ? ' If there is no parent or the parent has no groups you must select a group.' : '';
+        break;
+      case 'if_parent_exclusive':
+        $value = "If this book page has a parent, the parent's groups will be used and any groups you have selected will be ignored.  Otherwise your selection will be used.";
+        $value .= variable_get('og_book_inheritance_required', FALSE) ? ' If there is no parent or the parent has no groups you must select a group.' : ' If there is no parent or the parent has no groups, no groups will be selected.';
+        break;
+      case 'if_parent_plus':
+        $value = "If this book page has a parent, the parent's groups will be added to your selection.";
+        $value .= variable_get('og_book_inheritance_required', FALSE) ? ' If there is no parent or the parent has no groups you must select a group.' : '';
+        break;
+    }
+
+    $form['og_nodeapi']['visible']['parent_message'] = array(
+      '#type' => 'item',
+      '#value' => t($value),
+      '#weight' => -20,
+    );
+    if ($inherit_when == 'user_plus' || $inherit_when == 'user_exclusive') {
+      $form['og_nodeapi']['visible']['inherit'] = array(
+        '#type' => 'checkbox',
+        '#title' => t($title),
+        '#default_value' => variable_get('og_book_inheritance_user_checkbox_default', FALSE),
+        '#weight' => -19.5,
+      );
+    }
+  }
+}
+
+/**
+ * Settings form
+ */
+function og_book_inheritance_settings_form() {
+
+  $inherit_from_options = array(
+    'parent' => t('Use immediate parent groups'),
+    'top' => t('Use top level parent groups')
+  );
+
+  $inherit_when_options = array(
+    'if_empty' => t('Parents groups are always used if no groups are selected'),
+    'if_parent_exclusive' => t('Parents groups are always used if a parent exists (discarding any user selections)'),
+    'if_parent_plus' => t('Parents groups are always used if a parent exists (in addition to user selections)'),
+    'user_exclusive' => t('User can select to use parents groups via a checkbox (discarding any user selections)'),
+    'user_plus' => t('User can select to use parents groups via a checkbox (in addition to user selections)')
+  );
+
+  $form['og_book_inheritance_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => 'Enable group inheritance',
+    '#default_value' => variable_get('og_book_inheritance_enabled', FALSE),
+  );
+  $form['og_book_inheritance_inherit_from'] = array(
+    '#type' => 'select',
+    '#title' => t('Inherit from'),
+    '#default_value' => variable_get('og_book_inheritance_inherit_from', 'parent'),
+    '#options' => $inherit_from_options,
+  );
+  $form['og_book_inheritance_inherit_when'] = array(
+    '#type' => 'select',
+    '#title' => t('Inherit when'),
+    '#default_value' => variable_get('og_book_inheritance_inherit_when', 'if_empty'),
+    '#options' => $inherit_when_options,
+  );
+  $form['og_book_inheritance_user_checkbox_default'] = array(
+    '#type' => 'checkbox',
+    '#title' => 'User checkbox checked by default',
+    '#description' => t("If 'Inherit when' is set to give the user the option to use the parent's groups via checkbox, checking this makes that checkbox default to checked."),
+    '#default_value' => variable_get('og_book_inheritance_user_checkbox_default', FALSE),
+  );
+  $form['og_book_inheritance_inherit_public_exclusive'] = array(
+    '#type' => 'checkbox',
+    '#title' => 'Inherit public (when group inheritance is used exclusively)',
+    '#description' => t("When using options above that use inheritance exclusively and ignore the users existing selections, This determines whether the public flag is inherited or not."),
+    '#default_value' => variable_get('og_book_inheritance_inherit_public_exclusive', TRUE),
+  );
+  $form['og_book_inheritance_inherit_public_plus'] = array(
+    '#type' => 'checkbox',
+    '#title' => 'Inherit public (when group inheritance is added to user input)',
+    '#description' => t("When using options above that add inheritance to the users existing selections, This determines whether the public flag is inherited or not."),
+    '#default_value' => variable_get('og_book_inheritance_inherit_public_plus', TRUE),
+  );
+  $form['og_book_inheritance_required'] = array(
+    '#type' => 'checkbox',
+    '#title' => 'Require a selection or inheritance',
+    '#description' => t("If checked, the user will not be able to continue unless they have selected a group or inheritance is set up and the page's parents have groups."),
+    '#default_value' => variable_get('og_book_inheritance_required', FALSE),
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * Returns the parent node based on the og_book_inheritance_inherit_from variable
+ */
+function og_book_inheritance_get_parent_node($book) {
+  if (variable_get('og_book_inheritance_inherit_from', 'parent') == 'top') {
+    $parent_node = node_load($book['bid']);
+  }
+  else {
+    $parent = book_link_load($book['plid']);
+    $parent_node = node_load($parent['nid']);
+  }
+  return $parent_node;
+}

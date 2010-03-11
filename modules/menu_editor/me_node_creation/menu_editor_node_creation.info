@@ -1,0 +1,13 @@
+name = Menu Editor - Node creation
+description = Menu item placeholders for node creation.
+package = Menu
+core = 6.x
+dependencies[] = menu_editor
+
+
+; Information added by drupal.org packaging script on 2010-01-26
+version = "6.x-1.2"
+core = "6.x"
+project = "menu_editor"
+datestamp = "1264481106"
+

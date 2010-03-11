@@ -1,0 +1,24 @@
+diff -ru ctools.orig/plugins/content_types/user_context/user_picture.inc ctools/plugins/content_types/user_context/user_picture.inc
+--- ctools.orig/plugins/content_types/user_context/user_picture.inc	2010-01-29 22:18:26.000000000 +0200
++++ ctools/plugins/content_types/user_context/user_picture.inc	2010-02-04 22:03:49.000000000 +0200
+@@ -23,7 +23,7 @@
+     return drupal_not_found();
+   }
+ 
+-  $block->title = check_plain($account->name);
++  $block->title = check_plain(theme('username',$account,array('plain' => TRUE)));
+   $block->content = theme('user_picture', $account);
+ 
+   return $block;
+diff -ru ctools.orig/plugins/content_types/user_context/user_profile.inc ctools/plugins/content_types/user_context/user_profile.inc
+--- ctools.orig/plugins/content_types/user_context/user_profile.inc	2010-01-29 22:18:26.000000000 +0200
++++ ctools/plugins/content_types/user_context/user_profile.inc	2010-02-04 22:03:29.000000000 +0200
+@@ -28,7 +28,7 @@
+ 
+   $block = new stdClass();
+   $block->module = 'user-profile';
+-  $block->title = check_plain($account->name);
++  $block->title = check_plain(theme('username',$account,array('plain' => TRUE)));
+   $block->content = theme('user_profile', $account);
+ 
+   return $block;

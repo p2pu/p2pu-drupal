@@ -1,0 +1,112 @@
+<?php
+// $Id: mass_contact.install,v 1.5.2.1 2008/07/19 20:13:00 oadaeh Exp $
+
+/**
+ * @file
+ * This is the un/install file for the Mass Contact module.
+ *
+ * This module enables users to contact multiple users through selected roles.
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function mass_contact_schema() {
+  $schema['mass_contact'] = array(
+    'description' => t('The base table for nodes.'),
+    'fields' => array(
+      'cid' => array(
+        'description' => t('The primary id field for the category table.'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE),
+      'category' => array(
+        'description' => t('The name of the category.'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => ''),
+      'recipients' => array(
+        'description' => t('A list of the users to receive the message.'),
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE),
+      'reply' => array(
+        'description' => t('.'),
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE),
+      'weight' => array(
+        'description' => t('.'),
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+        'default' => '0'),
+      'selected' => array(
+        'description' => t('.'),
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+        'default' => '0'),
+    ),
+    'primary key' => array('cid'),
+    'unique keys' => array(
+      'category' => array('category')
+    ),
+  );
+
+  return $schema;
+}
+
+
+/**
+ * Implementation of hook_install().
+ */
+function mass_contact_install() {
+  drupal_install_schema('mass_contact');
+  drupal_set_message(t('All tables and entries required by the Mass Contact module have been created.'));
+}
+
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function mass_contact_uninstall() {
+  drupal_uninstall_schema('mass_contact');
+
+//  db_query('DELETE FROM node_type WHERE type = "mass_contact"');
+
+  variable_del('mass_contact_bcc_d');
+  variable_del('mass_contact_bcc_d_override');
+  variable_del('mass_contact_category_override');
+  variable_del('mass_contact_default_sender_email');
+  variable_del('mass_contact_default_sender_name');
+  variable_del('mass_contact_form_information');
+  variable_del('mass_contact_html_d');
+  variable_del('mass_contact_hourly_threshold');
+  variable_del('mass_contact_message_prefix');
+  variable_del('mass_contact_message_suffix');
+  variable_del('mass_contact_nodecc_d');
+  variable_del('mass_contact_optout_d');
+  variable_del('mass_contact_recipient_limit');
+}
+
+
+/**
+ * Implementation of hook_update().
+ */
+function mass_contact_update_6000() {
+  $ret = array();
+
+  $result = db_query('SELECT * FROM {permission}');
+  while ($permission = db_fetch_object($result)) {
+    if (strstr($permission->perm, 'access mass contact form')) {
+      $new_permission = str_replace ('access mass contact form', 'send mass contact e-mails', $permission->perm);
+      $ret[] = update_sql('UPDATE {permission} SET perm = "'. $new_permission .'" WHERE rid = '. $permission->rid .' AND tid = '. $permission->tid);
+    }
+  }
+
+  return $ret;
+}

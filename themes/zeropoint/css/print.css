@@ -1,0 +1,50 @@
+/* print.css
+*/
+
+
+.page, .sizer, .expander0, 
+body.layout-left-main-right .outer,
+body.layout-left-main .outer,
+body.layout-main-right .outer {
+	margin: 0 !important;
+	padding: 0 !important;
+	width: 100% !important;
+}
+
+#above,
+#top-elements,
+#header .block,
+#navlist, #subnavlist, #navlist2,
+#section1,
+.colleft,
+.colright,
+#content-top,
+#content-bottom,
+#section2,
+#bar,
+#footer-wrapper,
+#shadow,
+#breadcrumb,
+.picture,
+.terms,
+.tabs,
+.feed-icon,
+.links {
+	display: none;
+}
+
+#content,
+.content,
+.title {
+	margin:20px 0;
+	width: auto;
+}
+
+a:hover, a:active, a:link, a:visited {
+	color: #000;
+}
+
+.comment .title {
+	padding: 0;
+	margin: 0;
+}

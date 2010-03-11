@@ -1,0 +1,17 @@
+; $Id: og_content_type_admin.info,v 1.7 2008/10/01 22:33:38 paulbooker Exp $
+;/**
+; * @package OG_CTA
+; * @category NeighborForge
+; */
+name = OG Content Type Admin
+description = Allows restriction of content type use based on group.
+
+package = Organic groups
+dependencies[] = og
+core = 6.x
+; Information added by drupal.org packaging script on 2009-10-15
+version = "6.x-1.2"
+core = "6.x"
+project = "og_content_type_admin"
+datestamp = "1255605043"
+

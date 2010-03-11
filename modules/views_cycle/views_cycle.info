@@ -1,0 +1,14 @@
+; $Id: views_cycle.info,v 1.1 2009/03/20 21:47:24 crell Exp $
+name = Views Cycle
+description = Wrapper for using the jQuery cycle plugin in Views.
+core = 6.x
+php = 5.2
+package = Views
+dependencies[] = views
+
+; Information added by drupal.org packaging script on 2010-01-13
+version = "6.x-1.0-beta3"
+core = "6.x"
+project = "views_cycle"
+datestamp = "1263414609"
+

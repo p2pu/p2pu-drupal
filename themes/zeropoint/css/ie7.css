@@ -1,0 +1,37 @@
+.expander0, #top_right, #body_right, 
+body.layout-left-main-right .outer, body.layout-left-main .outer, body.layout-main-right .outer, 
+body.layout-left-main-right .outer a, body.layout-left-main .outer a, body.layout-main-right .outer a {
+	zoom: 1;
+} /* The above rule gives hasLayout to some page elements so that IE will not be buggy */
+
+
+#middlecontainer {
+	word-wrap: break-word;
+}
+.comment {
+	margin: 0 !important;
+}
+.block .item-list li {
+	vertical-align: top;
+}
+
+
+/** Drupal admin tables **/
+#main tr.even th,
+#main tr.even td,
+#main tr.odd th,
+#main tr.odd td {
+	border-bottom: 1px solid #ccc; /* IE doesn't display borders on table rows */
+}
+
+
+/* Primary menu */
+body.sfish #navlinks ul li.expanded {
+	margin-right: 4px;
+}
+
+
+/* Ubercart */
+.uc-store-admin-panel .panel-title a {
+	margin-left: 25px !important;
+}

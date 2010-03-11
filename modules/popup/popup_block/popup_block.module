@@ -1,0 +1,186 @@
+<?php
+// $Id:
+
+
+
+/* ---- Hook implementation ---- */
+
+
+
+/**
+ * Implementation of hook_form_alter
+ * Adds UI settings to popup filter settings page
+ */
+function popup_block_form_alter(&$form, $form_state, $form_id){
+
+  if($form_id == 'block_admin_configure' && $form['module']['#value'] != 'popup_menu'){
+
+    $settings = _popup_block_settings();
+    $block_settings = $settings[$form['module']['#value'].':'.$form['delta']['#value']];
+    $position_options = array('top-left' => t('Top left'), 'top-right' => t('Top right'), 'bottom-right' => t('Bottom right'), 'bottom-left' => t('Bottom left'));
+
+    $form['popup'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Block popup settings'),
+      '#collapsible' => 1,
+
+      'popup-block' => array(
+        '#default_value' => $block_settings['active'],
+        '#description' => t('This will render the block with the body initially invisible. When a user hovers over or clicks on the title, the body is displayed.'),
+        '#title' => t('Display this block as a popup'),
+        '#type' => 'checkbox',
+      ),
+  
+      'popup-block-origin' => array(
+        '#default_value' => $block_settings['origin'],
+        '#description' => t('The corner of the popup title that the body popup will originate in.'),
+        '#title' => t('Origin'),
+        '#type' => 'select',
+        '#options' => $position_options,
+      ),
+    
+      'popup-block-expand' => array(
+        '#default_value' => $block_settings['expand'],
+        '#description' => t('The direction that the body popup should expand in, starting from the origin.'),
+        '#title' => t('Expand to'),
+        '#type' => 'select',
+        '#options' => $position_options,
+      ),
+
+      'popup-block-effect' => array(
+        '#default_value' => $block_settings['effect'],
+        '#description' => t('The animation effect to use to hide and show the body.'),
+        '#title' => t('Effect'),
+        '#type' => 'select',
+        '#options' => array('none' => t('None'), 'slide' => t('Slide'), 'fade' => t('Fade'), 'slide-fade' => t('Slide and Fade')),
+      ),
+    
+      'popup-block-activate' => array(
+        '#default_value' => $block_settings['activate'],
+        '#description' => t('The manner in which the user is to activate the hiding or showing of the body.'),
+        '#title' => t('Activate'),
+        '#type' => 'select',
+        '#options' => array('hover' => t('Hover'), 'click' => t('Click')),
+      ),
+
+    );
+    
+    $form['submit']['#weight'] = 10;
+    $form['#submit'][] = 'popup_block_form_submit';
+  }
+
+}
+
+
+
+/**
+ * Implementation of hook_theme
+ */
+function popup_block_theme() {
+
+  return array(
+    'blocks' => array(
+      'arguments' => array('region', FALSE),
+      'function' => 'popup_block_blocks',
+    ),
+  );
+
+  return $theme;
+}
+
+
+
+/* ---- Themeing hooks ---- */
+
+
+
+function popup_block_blocks($region) {
+
+  $output = '';
+  $settings = _popup_block_settings();
+
+  module_load_include('inc', 'popup', 'processing');
+  
+  if ($list = block_list($region)) {
+    foreach ($list as $key => $block) {
+
+      $block_settings = $settings[$block->module.':'.$block->delta];
+
+      if ($block_settings && $block_settings['active']){
+
+        $attributes = array(
+          'origin' => $block_settings['origin'],
+          'expand' => $block_settings['expand'],
+          'effect' => $block_settings['effect'],
+          'activate' => $block_settings['activate'],
+        );
+
+        $output .= _popup_element(
+          $block->subject,
+          $block->content,
+          $attributes, 
+          _classes($attributes)
+        );
+        
+      } else {
+        $output .= theme('block', $block);
+      }
+    }
+  }
+
+  // Add any content assigned to this region through drupal_set_content() calls.
+  $output .= drupal_get_content($region);
+
+  return $output;
+}
+
+
+
+/* ---- Forms ---- */
+
+
+
+function popup_block_form_submit(&$form, &$form_state){
+
+  $settings = _popup_block_settings();
+  $values = $form_state['values'];
+  
+  $settings[$values['module'].':'.$values['delta']] = array(
+    'active' => $values['popup-block'],
+    'origin' => $values['popup-block-origin'],
+    'expand' => $values['popup-block-expand'],
+    'effect' => $values['popup-block-effect'],
+    'activate' => $values['popup-block-activate'],
+  );
+
+  _popup_block_settings($settings);
+}
+
+
+
+/* ---- Settings ---- */
+
+
+
+function _popup_block_settings($new_settings = FALSE){
+
+  static $settings = FALSE;
+  if ($new_settings){
+    $settings = $new_settings;
+    variable_set('popup-block-settings', $settings);
+  }
+
+  if (!$settings){
+    $settings = variable_get('popup-block-settings', array());
+  }
+
+  return $settings;
+}
+
+
+
+
+
+
+
+

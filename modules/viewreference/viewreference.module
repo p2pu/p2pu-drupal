@@ -1,0 +1,839 @@
+<?php
+// $Id: viewreference.module,v 1.2.2.18 2010/01/16 09:59:50 danielb Exp $
+
+/**
+ * @file
+ * Defines a field type for referencing a view from a node.
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function viewreference_menu() {
+  $items = array();
+  $items['viewreference/autocomplete'] = array(
+    'title' => 'viewreference autocomplete',
+    'page callback' => 'viewreference_autocomplete',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function viewreference_theme() {
+  return array(
+    'viewreference_item_simple' => array(
+      'arguments' => array('item' => NULL),
+    ),
+    'viewreference_item_advanced' => array(
+      'arguments' => array('item' => NULL, 'view' => NULL),
+    ),
+    'viewreference_select' => array(
+      'arguments' => array('element' => NULL),
+    ),
+    'viewreference_autocomplete' => array(
+      'arguments' => array('element' => NULL),
+    ),
+    'viewreference_formatter_default' => array(
+      'arguments' => array('element'),
+    ),
+    'viewreference_formatter_full' => array(
+      'arguments' => array('element'),
+    ),
+    'viewreference_formatter_plain' => array(
+      'arguments' => array('element'),
+    ),
+    'viewreference_formatter_link' => array(
+      'arguments' => array('element'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_field_info().
+ *
+ * Here we indicate that the content module will use its default
+ * handling for the view of this field.
+ *
+ * Callbacks can be omitted if default handing is used.
+ * They're included here just so this module can be used
+ * as an example for custom modules that might do things
+ * differently.
+ */
+function viewreference_field_info() {
+  return array(
+    'viewreference' => array(
+      'label' => t('View reference'),
+      'description' => t('Store an internal identifer for a related view as an integer value.'),
+      'callbacks' => array(
+        'tables' => CONTENT_CALLBACK_DEFAULT,
+        'arguments' => CONTENT_CALLBACK_DEFAULT,
+        ),
+      ),
+  );
+}
+
+/**
+ * Implementation of hook_field_settings().
+ */
+function viewreference_field_settings($op, $field) {
+
+  switch ($op) {
+
+    case 'form':
+      $form = array();
+      $form['referenceable_views'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Views that can be referenced'),
+        '#description' => t('Select the views that can be referenced. If no views are selected, then all the views will be available.'),
+        '#multiple' => TRUE,
+        '#default_value' => is_array($field['referenceable_views']) ? $field['referenceable_views'] : array(),
+        '#options' => viewreference_get_list_of_views(),
+      );
+      $form['arguments'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Arguments'),
+        '#collapsible' => TRUE,
+        '#collapsed' => ($field['dsv_arguments'] || $field['php_arguments']) ? FALSE : TRUE,
+        '#description' => t('Enabling the following options will provide an input field for passing arguments to the view.'),
+      );
+      $form['arguments']['dsv_arguments'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Allow delimiter seperated values.'),
+        '#default_value' => isset($field['dsv_arguments']) ? $field['dsv_arguments'] : 0,
+        '#description' => t('Users can provide a list of arguments seperated by a delimiter. e.g: <em>term_1/term_2</em>'),
+      );
+      $form['arguments']['php_arguments'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Allow PHP code.'),
+        '#default_value' => isset($field['php_arguments']) ? $field['php_arguments'] : 0,
+        '#description' => t('Users can insert PHP code to generate the list of arguments. e.g: <em>term_1/&lt;?php print "term_x/term_y"; ?&gt;/term_2</em>'),
+      );
+      $form['arguments']['delimiter'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Delimiter'),
+        '#default_value' => !empty($field['delimiter']) ? $field['delimiter'] : '/',
+        '#size' => 3,
+        '#maxlength' => 30,
+        '#required' => TRUE,
+      );
+      $row_range = range(0, 10);
+      unset($row_range[0]);
+      $form['arguments']['rows'] = array(
+        '#type' => 'select',
+        '#title' => t('Number of rows in argument field'),
+        '#default_value' => isset($field['rows']) ? $field['rows'] : 1,
+        '#options' => $row_range,
+        '#description' => t('Set as 1 for textfield, or larger values for textarea (may be easier to write PHP with a textarea)'),
+        '#required' => TRUE,
+      );
+
+      return $form;
+
+    case 'save':
+      $settings = array('referenceable_views', 'dsv_arguments', 'php_arguments', 'delimiter', 'rows');
+      return $settings;
+
+    case 'database columns':
+      $columns = array(
+        'view_id' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE, 'default' => 0),
+        'arguments' => array('type' => 'text', 'size' => 'big'),
+      );
+      return $columns;
+
+    case 'views data':
+      $data = content_views_field_views_data($field);
+      $db_info = content_database_info($field);
+      $table_alias = content_views_tablename($field);
+
+      // Swap the filter handler to the 'in' operator.
+      $data[$table_alias][$field['field_name'] .'_view_id']['filter']['handler'] = 'views_handler_filter_many_to_one_content';
+
+      return $data;
+  }
+}
+
+/**
+ * Implementation of hook_field().
+ */
+function viewreference_field($op, &$node, $field, &$items, $teaser, $page) {
+  switch ($op) {
+    case 'validate':
+      $refs = _viewreference_potential_references($field, TRUE);
+      foreach ($items as $delta => $item) {
+        if (is_array($item) && !empty($item['error_field'])) {
+          $error_field = $item['error_field'];
+          unset($item['error_field']);
+          if (!empty($item['view_id'])) {
+            if (!in_array($item['view_id'], array_keys($refs))) {
+              form_set_error($error_field, t("%name : This view can't be referenced.", array('%name' => t($field['widget']['label']))));
+            }
+          }
+        }
+      }
+      return $items;
+  }
+}
+
+/**
+ * Implementation of hook_content_is_empty().
+ */
+function viewreference_content_is_empty($item, $field) {
+  return empty($item['view_id']);
+}
+
+/**
+ * Implementation of hook_field_formatter_info().
+ */
+function viewreference_field_formatter_info() {
+  return array(
+    'default' => array(
+      'label' => t('Default (view)'),
+      'field types' => array('viewreference'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+    ),
+    'full' => array(
+      'label' => t('Full (title and view)'),
+      'field types' => array('viewreference'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+    ),
+    'plain' => array(
+      'label' => t('Title (no link)'),
+      'field types' => array('viewreference'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+    ),
+    'link' => array(
+      'label' => t('Title (link)'),
+      'field types' => array('viewreference'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+    ),
+  );
+}
+
+/**
+ * Theme function for 'default' viewreference field formatter.
+ */
+function theme_viewreference_formatter_default($element) {
+  $output = '';
+  if (!empty($element['#item']['view_id']) && is_numeric($element['#item']['view_id'])) {
+    $view = db_fetch_object(db_query("SELECT name, position FROM {viewreference} WHERE view_id = '%d'", $element['#item']['view_id']));
+    if ($view) {
+      $args = viewreference_get_element_args($element);
+      $view_object = views_get_view($view->name);
+      if ($view_object && $view_object->access($view->position)) {
+        $output .= $view_object->preview($view->position, $args);
+      }
+    }
+  }
+  return $output;
+}
+
+/**
+ * Theme function for 'full' viewreference field formatter.
+ */
+function theme_viewreference_formatter_full($element) {
+  $output = '';
+  if (!empty($element['#item']['view_id']) && is_numeric($element['#item']['view_id'])) {
+    $view = db_fetch_object(db_query("SELECT name, position FROM {viewreference} WHERE view_id = '%d'", $element['#item']['view_id']));
+    if ($view) {
+      $args = viewreference_get_element_args($element);
+      $view_object = views_get_view($view->name);
+      if ($view_object && $view_object->access($view->position)) {
+        $title = $view_object->get_title() ? $view_object->get_title() : $view->title;
+        $output .= '<h3 class="title viewreference-title">'. check_plain($title) .'</h3>';
+        $output .= $view_object->preview($view->position, $args);
+      }
+    }
+  }
+  return $output;
+}
+
+/**
+ * Theme function for 'plain' nodereference field formatter.
+ */
+function theme_viewreference_formatter_plain($element) {
+  $output = '';
+  if (!empty($element['#item']['view_id']) && is_numeric($element['#item']['view_id'])) {
+    $view = db_fetch_object(db_query("SELECT name, title FROM {viewreference} WHERE view_id = '%d'", $element['#item']['view_id']));
+    if ($view) {
+      $view_object = views_get_view($view->name);
+      if ($view_object && $view_object->access($view->position)) {
+        $title = $view_object->get_title() ? $view_object->get_title() : $view->title;
+        $output .= check_plain($title);
+      }
+    }
+  }
+  return $output;
+}
+
+/**
+ * Theme function for 'link' nodereference field formatter.
+ */
+function theme_viewreference_formatter_link($element) {
+  $output = '';
+  if (!empty($element['#item']['view_id']) && is_numeric($element['#item']['view_id'])) {
+    $view = db_fetch_object(db_query("SELECT name, position, title FROM {viewreference} WHERE view_id = '%d'", $element['#item']['view_id']));
+    if ($view) {
+      $view_object = views_get_view($view->name);
+      if ($view_object && $view_object->access($view->position)) {
+        $title = $view_object->get_title() ? $view_object->get_title() : $view->title;
+        if (isset($view_object->display[$view->position]->display_options['path']) && !$view_object->disabled) {
+          $args = viewreference_get_element_args($element);
+          $url_args = implode("/", $args);
+          $path = $view_object->display[$view->position]->display_options['path'];
+          if ($url_args) {
+            $path .= "/". $url_args;
+          }
+          $output .= l($title, $view_object->get_url($args, $path));
+        }
+        else {
+          $output .= check_plain($title);
+        }
+      }
+    }
+  }
+  return $output;
+}
+
+/**
+ * Implementation of hook_widget_info().
+ *
+ * We need custom handling of multiple values for the viewreference_select
+ * widget because we need to combine them into a options list rather
+ * than display multiple elements.
+ *
+ * We will use the content module's default handling for default value.
+ *
+ * Callbacks can be omitted if default handing is used.
+ * They're included here just so this module can be used
+ * as an example for custom modules that might do things
+ * differently.
+ */
+function viewreference_widget_info() {
+  return array(
+    'viewreference_select' => array(
+      'label' => t('Select list'),
+      'field types' => array('viewreference'),
+      'multiple values' => CONTENT_HANDLE_CORE,//CONTENT_HANDLE_MODULE,
+      'callbacks' => array(
+        'default value' => CONTENT_CALLBACK_DEFAULT,
+      ),
+    ),
+    'viewreference_autocomplete' => array(
+      'label' => t('Autocomplete text field'),
+      'field types' => array('viewreference'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+      'callbacks' => array(
+        'default value' => CONTENT_CALLBACK_DEFAULT,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implementation of FAPI hook_elements().
+ *
+ * Any FAPI callbacks needed for individual widgets can be declared here,
+ * and the element will be passed to those callbacks for processing.
+ *
+ * Drupal will automatically theme the element using a theme with
+ * the same name as the hook_elements key.
+ *
+ * Autocomplete_path is not used by text_widget but other widgets can use it
+ * (see viewreference and userreference).
+ */
+function viewreference_elements() {
+  return array(
+    'viewreference_select' => array(
+      '#input' => TRUE,
+      '#columns' => array('uid'), '#delta' => 0,
+      '#process' => array('viewreference_select_process'),
+      ),
+    'viewreference_autocomplete' => array(
+      '#input' => TRUE,
+      '#columns' => array('name'), '#delta' => 0,
+      '#process' => array('viewreference_autocomplete_process'),
+      '#autocomplete_path' => FALSE,
+      ),
+    );
+}
+
+/**
+ * Implementation of hook_widget().
+ *
+ * Attach a single form element to the form. It will be built out and
+ * validated in the callback(s) listed in hook_elements. We build it
+ * out in the callbacks rather than here in hook_widget so it can be
+ * plugged into any module that can provide it with valid
+ * $field information.
+ *
+ * Content module will set the weight, field name and delta values
+ * for each form element. This is a change from earlier CCK versions
+ * where the widget managed its own multiple values.
+ *
+ * If there are multiple values for this field, the content module will
+ * call this function as many times as needed.
+ *
+ * @param $form
+ *   the entire form array, $form['#node'] holds node information
+ * @param $form_state
+ *   the form_state, $form_state['values'][$field['field_name']]
+ *   holds the field's form values.
+ * @param $field
+ *   the field array
+ * @param $items
+ *   array of default values for this field
+ * @param $delta
+ *   the order of this item in the array of subelements (0, 1, 2, etc)
+ *
+ * @return
+ *   the form item for a single element for this field
+ */
+function viewreference_widget(&$form, &$form_state, $field, $items, $delta = 0) {
+  //error_log('items'.print_r($items,true));
+  switch ($field['widget']['type']) {
+    case 'viewreference_select':
+      $element = array(
+        '#type' => 'viewreference_select',
+        '#default_value' => isset($items[$delta]) ? $items[$delta] : NULL,
+      );
+      break;
+
+    case 'viewreference_autocomplete':
+      $element = array(
+        '#type' => 'viewreference_autocomplete',
+        '#default_value' => isset($items[$delta]) ? $items[$delta] : NULL,
+        '#value_callback' => 'viewreference_autocomplete_value',
+      );
+      break;
+  }
+  return $element;
+}
+
+/**
+ * Value for a viewreference autocomplete element.
+ *
+ * Substitute in the view title for the internal view vid.
+ */
+function viewreference_autocomplete_value($element, $edit = FALSE) {
+  $field_key = $element['#columns'][0];
+  $args_key = $element['#columns'][1];
+  if (!empty($element['#default_value'][$field_key])) {
+    $vid = $element['#default_value'][$field_key];
+    $value = db_result(db_query("SELECT title FROM {viewreference} WHERE view_id = '%d'", $vid));
+    $value .= ' [view:'. $vid .']';
+    return array($field_key => $value, $element['#columns'][1] => $element['#default_value'][$args_key]);
+  }
+  return array($field_key => NULL, $element['#columns'][1] => $element['#default_value'][$args_key]);
+}
+
+/**
+ * Process an individual element.
+ *
+ * Build the form element. When creating a form using FAPI #process,
+ * note that $element['#value'] is already set.
+ *
+ * The $fields array is in $form['#field_info'][$element['#field_name']].
+ */
+
+function viewreference_select_process($element, $edit, $form_state, $form) {
+
+  $field = $form['#field_info'][$element['#field_name']];
+
+  $element[$element['#columns'][0]] = array(
+    '#type' => 'select',
+    '#multiple' => 0,
+    '#options' => viewreference_allowed_values($field),
+    '#default_value' => isset($element['#value'][$element['#columns'][0]]) ? $element['#value'][$element['#columns'][0]] : '',
+    '#element_validate' => array('viewreference_select_validate'),
+    '#prefix' => t(
+      '<div class="viewreference-wrapper" id="viewreference-!field_id">', 
+      array("!field_id" => str_replace('_', '-', $element['#field_name']) .'-'. $element['#delta'])
+    ),  // localized for customisations
+
+    // The following values were set by the content module and need
+    // to be passed down to the nested element.
+    '#field_name' => $element['#field_name'],
+    '#delta' => $element['#delta'],
+    '#columns' => $element['#columns'],
+    '#title' => $element['#title'],
+    '#required' => $element['#required'],
+    '#description' => $element['#description'],
+ 
+  );
+
+  if ($field['dsv_arguments'] == 1 || $field['php_arguments'] == 1) {
+
+    if ($field['rows'] == 1) {
+      $args_widget = 'textfield';
+    }
+    else {
+      $args_widget = 'textarea';
+    }
+
+    $element[$element['#columns'][1]] = array(
+      '#type' => $args_widget,
+      '#default_value' => isset($element['#value'][$element['#columns'][1]]) ? $element['#value'][$element['#columns'][1]] : '',
+      '#element_validate' => array('viewreference_arguments_validate'),
+      '#title' => $element['#title'] .' '. t('arguments'),
+      '#suffix' => t('</div>'),
+      '#rows' => $field['rows'],
+
+      // The following values were set by the content module and need
+      // to be passed down to the nested element.
+      '#field_name' => $element['#field_name'] .t(" arguments"),
+      '#delta' => $element['#delta'],
+      '#columns' => $element['#columns'],
+      '#required' => $element['#required'],
+      '#description' => $element['#description'],
+    );
+
+  }
+  else {
+    $element[$element['#columns'][0]]['#suffix'] = t('</div>');
+  }
+
+  return $element;
+}
+
+/**
+ * Process an individual element.
+ *
+ * Build the form element. When creating a form using FAPI #process,
+ * note that $element['#value'] is already set.
+ *
+ */
+function viewreference_autocomplete_process($element, $edit, $form_state, $form) {
+
+  $field = $form['#field_info'][$element['#field_name']];
+
+  $element[$element['#columns'][0]] = array(
+    '#type' => 'text_textfield',
+    '#default_value' => isset($element['#value']) ? $element['#value'] : '',
+    '#autocomplete_path' => 'viewreference/autocomplete/'. $element['#field_name'],
+    '#element_validate' => array('viewreference_autocomplete_validate'),
+    '#prefix' => t(
+      '<div class="viewreference-wrapper" id="viewreference-!field_id">', 
+      array("!field_id" => str_replace('_', '-', $element['#field_name']) .'-'. $element['#delta'])
+    ),  // localized for customisations
+
+    // The following values were set by the content module and need
+    // to be passed down to the nested element.
+    '#field_name' => $element['#field_name'],
+    '#delta' => $element['#delta'],
+    '#columns' => $element['#columns'],
+    '#title' => $element['#title'],
+    '#required' => $element['#required'],
+    '#description' => $element['#description'],
+  );
+
+  if ($field['dsv_arguments'] == 1 || $field['php_arguments'] == 1) {
+
+    if ($field['rows'] == 1) {
+      $args_widget = 'textfield';
+    }
+    else {
+      $args_widget = 'textarea';
+    }
+
+    $element[$element['#columns'][1]] = array(
+      '#type' => $args_widget,
+      '#default_value' => isset($element['#value'][$element['#columns'][1]]) ? $element['#value'][$element['#columns'][1]] : '',
+      '#element_validate' => array('viewreference_arguments_validate'),
+      '#title' => $element['#title'] .' '. t('arguments'),
+      '#suffix' => t('</div>'),
+      '#rows' => $field['rows'],
+
+      // The following values were set by the content module and need
+      // to be passed down to the nested element.
+      '#field_name' => $element['#field_name'] .t(" arguments"),
+      '#delta' => $element['#delta'],
+      '#columns' => $element['#columns'],
+      '#required' => $element['#required'],
+      '#description' => $element['#description'],
+    );
+
+  }
+  else {
+    $element[$element['#columns'][0]]['#suffix'] = t('</div>');
+  }
+
+  return $element;
+}
+
+/**
+ * Validate arguments string.
+ */
+function viewreference_arguments_validate($element, &$form_state) {
+
+}
+
+/**
+ * Validate a select element.
+ */
+
+function viewreference_select_validate($element, &$form_state) {
+
+}
+
+/**
+ * Validate an autocomplete element.
+ *
+ * Remove the wrapper layer and set the right element's value.
+ */
+
+function viewreference_autocomplete_validate($element, &$form_state) {
+  $field_name = $element['#field_name'];
+  $field = content_fields($field_name);
+  $field_key  = $element['#columns'][0];
+  $delta = $element['#delta'];
+  $value = $element['#value'][$field_key];
+  $vid = NULL;
+  if (!empty($value)) {
+    preg_match('/^(?:\s*|(.*) )?\[\s*view\s*:\s*(\d+)\s*\]$/', $value, $matches);
+    if (!empty($matches)) {
+      // explicit vid
+      list(, $title, $vid) = $matches;
+
+      $args[] = $vid;
+      $result = db_query("SELECT title FROM {viewreference} WHERE view_id = '%s'", $args);
+
+      if (!empty($title) && ($v = db_fetch_object($result)) && $title != $v->title) {  
+        form_set_error($element[$field_key], t('%name: Title mismatch. Please check your selection.'), array('%name' => t($element[$field_key]['#title'])));
+      }
+    }
+    else {
+      $vids = _viewreference_potential_references($field, FALSE, $value, TRUE);
+      $vid = (!empty($vids)) ? array_shift(array_keys($vids)) : 0;
+    }
+  }
+  form_set_value($element, $vid, $form_state);
+  return $element;
+}
+
+/**
+ * Implementation of hook_allowed_values().
+ */
+function viewreference_allowed_values($field) {
+  $options = _viewreference_potential_references($field, TRUE);
+  
+  foreach ($options as $key => $value) {
+    $options[$key] = _viewreference_item($field, $value);
+  }
+  if (!$field['required']) {
+    $options = array(0 => '<'. t('none') .'>') + $options;
+  }
+  return $options;
+}
+
+/**
+ * Fetch an array of all candidate referenced views,
+ * for use in presenting the selection form to the user.
+ * 
+ */
+function _viewreference_potential_references($field, $return_full_views = FALSE, $string = '', $exact_string = false) {
+  // build the appropriate query
+  $related_views = array();
+  $args = array();
+
+  if (is_array($field['referenceable_views'])) {
+    $view_list = $field['referenceable_views'];
+    if (!count(array_filter($view_list))) {
+      $view_list = array_keys(viewreference_get_list_of_views());
+    }
+    foreach ($view_list as $related_key => $related_view) {
+      if ($related_view) {
+        $related_views[] = "view_id = %d";
+        $args[] = $related_view;
+      }
+    }
+  }
+
+  $related_clause = implode(' OR ', $related_views);
+
+  if (!count($related_views)) {
+    return array();
+  }
+
+  if (isset($string)) {
+    $string_clause = $exact_string ? " AND title = '%s'" : " AND title LIKE '%%%s%'";
+    $related_clause = " (". $related_clause .")". $string_clause;
+    $args[] = $string;
+  }
+
+  $result = db_query("SELECT view_id, position, name, title FROM {viewreference} WHERE ". $related_clause ." ORDER BY view_id", $args);
+
+  $rows = array();
+
+  while ($v = db_fetch_object($result)) {
+    if ($return_full_views) {
+      $rows[$v->view_id] = $v;
+    }
+    else {
+      $rows[$v->view_id] = $v->title;
+    }
+  }
+
+  return $rows;
+
+}
+
+/**
+ * Retrieve a pipe delimited string of autocomplete suggestions
+ */
+function viewreference_autocomplete($field_name, $string = '') {
+  $fields = content_fields();
+  $field = $fields[$field_name];
+  $matches = array();
+  $references = _viewreference_potential_references($field, TRUE, $string);
+  foreach ($references as $rowvid => $rowname) {
+    $matches[_viewreference_item($field, $rowname) .' [view:'. $rowvid .']'] = _viewreference_item($field, $rowname);
+  }
+  drupal_json($matches);
+}
+
+function _viewreference_item($field, $item, $html = FALSE) {
+  $output = theme('viewreference_item_simple', $item);
+  $output = $html ? check_plain($output) : $output;
+  return $output;
+}
+
+function theme_viewreference_item_advanced($item, $field_names, $view) {
+  $item_fields = array();
+  $item = (array) $item;
+  foreach ($item as $delta => $value) {
+    // remove link tags (ex : for view titles)
+    $value = preg_replace('/<a[^>]*>(.*)<\/a>/iU', '$1', $value);
+    if (!empty($value)) {
+      $item_fields[] = "<span class='view-field view-data-$field_names[$delta]'>$value</span>";;
+    }
+  }
+  $output = implode(' - ', $item_fields);
+  $output = "<span class='view-item view-item-$view->name'>$output</span>";
+  return $output;
+}
+
+function theme_viewreference_item_simple($item) {
+  return $item->title;
+}
+
+/**
+ * FAPI theme for an individual elements.
+ *
+ * The textfield or select is already rendered by the
+ * textfield or select themes and the html output
+ * lives in $element['#children']. Override this theme to
+ * make custom changes to the output.
+ *
+ * $element['#field_name'] contains the field name
+ * $element['#delta]  is the position of this element in the group
+ */
+function theme_viewreference_select($element) {
+  return $element['#children'];
+}
+
+function theme_viewreference_autocomplete($element) {
+  return $element['#children'];
+}
+
+/**
+ * Builds a table of view references, and returns data as an array
+ */
+function viewreference_get_list_of_views() {  
+  $views = array();
+  $loaded_views = views_get_all_views();
+  foreach ((array)$loaded_views as $view_name => $view) {
+    foreach ((array)$view->display as $display_key => $display_data) {
+      // views guy reckons not to use default
+      if ($display_key != 'default') {
+        // Figure out what the view_id is by doing some queries
+        $view_id = db_result(db_query("SELECT view_id FROM {viewreference} WHERE name = '%s' AND position = '%s' ", $view_name, $display_key));
+        if (!$view_id) {
+          $view_id = db_result(db_query("SELECT MAX(view_id) FROM {viewreference}"))+1;
+        }
+
+        if ($view_id) {
+          // Update database (delete [if possible] then insert)
+          db_query("DELETE FROM {viewreference} WHERE view_id = %d", $view_id);
+          $title = ucfirst($view_name) .' '. $display_data->display_title;
+          db_query("INSERT INTO {viewreference} (view_id, name, position, title) VALUES (%d, '%s', '%s', '%s')", $view_id, $view_name, $display_key, $title);
+
+          // Build return array
+          $views[$view_id] = $title;
+        }
+
+      }
+    }
+  }
+  return $views;
+}
+
+/**
+ * Convert arguments text field entry to an array of arguments
+ */
+function viewreference_get_element_args($element) {
+  $string = &$element['#item']['arguments'];
+  $settings = unserialize(db_result(db_query("SELECT global_settings FROM {content_node_field} WHERE field_name = '%s'", $element['#field_name'])));
+  $delimiter = &$settings['delimiter'];
+  $dsv_arguments = &$settings['dsv_arguments'];
+  $php_arguments = &$settings['php_arguments'];
+  $arguments = '';
+  $args = array();
+
+  if ($php_arguments) {
+    $variables = array(
+      'node' => $element['#node'],
+    );
+    $arguments = viewreference_eval($string, $variables);
+  }
+  else if ($dsv_arguments) {
+    $arguments = $string;
+  }
+
+  if ($arguments) {
+    $args = explode($delimiter, $arguments);
+    foreach ($args as $k => $v) {
+      $args[$k] = trim($v);
+    }
+  }
+
+  return $args;
+
+}
+
+/**
+ * Evaluate the code, whilst selecting what variables will be available in the PHP.
+ */
+function viewreference_eval($code, $variables = array()) {
+  global $theme_path, $theme_info, $conf;
+
+  // Store current theme path.
+  $old_theme_path = $theme_path;
+
+  // Restore theme_path to the theme, as long as drupal_eval() executes,
+  // so code evaluted will not see the caller module as the current theme.
+  // If theme info is not initialized get the path from theme_default.
+  if (!isset($theme_info)) {
+    $theme_path = drupal_get_path('theme', $conf['theme_default']);
+  }
+  else {
+    $theme_path = dirname($theme_info->filename);
+  }
+
+  foreach ((array)$variables as $key => $value) {
+    $$key = $value;
+  }
+
+  ob_start();
+  print eval('?>'. $code);
+  $output = ob_get_contents();
+  ob_end_clean();
+
+  // Recover original theme path.
+  $theme_path = $old_theme_path;
+
+  return $output;
+}

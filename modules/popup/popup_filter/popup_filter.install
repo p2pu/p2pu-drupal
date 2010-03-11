@@ -1,0 +1,17 @@
+<?php
+
+
+function popup_filter_install() {
+
+  db_query("INSERT INTO {filter_formats}(name) VALUES('Popup filter')");
+  $filter = db_result(db_query("SELECT format FROM {filter_formats} WHERE name='Popup filter'"));
+  db_query('INSERT INTO {filters}(format, module) VALUES(%d, "popup_filter")', $filter);
+
+}
+
+
+
+function popup_filter_uninstall() {
+  db_query("DELETE FROM {filter_formats} WHERE name='Popup filter'");
+  db_query('DELETE FROM {filters} WHERE module="popup_filter"', $filter);
+}

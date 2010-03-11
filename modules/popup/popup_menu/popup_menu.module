@@ -1,0 +1,192 @@
+<?php
+// $Id:
+
+
+
+/* ---- Hook implementation ---- */
+
+
+
+/**
+ * Implementation of hook_block
+ */
+function popup_menu_block($op = 'list', $delta = 0, $edit = array()){
+
+  switch($op){
+
+    case 'list': return popup_menu_list();
+
+    case 'configure': return popup_menu_block_form($delta);
+
+    case 'save': popup_menu_block_form_save($delta, $edit); break;
+
+    case 'view': return popup_menu_view($delta);
+
+  }
+
+}
+
+
+
+/* ---- List & View ---- */
+
+
+
+function popup_menu_list(){
+
+  $menus = menu_get_menus();
+  $menu_blocks = array();
+
+  foreach($menus as $id => $menu){
+    $menu_blocks[$id]['info'] = 'Popup menu: '.$menu;
+  }
+  return $menu_blocks;
+}
+
+
+
+function popup_menu_view($delta){
+
+  module_load_include('inc', 'popup', 'processing');
+
+  $settings = _popup_menu_settings();
+  $menu_settings = $settings[$delta]
+    ? $settings[$delta]
+    : _popup_menu_default_settings();
+  $menu_settings['menu'] = $delta;
+  
+  return array(
+    'content' => _popup_menu($menu_settings)
+  );
+}
+
+
+
+/* ---- Forms ---- */
+
+
+
+function popup_menu_block_form($delta){
+
+  $position_options = array('top-left' => t('Top left'), 'top-right' => t('Top right'), 'bottom-right' => t('Bottom right'), 'bottom-left' => t('Bottom left'));
+  $settings = _popup_menu_settings();
+
+  $menu_settings = $settings[$delta]
+    ? $settings[$delta]
+    : _popup_menu_default_settings();
+
+  return array(
+
+    'popup-menu' => array(
+      '#type' => 'fieldset',
+      '#title' => t('Popup menu settings'),
+      '#collapsible' => 1,
+
+      'origin' => array(
+        '#default_value' => $menu_settings['origin'],
+        '#description' => t('The corner of the popup title that the menu popup will originate in.'),
+        '#title' => t('Origin'),
+        '#type' => 'select',
+        '#options' => $position_options,
+      ),
+    
+      'expand' => array(
+        '#default_value' => $menu_settings['expand'],
+        '#description' => t('The direction that the menu popup should expand in, starting from the origin.'),
+        '#title' => t('Expand to'),
+        '#type' => 'select',
+        '#options' => $position_options,
+      ),
+
+      'effect' => array(
+        '#default_value' => $menu_settings['effect'],
+        '#description' => t('The animation effect to use to hide and show the menu.'),
+        '#title' => t('Effect'),
+        '#type' => 'select',
+        '#options' => array('none' => t('None'), 'slide' => t('Slide'), 'fade' => t('Fade'), 'slide-fade' => t('Slide and Fade')),
+      ),
+    
+      'activate' => array(
+        '#default_value' => $menu_settings['activate'],
+        '#description' => t('The manner in which the user is to activate the hiding or showing of the menu.'),
+        '#title' => t('Activate'),
+        '#type' => 'select',
+        '#options' => array('hover' => t('Hover'), 'click' => t('Click')),
+      ),
+    
+      'flat' => array(
+        '#default_value' => $menu_settings['flat'],
+        '#description' => t('Select this option if the root of the menu should not be displayed.'),
+        '#title' => t('Flatten menu structure'),
+        '#type' => 'checkbox',
+      ),
+
+      'inline' => array(
+        '#default_value' => $menu_settings['inline'],
+        '#description' => t('Only effective if a the menu is displayed flat. Display top level items next to one another.'),
+        '#title' => t('Inline top level'),
+        '#type' => 'checkbox',
+      ),
+    
+    ),
+  );
+  
+}
+
+
+
+function popup_menu_block_form_save($delta, $edit){
+
+  $settings = _popup_menu_settings();
+
+  $settings[$delta] = array(
+    'origin' => $edit['origin'],
+    'expand' => $edit['expand'],
+    'effect' => $edit['effect'],
+    'activate' => $edit['activate'],
+    'flat' => $edit['flat'],
+    'inline' => $edit['inline'],
+  );
+
+  _popup_menu_settings($settings);
+
+}
+
+
+
+/* ---- Settings ---- */
+
+
+
+function _popup_menu_settings($new_settings = FALSE){
+
+  static $settings = FALSE;
+  if ($new_settings){
+    $settings = $new_settings;
+    variable_set('popup-menu-settings', $settings);
+  }
+
+  if (!$settings){
+    $settings =  variable_get('popup-menu-settings', array());
+  }
+
+  return $settings;
+}
+
+
+
+function _popup_menu_default_settings(){
+
+  return array(
+    'origin' => 'top-right',
+    'expand' => 'bottom-right',
+    'effect' => 'none',
+    'activate' => 'hover',
+    'flat' => FALSE,
+    'inline' => FALSE,
+  );
+
+}
+
+
+

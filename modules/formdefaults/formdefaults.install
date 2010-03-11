@@ -1,0 +1,33 @@
+<?php
+function formdefaults_install() 
+{
+  drupal_install_schema('formdefaults'); 
+  db_query("UPDATE {system} SET weight = 20 WHERE name = '%s'", 'formdefaults');
+}
+
+/**
+ * Implementation of hook_uninstall
+ *
+ */
+function formdefaults_uninstall()
+{
+  drupal_uninstall_schema('formdefaults'); 
+}
+
+/**
+ * Implementation of hook_schema
+ *
+ * @return array Schema definition array. 
+ */
+function formdefaults_schema()
+{
+	$schema['formdefaults_forms'] = array(
+	  'fields' => array(
+	     'formid' => array('type' => 'varchar','length' => 255),
+	     'formdata' => array('type' => 'text')
+	     ),
+	   'primary key' => array('formid'),
+	  ); 
+	  
+	return $schema; 
+}

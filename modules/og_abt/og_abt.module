@@ -1,0 +1,414 @@
+<?php
+// $Id: og_abt.module,v 1.1.2.16.2.7 2008/09/09 22:16:05 jrbeeman Exp $
+
+/**
+ * @file
+ * Organic Groups Audience By Type module
+ *
+ * See details in README.txt
+ */
+
+
+/**
+ * Implementation of hook_menu().
+ */
+function og_abt_menu() {
+  $items = array();
+  $og_types = og_get_types('group');
+
+  foreach (node_get_types('types', NULL, TRUE) as $type) {
+    $type_url_str = str_replace('_', '-', $type->type);
+    $is_og_type = in_array($type->type, $og_types);
+    $show_menu = ($is_og_type || (og_is_group_post_type($type->type) && module_exists('og_access'))) ? TRUE : FALSE;
+    $form_id = $is_og_type ? 'og_abt_admin_settings_og' : 'og_abt_admin_settings_nonog';
+    if ($show_menu) {
+      $items['admin/content/node-type/'. $type_url_str .'/abt'] = array(
+        'title' => 'OG audience settings',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array($form_id, $type->type),
+        'access arguments' => array('administer content types'),
+        'file' => 'og_abt.admin.inc',
+        'type' => MENU_LOCAL_TASK,
+        'weight' => 2,
+      );
+    }
+  }
+
+  return $items;
+}
+
+
+function og_abt_defaults() {
+  return array(
+    'omit' => 0,
+    'force_single' => 0,
+    'public_access' => array(),
+  );
+}
+
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function og_abt_form_alter(&$form, $form_state, $form_id) {
+  if ($form['#id'] == 'node-form') {
+    og_abt_alter_node_form($form, $form_state, $form_id);
+  }
+  if ($form_id == 'og_audience_build_form') {
+    og_abt_alter_audience_build_form($form, $form_state, $form_id);
+  }
+}
+
+
+/**
+ * Alter the node edit / creation form
+ */
+function og_abt_alter_node_form(&$form, $form_state, $form_id) {
+  $types = node_get_types('names');
+  $og_types = og_get_types('group');
+  $node = $form['#node'];
+
+  if ((variable_get('og_content_type_usage_'. $node->type, NULL) != 'omitted') && count($form['og_nodeapi']['visible']['og_groups']['#options'])) {
+    // Add the og_abt JS file to provide some functionality that we break
+    // by altering the node edit form
+    if (module_exists('og_access')) {
+      drupal_add_js(drupal_get_path('module', 'og_abt') .'/og_abt.js');
+    }
+
+    $groups = og_abt_all_groups_with_type();
+    $original_values = $form['og_nodeapi']['visible']['og_groups'];
+    $defaults = $form['og_nodeapi']['visible']['og_groups']['#default_value'] ? $form['og_nodeapi']['visible']['og_groups']['#default_value'] : array();
+    $is_optgroup = FALSE;
+    foreach ($original_values['#options'] as $key => $option) {
+      // Are we dealing with option groups?
+      if (!is_numeric($key)) {
+        $is_optgroup = TRUE;
+      }
+    }
+    $form['og_nodeapi']['visible']['og_groups_is_optgroup'] = array('#type' => 'value', '#value' => $is_optgroup);
+
+    // Setup the form structure
+    $form['#validate']['og_abt_node_form_validate'] = array();
+    $form['#submit']['og_abt_node_form_submit'] = array();
+
+    // Set value of og_groups to a dummy value so that it passes validation
+    // in og.module (see 'validate' op of og_nodeapi).
+    // We recreate the validation in our own validate op.
+    $form['og_nodeapi']['visible']['og_groups'] = array('#type' => 'value', '#value' => array('dummy value'));
+
+    if (!isset($form['og_nodeapi']['#title'])) {
+      $form['og_nodeapi']['visible']['og_abt'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Audience'),
+        '#collapsible' => TRUE,
+        '#collapsed' => FALSE,
+      );
+    }
+
+    // Do the bulk of the form modification by processing the group options
+    if ($is_optgroup) {
+      foreach ($original_values['#options'] as $key => $options) {
+        $keymap = og_abt_optgroup_keymap();
+        $real_key = $keymap[$key];
+        $form['og_nodeapi']['visible']['og_abt'][$real_key] = array(
+          '#type' => 'fieldset',
+          '#title' => t($key),
+        );
+        $tree = array_merge($form['og_nodeapi']['visible']['og_abt'][$real_key], og_abt_process_options($options, $defaults, "$real_key", $node->type));
+        $form['og_nodeapi']['visible']['og_abt'][$real_key] = $tree;
+      }
+    }
+    else {
+      $form['og_nodeapi']['visible']['og_abt'][] = og_abt_process_options($original_values['#options'], $defaults, NULL, $node->type);
+    }
+
+    // Alter public checkbox visibility, if necessary
+    if (module_exists('og_access') && og_is_group_post_type($node->type)) {
+      $roles = variable_get('og_abt_'. $node->type .'_public_access', array());
+      if (count($roles)) {
+        global $user;
+        $has_public_access = FALSE;
+        foreach ($roles as $role) {
+          // Special case for handling 'authenticated user' role
+          if ($role == 2 || array_key_exists($role, $user->roles)) {
+            $has_public_access = TRUE;
+          }
+        }
+        if (!$has_public_access) {
+          if (isset($form['og_nodeapi']['visible']['og_public'])) {
+            $tmp = $form['og_nodeapi']['visible']['og_public'];
+            unset($form['og_nodeapi']['visible']['og_public']);
+            $tmp['#type'] = 'value';
+            $form['og_nodeapi']['og_public'] = $tmp;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+/**
+ * Alter the audience form from OG Audience
+ */
+function og_abt_alter_audience_build_form(&$form, $form_state, $form_id) {
+  $node = $form['target_node']['#value'];
+  
+  // Process add to fieldset
+  $add_options = $form['og_audience_add']['add_to']['#options'];
+  $form['og_audience_add']['add_to'] = og_abt_process_options($add_options, array(), 'add', $node->type);
+  
+  // Process remove from fieldset
+  $remove_options = $form['og_audience_remove']['remove_from']['#options'];
+  $form['og_audience_remove']['remove_from'] = og_abt_process_options($remove_options, array(), 'remove', $node->type, FALSE);
+  
+  $form['#validate'][] = 'og_abt_audience_form_validate';
+}
+
+
+function og_abt_audience_form_validate($form, &$form_state) {
+  $og_types = og_get_types('group');
+  $add_to = array();
+  $remove_from = array();
+  
+  foreach ($og_types as $og_type) {
+    if (isset($form_state['values']['og_group_type_'. $og_type .'_add'])) {
+      $add_to = array_merge($add_to, $form_state['values']['og_group_type_'. $og_type .'_add']);
+    }
+    if (isset($form_state['values']['og_group_type_'. $og_type .'_remove'])) {
+      $remove_from = array_merge($remove_from, $form_state['values']['og_group_type_'. $og_type .'_remove']);
+    }
+  }
+  
+  $form_state['values']['add_to'] = $add_to;
+  $form_state['values']['remove_from'] = $remove_from;
+}
+
+
+/**
+ * Map optgroup strings to better form keys
+ */
+function og_abt_optgroup_keymap() {
+  return array(
+    t('My groups') => 'my',
+    t('Other groups') => 'other',
+  );
+}
+
+
+/**
+ * Process the group selectors
+ * @param $options
+ *   The array of options to process
+ * @param $defaults
+ *   An array of keys matching a set of $options.  These will be set as the default values for the new option set.
+ * @param $suffix
+ *   The suffix to append to the form items
+ * @param $type
+ *   The node type for which the form is being processed
+ * @param $process_all
+ *   Whether or not to process all available groups as options (usually desired)
+ */
+function og_abt_process_options($options, $defaults, $suffix = NULL, $type, $process_all = TRUE) {
+  global $user;
+  $types = node_get_types('names');
+  $groups = og_abt_all_groups_with_type();
+  $og_types = og_get_types('group');
+  $form = array();
+
+  foreach ($og_types as $og_type) {
+    $settings = variable_get('og_abt_'. $og_type .'-'. $type, og_abt_defaults());
+    $form['og_group_type_'. $og_type .'_'. $suffix] = array(
+      '#type' => $settings['force_single'] ? 'select' : 'checkboxes',
+      '#title' => $types[$og_type],
+      '#multiple' => !$settings['force_single'],
+      '#options' => array(),
+      '#default_value' => array(),
+      '#attributes' => array('class' => 'og-audience'),
+    );
+  }
+
+  // Add the options
+  foreach ($options as $nid => $title) {
+    $og_type = $groups[$nid]->type;
+    $form['og_group_type_'. $og_type .'_'. $suffix]['#options'][$nid] = $title;
+    if (in_array($nid, $defaults)) {
+      $form['og_group_type_'. $og_type .'_'. $suffix]['#default_value'][$nid] = $nid;
+    }
+  }
+
+  foreach ($og_types as $og_type) {
+    $settings = variable_get('og_abt_'. $og_type .'-'. $type, og_abt_defaults());
+
+    // Allow other modules to alter this list of options
+    // (see og_abt_domain.module)
+    $tmp_options = $form['og_group_type_'. $og_type .'_'. $suffix]['#options'];
+    // If admin roles are set, check to see if we should show *all* groups of this type
+    if ($suffix != 'my' && count($settings['admin_roles']) && $process_all) {
+      $matched = FALSE;
+      foreach ($settings['admin_roles'] as $role) {
+        if (array_key_exists($role, $user->roles)) {
+          $matched = TRUE;
+        }
+      }
+      if ($matched) {
+        $tmp_options = og_abt_all_groups_of_type_options($og_type);
+      }
+    }
+    if ($suffix != 'my') {
+      foreach (module_implements('og_abt_alter') as $name) {
+        $function = $name .'_og_abt_alter';
+        $function($tmp_options, $og_type, $type, $suffix);
+      }
+    }
+    if ($suffix == 'other') {
+      // If this is the "other" groups selector, unset any groups the user is a member of,
+      // as they will already be listed in "my groups" (fail-safe for admin displays)
+      foreach ($tmp_options as $key => $value) {
+        if (array_key_exists($key, $user->og_groups)) {
+          unset($tmp_options[$key]);
+        }
+      }
+    }
+    $form['og_group_type_'. $og_type .'_'. $suffix]['#options'] = $tmp_options;
+
+    // Remove any empty selectors and change the type based on number of options
+    $options = $form['og_group_type_'. $og_type .'_'. $suffix]['#options'];
+    if (!count($options) || (count($options) == 1 && isset($options[0]) && $options[0] == '')) {
+      unset($form['og_group_type_'. $og_type .'_'. $suffix]);
+    }
+
+    $count = count($form['og_group_type_'. $og_type .'_'. $suffix]['#options']);
+    if (!$count || $settings['omit']) {
+      unset($form['og_group_type_'. $og_type .'_'. $suffix]);
+    }
+    elseif ($count >= 20 || $settings['force_single']) {
+      $form['og_group_type_'. $og_type .'_'. $suffix]['#type'] = 'select';
+      if (!$form['og_group_type_'. $og_type .'_'. $suffix]['#multiple']) {
+        $form['og_group_type_'. $og_type .'_'. $suffix]['#options'] = array(0 => '') + $form['og_group_type_'. $og_type .'_'. $suffix]['#options'];
+      }
+    }
+  }
+
+  if (!count($form) && $suffix == 'my') {
+    $form['og_empty'] = array(
+      '#type' => 'markup',
+      '#value' => '<em>'. t('You are not subscribed to any groups.') .'</em>',
+    );
+  }
+
+  return $form;
+}
+
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function og_abt_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  switch ($op) {
+    case 'presave':
+      $node->og_groups = og_abt_flatten_groups($node);
+      break;
+
+    case 'validate':
+      $node->og_groups = og_abt_flatten_groups($node);
+      og_nodeapi($node, 'validate', $a3);
+      break;
+  }
+}
+
+
+/**
+ * Flatten the multiple group selectors down a flat array, for use by
+ * core og module for saving and validation
+ */
+function og_abt_flatten_groups($node) {
+  $nids = array();
+  $og_types = og_get_types('group');
+  $is_optgroup = $node->og_groups_is_optgroup;
+  $keys = og_abt_optgroup_keymap();
+
+  foreach ($og_types as $type) {
+    $found = array();
+    $settings = variable_get('og_abt_'. $type .'-'. $node->type, og_abt_defaults());
+    $full_type = 'og_group_type_'. $type .'_';
+    if ($is_optgroup) {
+      foreach ($keys as $key) {
+        $tmp_type = $full_type . $key;
+        if (isset($node->$tmp_type)) {
+          if (is_array($node->$tmp_type)) {
+            foreach ($node->$tmp_type as $nid => $value) {
+              if ($nid && $nid == $value) {
+                $found[$nid] = $nid;
+              }
+            }
+          }
+          else {
+            $found[$node->$tmp_type] = $node->$tmp_type;
+          }
+        }
+      }
+    }
+    else {
+      if (isset($node->$full_type)) {
+        if (is_array($node->$full_type)) {
+          foreach ($node->$full_type as $nid => $value) {
+            if ($nid == $value) {
+              $found[$nid] = $nid;
+            }
+          }
+        }
+        elseif (isset($node->$tmp_type)) {
+          $found[$node->$tmp_type] = $node->$tmp_type;
+        }
+      }
+    }
+    $found = array_filter($found);
+    if ($settings['required'] && !count($found)) {
+      if ($is_optgroup) {
+        foreach (og_abt_optgroup_keymap() as $key) {
+          if (!count($_SESSION['messages']['error'])) {
+            form_set_error('og_group_type_'. $type .'_'. $key, t('A %type group is required from either <em>My groups</em> or <em>Other groups</em>.', array('%type' => node_get_types('name', $type))));
+          }
+        }
+      }
+    }
+    $nids = array_merge($nids, $found);
+  }
+
+  if (isset($node->og_groups) && is_array($node->og_groups)) {
+    $nids = array_merge($node->og_groups, $nids);
+  }
+
+  return count($nids) ? $nids : NULL;
+}
+
+
+/**
+ * Used as a helper, to get the group type of the node
+ */
+function og_abt_all_groups_with_type() {
+  static $results = array();
+  if (!count($results)) {
+    list($types, $args) = og_get_sql_args();
+    $sql = "SELECT n.nid, n.type FROM {node} n WHERE n.type ". $args ." AND n.status = 1 ORDER BY n.nid ASC";
+    $result = db_query($sql, $types);
+    while ($row = db_fetch_object($result)) {
+      $results[$row->nid] = $row;
+    }
+  }
+  return $results;
+}
+
+
+function og_abt_all_groups_of_type_options($type) {
+  static $results = array();
+  if (!count($results[$type])) {
+    $sql = "SELECT n.title, n.nid FROM {node} n WHERE n.type = '%s' AND n.status = 1 ORDER BY n.title ASC";
+    $result = db_query($sql, $type);
+    while ($row = db_fetch_object($result)) {
+      $results[$type][$row->nid] = $row->title;
+    }
+  }
+  return count($results[$type]) ? $results[$type] : array();
+}

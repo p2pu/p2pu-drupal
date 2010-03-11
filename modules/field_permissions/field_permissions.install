@@ -1,0 +1,118 @@
+<?php
+// $Id: field_permissions.install,v 1.1.2.4 2009/11/14 15:58:44 markuspetrux Exp $
+
+/**
+ * @file
+ * Installation hooks for Field Permissions module.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function field_permissions_install() {
+  $t = get_t();
+
+  // If Content Permissions module is enabled we need to enable permissions
+  // for all fields, as a method to upgrade from one module to another with
+  // the same exact options available.
+  $messages = array();
+  if (module_exists('content_permissions')) {
+    drupal_load('module', 'content');
+    $result = db_query('SELECT field_name, global_settings FROM {'. content_field_tablename() .'}');
+    while ($field = db_fetch_object($result)) {
+      $global_settings = unserialize($field->global_settings);
+      $global_settings['field_permissions'] = array(
+        'view' => 'view',
+        'edit' => 'edit',
+      );
+      $global_settings = serialize($global_settings);
+      // We cannot use update_sql() here because of curly braces in serialized array.
+      db_query("UPDATE {". content_field_tablename() ."} SET global_settings = '%s' WHERE field_name = '%s'", $global_settings, $field->field_name);
+      $messages[] = $t('Field permissions have been enabled for field %field-name.', array('%field-name' => $field->field_name));
+    }
+  }
+
+  drupal_set_message($t('Field Permissions module has been installed successfully.'));
+
+  if (!empty($messages)) {
+    content_clear_type_cache();
+    drupal_set_message($t('We have found that Content Permissions module (part of CCK) is installed, permissions have been enabled for all fields in your site. You can now uninstall Content Permissions module. Then you may want to enable and/or disable permissions for each field independently from the field settings form.'));
+    drupal_set_message(implode('<br />', $messages));
+  }
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function field_permissions_uninstall() {
+  $t = get_t();
+
+  drupal_load('module', 'content');
+
+  // Remove field permission settings from fields.
+  $messages = array();
+  $result = db_query('SELECT field_name, global_settings FROM {'. content_field_tablename() .'}');
+  while ($field = db_fetch_object($result)) {
+    $global_settings = unserialize($field->global_settings);
+    if (isset($global_settings['field_permissions'])) {
+      unset($global_settings['field_permissions']);
+      $global_settings = serialize($global_settings);
+      // We cannot use update_sql() here because of curly braces in serialized array.
+      db_query("UPDATE {". content_field_tablename() ."} SET global_settings = '%s' WHERE field_name = '%s'", $global_settings, $field->field_name);
+      $messages[] = $t('Field permission settings have been removed from field %field-name.', array('%field-name' => $field->field_name));
+    }
+  }
+
+  drupal_set_message($t('Field Permissions module has been uninstalled successfully.'));
+
+  if (!empty($messages)) {
+    content_clear_type_cache();
+    drupal_set_message(implode('<br />', $messages));
+  }
+}
+
+/**
+ * Update global field settings for field permissions.
+ */
+function field_permissions_update_6001() {
+  $ret = array();
+
+  drupal_load('module', 'content');
+
+  $result = db_query('SELECT field_name, global_settings FROM {'. content_field_tablename() .'}');
+  while ($field = db_fetch_object($result)) {
+    $global_settings = unserialize($field->global_settings);
+    if (isset($global_settings['field_permissions']) && !is_array($global_settings['field_permissions'])) {
+      if ($global_settings['field_permissions'] == 'any') {
+        $global_settings['field_permissions'] = array(
+          'view' => 'view',
+          'edit' => 'edit',
+        );
+      }
+      elseif ($global_settings['field_permissions'] == 'own') {
+        $global_settings['field_permissions'] = array(
+          'view' => 'view', 'view own' => 'view own',
+          'edit' => 'edit', 'edit own' => 'edit own',
+        );
+      }
+      else {
+        unset($global_settings['field_permissions']);
+      }
+      $global_settings = serialize($global_settings);
+      // We cannot use update_sql() here because of curly braces in serialized array.
+      $sql = "UPDATE {". content_field_tablename() ."} SET global_settings = '%s' WHERE field_name = '%s'";
+      db_query($sql, $global_settings, $field->field_name);
+      $ret[] = array(
+        'success' => TRUE,
+        'query' => strtr('Field permission settings have been updated for field %field-name.', array('%field-name' => $field->field_name)),
+      );
+    }
+  }
+
+  // Rebuild content caches only if necessary.
+  if (!empty($ret)) {
+    content_clear_type_cache();
+  }
+
+  return $ret;
+}

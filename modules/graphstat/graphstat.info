@@ -1,0 +1,13 @@
+; $Id: graphstat.info,v 1.2 2007/11/14 22:29:56 profix898 Exp $
+
+name = "Graphstat"
+description = "Creates graphs based on data recorded by the statistics, node, user and comment modules."
+dependencies[] = statistics
+core = 6.x
+
+; Information added by drupal.org packaging script on 2009-01-25
+version = "6.x-1.0"
+core = "6.x"
+project = "graphstat"
+datestamp = "1232894116"
+

@@ -1,0 +1,33 @@
+@CHARSET "UTF-8";
+
+body{ font: 10pt Tahoma, Geneva, sans-serif;}
+
+/* Headings */
+
+h1, h2, h3, h4, h5, h6{ font-weight: normal; margin: 3% 0 2% 0; padding: 0;}
+h1{ font-size: 250%;}
+h2{ font-size: 200%;}
+h3{ font-size: 180%;}
+h4{ font-size: 160%;}
+h5{ font-size: 130%;}
+h6{ font-size: 120%;}
+h5, h6{ font-weight: bold;}
+.title{ margin-top: 0;}
+table td h1,
+table td h2,
+table td h3{ margin-top: 0;}
+      
+
+/* Tables */
+body table thead th{ font-size: 110%; padding: 10px;}
+body table tr td{ padding: 10px;}
+
+/* Text */
+p{ margin: 10px 0 20px 0;}
+
+/* Forms */
+fieldset{ margin-top: 10px; padding: 5px 10px;}
+
+/* Other */
+div#mission{ margin: 10px 0;}
+div.meta{ margin-bottom: 10px;}

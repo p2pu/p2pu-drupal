@@ -1,0 +1,31 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Install file for the profile.module
+ */
+
+
+/**
+* Implementation of hook_install().
+*/
+function pcp_install() {
+  drupal_install_schema('pcp');
+}
+
+/**
+ * Implementation of hook_schema()
+ */
+function pcp_schema() {
+  $schema['profile_pcp'] = array(
+    'fields' => array(
+      'fid' => array('type' => 'int', 'not null' => TRUE),
+      ),
+    );
+  return $schema;
+}
+
+function pcp_uninstall() {
+  drupal_uninstall_schema('pcp');
+}

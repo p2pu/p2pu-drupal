@@ -1,0 +1,13 @@
+; $Id: themesettingsapi.info,v 1.6 2008/04/03 19:14:28 johnalbin Exp $
+
+name = "Theme Settings API"
+description = "Allows themes to add options to the themes settings page"
+core = 6.x
+;package =
+
+; Information added by drupal.org packaging script on 2008-04-03
+version = "6.x-1.4"
+core = "6.x"
+project = "themesettingsapi"
+datestamp = "1207252515"
+

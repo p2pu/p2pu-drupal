@@ -1,0 +1,15 @@
+<?php
+// $Id: popups.install,v 1.4.2.2 2009/01/13 00:17:50 starbow Exp $
+
+/**
+ * @file
+ */
+
+/**
+ * Implementation of hook_install().
+ *
+ * Ensures popups runs after everything else, since it short circuits in hook_init. 
+ */
+function popups_install() {
+  db_query("UPDATE {system} SET weight = %d WHERE name = 'popups'", 9999);
+}

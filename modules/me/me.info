@@ -1,0 +1,11 @@
+; $Id: me.info,v 1.2 2008/12/21 22:33:01 cdale Exp $
+name = 'me' Aliases
+description = Provides links to current user's pages using 'me' instead of the numerical user id.
+core = 6.x
+
+; Information added by drupal.org packaging script on 2009-06-26
+version = "6.x-2.7"
+core = "6.x"
+project = "me"
+datestamp = "1246011348"
+

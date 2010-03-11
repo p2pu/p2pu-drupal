@@ -1,0 +1,200 @@
+<?php
+// $Id: menu_per_role.module,v 1.6.2.7 2009/11/23 06:29:03 alexiswilke Exp $
+
+/**
+ * @file
+ * Allows restricting access to menu items per role
+ */
+
+/*
+ * Determines access for a give menu item id
+ *
+ * \warning
+ * This function is NOT called automatically up to version 6.10.
+ * You need to apply the patch provided in this module so it
+ * actually works in older versions. See file:
+ *
+ * drupal-6.6-menu_per_role.patch
+ *
+ * \param[in] $mlid The menu item identifier
+ *
+ * \return NULL if this module does not forbid the viewing of this menu item,
+ * FALSE otherwise
+ */
+function _menu_per_role_access($mlid) {
+  global $user;
+
+  if ($user->uid == 1 || empty($mlid)) {
+    // Admins do not lose access whatever this module would otherwise say
+    // Also, if the menu link identifier is not set, ignore the request
+    return NULL;
+  }
+
+  // check whether this role has visibility access (must be present)
+  $rids = _menu_per_role_get_roles($mlid);
+  if (!empty($rids) && count(array_intersect($rids, array_keys($user->roles))) == 0) {
+    // not permitted by the rids...
+    return FALSE;
+  }
+
+  // check whether this role has visibility access (must not be present)
+  $hrids = _menu_per_role_get_hide_from_roles($mlid);
+  if (!empty($hrids) && count(array_intersect($hrids, array_keys($user->roles))) > 0) {
+    // not permitted by the hrids...
+    return FALSE;
+  }
+
+  // this module is not preventing user from seeing this menu entry
+  return NULL;
+}
+
+
+/*
+ * Implementation of hook_form_alter().
+ */
+function menu_per_role_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'menu_edit_item') {
+    $f = &$form;
+    $form['submit']['#weight'] = 10;
+  }
+  if (isset($form['#node']) && $form['#node']->type .'_node_form' == $form_id && isset($form['menu'])) {
+    $f = &$form['menu'];
+  }
+  if (isset($f)) {
+    $default_value_roles = $form['menu']['mlid']['#value'] ? _menu_per_role_get_roles($form['menu']['mlid']['#value']) : array();
+    $default_value_hide_from_roles = $form['menu']['mlid']['#value'] ? _menu_per_role_get_hide_from_roles($form['menu']['mlid']['#value']) : array();
+    $f['menu_per_role'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Restrict item visibility'),
+      '#collapsible' => TRUE,
+      '#collapsed' => (count($default_value_roles) + count($default_value_hide_from_roles)) == 0,
+      '#weight' => 5,
+      '#description' => t('Check to know whether the user has proper visibility permissions to see this menu item. Note that both checks are always performed.'),
+    );
+    $f['menu_per_role']['menu_per_role_roles'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Show menu item only to selected roles'),
+      '#options' => user_roles(),
+      '#default_value' => $default_value_roles,
+      '#description' => t('Check no role to leave the access permission to the default. A user who is not part of at least one of the selected roles will not see this menu item.'),
+    );
+    $f['menu_per_role']['menu_per_role_hide_from_roles'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Hide menu item from selected roles'),
+      '#options' => user_roles(),
+      '#default_value' => $default_value_hide_from_roles,
+      '#description' => t('Check no role to leave the access permission to the default. A user who is part of any one of these roles will not see this menu item.'),
+    );
+    $form['#submit'][] = '_menu_per_role_form_submit';
+  }
+}
+
+
+/*
+ * Internal function to save the data in our table.
+ */
+function _menu_per_role_form_submit($form, &$form_state) {
+  if ($form_state['submitted']) {
+    $mlid = $form_state['values']['menu']['mlid'];
+    if ($mlid) {
+      // hide but to those roles
+      $rids = array();
+      $roles = isset($form_state['values']['menu_per_role_roles']) ?
+                     $form_state['values']['menu_per_role_roles']
+                     : $form_state['values']['menu']['menu_per_role']['menu_per_role_roles'];
+      foreach ($roles as $rid => $checked) {
+        if ($checked) {
+          $rids[] = $rid;
+        }
+      }
+      $rids_str = implode(',', $rids);
+      // show but to those roles
+      $hrids = array();
+      $roles = isset($form_state['values']['menu_per_role_hide_from_roles']) ?
+                     $form_state['values']['menu_per_role_hide_from_roles']
+                     : $form_state['values']['menu']['menu_per_role']['menu_per_role_hide_from_roles'];
+      foreach ($roles as $rid => $checked) {
+        if ($checked) {
+          $hrids[] = $rid;
+        }
+      }
+      $hrids_str = implode(',', $hrids);
+      // save in our table
+      db_query("UPDATE {menu_per_role} SET rids = '%s', hrids = '%s' WHERE mlid = %d", $rids_str, $hrids_str, $mlid);
+      if (db_affected_rows() == 0) {
+	// if nothing was affected, the row did not exist yet
+        db_query("INSERT INTO {menu_per_role} (mlid, rids, hrids) VALUES (%d, '%s', '%s')", $mlid, $rids_str, $hrids_str);
+      }
+      // reset the menus
+      menu_cache_clear_all();
+    }
+    else if (isset($form_state['values']['menu_per_role_roles'])) {
+      drupal_set_message(t('The menu link identifier was not defined on Submit in <b>Menu per Role</b>. You are most certainly adding a new menu item. For this feature to work when adding a menu item, you must apply the patch defined in <a href="http://drupal.org/node/326210" target="_blank">node #326210</a>. That patch is included in this module for that purpose.'), 'error');
+    }
+  }
+}
+
+
+/*
+ * When the menu item is being submitted, the core also calls the
+ * hook_menu_link_alter(&$item, $menu);
+ *
+ * By catching that function, we can set the special alter option
+ * that will let our module receive a call whenever the menu is
+ * ready for display but was not yet displayed. At that time we
+ * can mark the access as FALSE.
+ */
+function menu_per_role_menu_link_alter(&$item, $menu)
+{
+  // TODO: The following marks ALL menu items as alterable.
+  //       Any time a menu item is saved, it is marked as
+  //       such. I have no clue, at this time, of a way to
+  //       avoid such nonsense. Hints welcome!
+  $item['options']['alter'] = TRUE;
+}
+
+
+/*
+ * Before a menu item gets displayed, the core calls the hook:
+ * hook_translated_menu_link_alter(&$item, $map);
+ * (but only if $item['options']['alter'] is TRUE)
+ *
+ * This function is used to alter the access right based on
+ * the role definition of the item.
+ */
+function menu_per_role_translated_menu_link_alter(&$item, $map)
+{
+  // avoid checking the role if the item access is already false
+  if ($item['access'] && _menu_per_role_access($item['mlid']) === FALSE) {
+    $item['access'] = FALSE;
+  }
+}
+
+
+/*
+ * Gets all roles with access to the specified menu item
+ * No roles mean that access is granted by this module.
+ */
+function _menu_per_role_get_roles($mlid) {
+  $result = db_query("SELECT rids FROM {menu_per_role} WHERE mlid = %d", $mlid);
+  if ($result && ($row = db_fetch_object($result)) && $row->rids) {
+    return explode(',', $row->rids);
+  }
+
+  // not defined, everyone has the right to use it
+  return array();
+}
+
+/*
+ * Gets all roles without access to the specified menu item
+ * No roles mean that access is granted by this module.
+ */
+function _menu_per_role_get_hide_from_roles($mlid) {
+  $result = db_query("SELECT hrids FROM {menu_per_role} WHERE mlid = %d", $mlid);
+  if ($result && ($row = db_fetch_object($result)) && $row->hrids) {
+    return explode(',', $row->hrids);
+  }
+
+  // not defined, everyone has the right to use it
+  return array();
+}

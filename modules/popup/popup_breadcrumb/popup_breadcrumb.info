@@ -1,0 +1,7 @@
+name = Popup breadcrumb
+description = Replaces the standard breadcrumb with a block of configurable popup views
+package = User interface
+version = "6.x-3.0"
+core = 6.x
+dependencies[] = popup
+dependencies[] = views

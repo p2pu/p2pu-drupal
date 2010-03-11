@@ -1,0 +1,15 @@
+; $Id:
+name = Group Admin
+description = Provides a simple administrative interface to manage membership of OG Groups
+dependencies[] = og
+package = Organic groups
+version = 6.x-1.1
+core = 6.x
+
+
+; Information added by drupal.org packaging script on 2010-02-23
+version = "6.x-1.4"
+core = "6.x"
+project = "groupadmin"
+datestamp = "1266931207"
+

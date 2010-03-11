@@ -1,0 +1,21 @@
+<?php
+// $Id:
+
+
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function popup_uninstall() {
+
+  $variables = array(
+    'popup-style',
+    'popup-css-only',
+    'popup-hover-linger',
+  );
+
+  foreach($variables as $variable){
+    variable_del($variable);
+  }
+
+}

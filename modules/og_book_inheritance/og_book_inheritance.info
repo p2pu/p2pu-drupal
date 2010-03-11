@@ -1,0 +1,14 @@
+; $Id: og_book_inheritance.info,v 1.2 2009/05/19 14:10:08 agileware Exp $
+name = OG book inheritance
+description = Adds group inheritance functionality for book content
+package = Organic groups
+core = 6.x
+dependencies[] = og
+dependencies[] = book
+
+; Information added by drupal.org packaging script on 2009-07-07
+version = "6.x-1.1"
+core = "6.x"
+project = "og_book_inheritance"
+datestamp = "1246965357"
+

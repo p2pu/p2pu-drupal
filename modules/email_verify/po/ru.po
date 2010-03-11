@@ -1,0 +1,43 @@
+# translation of email_verify.po to russian
+# LANGUAGE translation of Drupal (email_verify.module)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from file: email_verify.module,v 1.4 2006/01/29 18:34:04 dbr
+#
+# Vlad Savitsky <vs@solti.com.ua>, 2007.
+msgid ""
+msgstr ""
+"Project-Id-Version: email_verify\n"
+"POT-Creation-Date: 2007-01-07 10:07+0100\n"
+"PO-Revision-Date: 2007-10-30 02:49+0200\n"
+"Last-Translator: Vlad Savitsky <vs@solti.com.ua>\n"
+"Language-Team: russian <ru@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: email_verify.module:19
+msgid "Verifies thoroughly email addresses during registration and account edition."
+msgstr "Проверяет тщательно адреса электронной почты во время регистрации и изменения учётной записи."
+
+#: email_verify.module:61
+msgid "Email host %host does not seem valid"
+msgstr "Сервер %host кажется не верным"
+
+#: email_verify.module:92
+msgid "Email host %host does not seem valid, it does not answer"
+msgstr "Сервер %host кажется неверным - он не отвечает"
+
+#: email_verify.module:126
+msgid "Email address %mail does not seem valid"
+msgstr "Адрес %mail кажется неверным"
+
+#: email_verify.module:137
+msgid "Verify user emails"
+msgstr "Проверять адреса электронной почты пользователей"
+
+#: email_verify.module:86;113;120;125;0
+msgid "email_verify"
+msgstr "email_verify"
+

@@ -1,0 +1,341 @@
+@CHARSET "UTF-8";
+
+body,
+body.admin-menu{ margin: 20px !important;}
+body{ background: #CCC8BF url('../images/body-back.png') repeat-x left 87px; font: 12px arial;}
+a{ color: #58cac1; text-decoration: none;}
+a:hover{ color: #58cac1; text-decoration: underline;}
+h2{ color: #800080; font-family: Georgia; font-size: 18px;}
+h3{ color: #800080; font-family: Georgia; font-size: 16px;}
+
+/* ---- Page header ---- */
+
+div#page-header{ font-family: georgia; height: 67px;}
+
+/* -- Logo -- */
+
+div#page-header div#logo{ float: left; width: 160px;}
+div#page-header div#logo a img{ display: block;}
+div.block-region{ position: absolute;}
+
+/* -- Slogan -- */
+
+div#slogan{ color: #666; float: left; font-size: 130%; font-weight: bold; padding: 16px 10px 0 0; text-align: right; width: 700px;}
+
+/* -- Blocks -- */
+
+div#page-header div#region-header{ float: right;}
+div#page-header div#region-header{ float: right; clear: right;}
+div#page-header div.block{ float: right; margin: 0; padding: 0; width: 52px;}
+
+/* Login */
+div#page-header div#block-menu-menu-login ul,
+div#page-header div#block-menu-menu-login ul li{ list-style: none; list-style-type: none; list-style-image: none; margin: 0; padding: 0; width: 52px;}
+div#page-header div#block-menu-menu-login a{ background: url('../images/login.png'); display: block; height: 53px; width: 52px;}
+body.logged-in div#page-header div#block-menu-menu-login a{ background: url('../images/logout.png');}
+div#page-header div#block-menu-menu-login a span{ display: none;}
+
+/* -- Navigation -- */
+
+div#navigation{ clear: both; height: 52px;}
+div#navigation div.primary{ float: left; width: 740px;}
+div#navigation div.block{ float: left;}
+div#navigation div.block-region{ display: none;}
+div#navigation div.popup-menu-flat-body-wrapper{ background: none; margin: 0; padding: 0;}
+div#navigation div.popup-menu-flat-body-wrapper div.popup-menu-inline-title-container a span.wrapper span{ color: #fff; font: 140% georgia;}
+div#navigation div.popup-menu-flat-body-wrapper div.popup-menu-inline-title-container a:hover span.wrapper span{ color: #ffff66;}
+div#navigation div.popup-menu-flat-body-wrapper div.popup-menu-inline-title-container a:hover span.wrapper span{ color: #ffff66;}
+
+div#navigation a#popup-element-11-title,
+div#navigation a#popup-element-12-title{ font-size: 8px;}
+
+div#popup-element-9-body{ width: 200px;}
+
+/* Search */
+
+form#search-theme-form{ float: right; padding: 8px 0 0 0; width: 180px;}
+form#search-theme-form label{ display: none;}
+form#search-theme-form input.form-text{ border: 0; display: block; float: right; height: 18px; padding: 2px 4px; width: 84px;}
+form#search-theme-form input.form-submit{ background: none; border: none; color: #fff; float: left; font: 140% georgia; width: 70px;}
+
+/* -- Blocks -- */
+
+div#page-sub-header p{ padding: 0; margin: 0;}
+
+/* -- Frontpage Blocks -- */
+
+body.page-home-page div#content-column .panel-flexible .block{ padding: 0 0 30px 0; width: 198px; float: left;}
+body.page-home-page div#content-column .panel-flexible .block h2{ font-family: Georgia; font-size: 17px; color: #800080;}
+body.page-home-page div#content-column .panel-flexible .block .content{ padding: 0 10px 0 0;}
+body.page-home-page div#content-column .panel-flexible .block .cta-icon{ margin-right: 6px; float: left;}
+body.page-home-page div#content-column .panel-flexible .block .content p{ margin: 0; padding: 4px 0;}
+body.page-home-page div#content-column .orange-panel{ clear: left;}
+body.page-home-page div#content-column .view-course-list .view-footer{ font-family: Geaorgi; text-align: right; font-size: 14px; padding: 10px 5px 0 0;}
+
+/* ---- Sub header ---- */
+
+div#page-sub-header div.block{ float: left; padding: 0; margin: 0 5px 0 0;}
+div#page-sub-header{ height: 30px;}
+div#page-sub-header .block-region{ display: none;}
+
+div#page-sub-header div.popup-body div.popup-body-inner { white-space: normal;}
+div#page-sub-header div.popup-body{ width: 200px;}
+
+div#page-sub-header #my-groups-navigation a.popup-title{ color: #aaa;}
+div#page-sub-header #my-groups-navigation a.popup-title:hover{ color: #fff;}
+div#page-sub-header #my-groups-navigation div.popup-element div.popup-title-container a.popped-up-title{ color: #fff;}
+
+div#page-sub-header #my-groups-navigation a.popup-title{ background-position: left -60px; }
+div#page-sub-header #my-groups-navigation a.popup-title span.wrapper{ background-position: left -60px; }
+div#page-sub-header #my-groups-navigation a.popup-title span.wrapper span{ background-position: right -60px; }
+div#page-sub-header #my-groups-navigation a.popup-title:hover{ background-position: left -80px; }
+div#page-sub-header #my-groups-navigation a.popup-title:hover span.wrapper{ background-position: left -80px; }
+div#page-sub-header #my-groups-navigation a.popup-title:hover span.wrapper span{ background-position: right -80px; }
+div#page-sub-header #my-groups-navigation div.popup-title-container a.popped-up-title{ background-position: left -100px; }
+div#page-sub-header #my-groups-navigation div.popup-title-container a.popped-up-title span.wrapper{ background-position: left -100px; }
+div#page-sub-header #my-groups-navigation div.popup-title-container a.popped-up-title span.wrapper span{ background-position: right -100px; }
+#my-groups-navigation-body h3{ font-size: 13px;}
+
+
+/* -- Popups -- */
+
+/* Title */
+div#page-sub-header a.popup-title span.wrapper span { padding-top: 2px;}
+
+/* Body */
+
+/* div#page-sub-header div#my-groups-navigation div.popup-body{ width: 250px;}*/
+/*div#page-sub-header div#administer-course-navigation div.popup-body{ width: 156px;} */
+div#page-sub-header div#administer-course-navigation div.popup-body{ background-image: none; }
+
+/* Content */
+div#page-sub-header div.popup-body h3{ color: #999; margin: 0; padding: 0 0 5px 0;}
+div#page-sub-header div.popup-body div.view-content ul{ margin: 0 0 10px; padding: 0;}
+div#page-sub-header div.popup-body div.view-content ul li{ border-top: 1px solid #8F8F8F; font-size: 90%; list-style: none; margin: 0; padding: 5px 0 5px 10px;}
+div#page-sub-header div.popup-body .views-field-type{ font-size: 90%;}
+div#page-sub-header div#administer-course-navigation span.create-a-template{ border-bottom: 1px solid #8F8F8F; display: block; padding-bottom: 5px; margin-bottom: 5px;}
+
+/* ---- Page body ---- */
+
+/* -- Background -- */
+
+div.page-body-back{ background: url('../images/content-back.png') repeat-y left top;}
+div.page-body-top{ background: url('../images/content-top.png') no-repeat left top;}
+div.page-body-bottom{ background: url('../images/content-bottom.png') no-repeat left bottom;}
+
+/* -- Content -- */
+
+div#content-column h1.title,
+div#content-column h2.pane-title{ font-size: 150%; font-family: georgia;}
+
+div#content-column table{ margin: 0 auto; width: 100%;}
+
+div.view-header h3{ font-size: 110%; font-weight: bold; border-bottom: 1px solid #000; margin: 20px 0 10px;}
+
+div.meta { border-style: solid none; border-width: 1px; clear: both; height: 30px; margin: 12px 0 8px 0;}
+div.meta img{ float: left; }
+div.meta span{ display: block; float: right; padding: 8px;}
+
+/* Tabs */
+div#content-column div.tabs * { border: 0; background: none;}
+div#content-column div.tabs ul { margin: 0 0 20px 0;}
+div#content-column div.tabs ul li { background: url('../images/tab-left.png') left top no-repeat; height: 18px; margin: 0 5px 0 0;}
+div#content-column div.tabs ul li a{ background: url('../images/tab-right.png') right top no-repeat; color: #fff; display: block; float: left; height: 18px; margin: 0; padding: 0 10px;}
+div#content-column div.tabs ul li.active{ background-position: left -18px;}
+div#content-column div.tabs ul li.active a{ background-position: right -18px;}
+
+/* Nodes */
+div#content-column div.node h2.title{ font-size: 115%;}
+div#content-column div.meta h2.title{ float: left; font-size: 120%; margin: none; padding: 5px 0 0 10px;}
+div#content-column div.meta h2.title a{ text-decoration: none;}
+
+div.node div.content{ clear: both; margin-bottom: 20px;}
+div.node ul.links{ clear: both; margin: 0; padding: 0;}
+div.node ul.links li{ margin: 0; padding: 0 10px 0 0;}
+
+div.node div.item-list ul{ margin-top: 20px;}
+div.node div.item-list ul li{ border-top: 1px solid;}
+
+div.node div.field-field-course-prerequisites div.field-items,
+div.node div.field-field-course-sign-up-req div.field-items{ color: #ddd; padding: 0 10px;}
+div.node div.field-field-course-prerequisites div.field-label,
+div.node div.field-field-course-sign-up-req div.field-label{ border-bottom: 1px solid;}
+div.node div.field-field-course-no-of-seats div.field-label,
+div.node div.field-field-course-status div.field-label,
+div.node div.field-field-course-opening-date div.field-label,
+div.node div.field-field-course-dates div.field-label{ float: left; width: 40%;}
+
+div.node-discussion div.content,
+div.node-teaser div.content,
+div.node-teaser ul.links{ padding: 0 10px;}
+
+/* Views */
+div.view-profile-info label{ display: block; float: left; width: 40%;}
+div.view-profile-info label.views-label-field-profile-url-url{ float: none; padding: 20px 0 10px 0;}
+div#content-column .view-og-mytracker .views-row{ background: #f4af59;}
+div#content-column .view-course-shouts table td { border-color: #f3f130; }
+div.views-table caption { font-family: georgia; font-size: 16px; }
+div.view-course-discussions div.views-row{ background: #F9F898;}
+div.view-course-discussions div.views-row div.box{ padding: 10px;}
+div.view-course-discussions div.views-row div.box h2{ font: 130% georgia;}
+div.view-course-list .views-field-title a{ font-size: 13px; font-family: Georgia; color: #fff;}
+div.view-course-list .views-field-subscribe a{ text-decoration: none; font-family: Georgia; font-size: 150%; }
+body.page-course div.view-course-list .views-field-subscribe a{ color: #333; text-decoration: none;}
+div.view-course-list .views-field-subscribe a:hover{ color: #333;}
+div.view-og-mytracker p{ margin: 5px 0;}
+body.page-course div.view-course-list a{ color: #fff; text-decoration: underline;}
+body.page-course div.view-course-list a:hover{ color: #222; text-decoration: none;}
+body.page-course div.view-course-list td.views-field-name{ width: 120px;}
+body.page-course div.view-course-list td.views-field-name .picture{ padding: 6px 0 0 0;}
+div.view-course-shouts h2.pane-title{ margin: 0;}
+div.view-course-events .view-header a{ font-family: georgia; font-size: 150%; text-decoration: none;}
+div.view-id-og_members_faces table td{ vertical-align: top;}
+
+/* Comments */
+div.comment{ background: #fff; margin: 0;}
+div.comment ul.links{ padding-bottom: 10px;}
+div.comment ul.links li{ padding: 0 10px 0 0;}
+div.comment div.content{ padding: 0 10px;}
+html.js .resizable-textarea textarea { height: 70px;}
+
+/* Comment form */
+form#contact-mail-page table.cke_editor td#cke_contents_edit-message,
+form#comment-form table.cke_editor td#cke_contents_edit-comment { height: 100px;}
+form#contact-mail-page .resizable-textarea,
+form#comment-form .resizable-textarea { width: 50%;}
+  
+/* Main calendar styles */
+
+div#content-column .calendar-calendar td .inner div.day a { color: #333; }
+div#content-column .calendar-calendar td .inner div.day a:hover{ color: #666;}
+div#content-column .calendar-calendar td.has-no-events { background: #fff; }
+div#content-column .calendar-calendar td .inner div.calendar div, .calendar-calendar td .inner div.calendar div a{ background: none;}
+div#content-column .date-nav div.date-heading h3{ color: #fff;}
+
+/* Mini calendar styles */
+
+body.no-sidebars div#content-column .panel-pane .calendar-calendar td .inner { padding: 0; }
+.panel-pane .calendar-calendar td .inner div, 
+.panel-pane .calendar-calendar td .inner div a { background: none; border: none; }
+.panel-pane .calendar-calendar .inner { min-height: 47px; }
+
+/* Grey */
+div.grey-panel div.meta { background: #777; border-color: #999;} 
+div.grey-panel div.node div.field-label { border-color: #777;}
+div.grey-panel tr.odd{ background-color: #555; border-bottom: #666}
+div.grey-panel tr.even{ background-color: #777; border-bottom: #666;}
+div.grey-panel .views-table th{ border-bottom: 3px solid #666;}
+
+/* Orange */
+div.orange-panel div.meta { background: #F4C894; border-color: #FfD8A4;} 
+div.orange-panel div.meta h2.title a{ color: #bb4400;}
+
+div.orange-panel .calendar-calendar td.has-events { background: #FFFFCC; }
+div.orange-panel .calendar-calendar * { border-color: #FFCB00;}
+div.orange-panel .calendar-calendar td.empty { background: #FFD8A4;}
+div.orange-panel .calendar-calendar th.days{ background: #FFFF99;}
+
+/* Yellow */
+div.yellow-panel div.meta { background: #FAF9AC; border-color: #fefeee;} 
+div.yellow-panel div.meta h2.title a{ color: #ee9900;}
+
+/* -- Panels -- */
+
+/* Fixes */
+body.page-home-page div.panel-flexible,
+body.page-about div.panel-flexible,
+body.page-faqs div.panel-flexible,
+body.page-advisors div.panel-flexible,
+body.page-team div.panel-flexible,
+body.page-contact-us div.panel-flexible{ margin: 0 auto; width: 100%;}
+body.page-home-page div.panels-flexible-column-1-10,
+body.page-about div.panels-flexible-column-28-1,
+body.page-faqs div.panels-flexible-column-30-1,
+body.page-advisors div.panels-flexible-column-29-1,
+body.page-team div.panels-flexible-column-31-1,
+body.page-contact-us div.panels-flexible-column-25-1 { float:left; width:33%;}
+body.page-home-page div.panels-flexible-column-1-1,
+body.page-about div.panels-flexible-column-28-main,
+body.page-advisors div.panels-flexible-column-29-main,
+body.page-faqs div.panels-flexible-column-30-main,
+body.page-team div.panels-flexible-column-31-main,
+body.page-contact-us div.panels-flexible-column-25-main { float:left; width:67%;}
+body.page-home-page div.panels-flexible-region-1-rightsidebar,
+body.page-about div.panels-flexible-region-28-rightsidebar,
+body.page-faqs div.panels-flexible-region-30-rightsidebar,
+body.page-advisors div.panels-flexible-region-29-rightsidebar,
+body.page-team div.panels-flexible-region-31-rightsidebar,
+body.page-contact-us div.panels-flexible-region-25-rightsidebar { width: 100%;}
+body.page-home-page div.panels-flexible-region-inside{ padding: 0 5px 0 0;}
+body.page-home-page div.panels-flexible-region-inside-last{ padding: 0;}
+
+/* All panes */
+div.panel-pane div.corner{ background-repeat: no-repeat; margin-bottom: 10px;}
+div.panel-pane div.tl{ background-position: left top;}
+div.panel-pane div.tr{ background-position: right top;}
+div.panel-pane div.br{ background-position: right bottom;}
+div.panel-pane div.bl{ background-position: left bottom;}
+div.panel-pane div.pane-inner{ padding: 10px 10px 20px 10px;}
+div.panel-pane h2{ margin-top: 0;}
+div.panel-pane ul{ padding-left: 10px;}
+
+/* Grey */
+div.grey-panel{ background: url('../images/grey-back.png'); color: #eee;}
+div.grey-panel h2{ color: #55CAC1;}
+div.grey-panel a{ color: #F3F130;}
+div.grey-panel a:hover{ color: #fff;}
+div.grey-panel div.tl{ background-image: url('../images/grey-tl.png');}
+div.grey-panel div.tr{ background-image: url('../images/grey-tr.png');}
+div.grey-panel div.bl{ background-image: url('../images/grey-bl.png');}
+div.grey-panel div.br{ background-image: url('../images/grey-br.png');}
+div.grey-panel div.pane-content div.item-list ul{ margin: 0; padding: 0;}
+div.grey-panel div.pane-content div.item-list ul li{ border-top: 1px solid #777; list-style-type: none; list-style-image: none; margin: 0; padding: 5px 0 5px 20px;}
+
+/* Orange */
+div.orange-panel{ background: url('../images/orange-back.png'); color: #333;}
+div.orange-panel h2{ color: #333;}
+div.orange-panel a{ color: #333; text-decoration: underline;}
+div.orange-panel a:hover{ color: #fff; text-decoration: none;}
+div.orange-panel div.tl{ background-image: url('../images/orange-tl.png');}
+div.orange-panel div.tr{ background-image: url('../images/orange-tr.png');}
+div.orange-panel div.bl{ background-image: url('../images/orange-bl.png');}
+div.orange-panel div.br{ background-image: url('../images/orange-br.png');}
+div.orange-panel table *{ border-color: #f48b08;}
+div.orange-panel tr.even{ background: #f4a33d;}
+div.orange-panel tr.odd{ background: #d77a07;}
+
+/* Yellow */
+div.yellow-panel{ background: url('../images/yellow-back.png'); color: #333;}
+div.yellow-panel h2{ color: #333;}
+div.yellow-panel a{ color: #333; text-decoration: underline;}
+div.yellow-panel a:hover{ color: #666; text-decoration: none;}
+div.yellow-panel div.tl{ background-image: url('../images/yellow-tl.png');}
+div.yellow-panel div.tr{ background-image: url('../images/yellow-tr.png');}
+div.yellow-panel div.bl{ background-image: url('../images/yellow-bl.png');}
+div.yellow-panel div.br{ background-image: url('../images/yellow-br.png');}
+div.yellow-panel table *{ border-color: #f3f130;}
+div.yellow-panel tr.even{ background: #ffffcc;}
+div.yellow-panel tr.odd{ background: #ffff99;}
+
+/* Button panel */
+div.button-panel div.pane-inner{ padding: 10px;}
+div.button-panel div.pane-inner div.pane-content p{ margin: 0; padding: 0;}
+div.button-panel div.pane-inner div.pane-content{ margin: 0; padding: 0; text-align: center;}
+div.button-panel div.pane-inner a{ font-family: Georgia; color: #333; font-size: 150%; text-decoration: none;}
+
+/* Shout panel */
+div#edit-shout-box-wrapper #edit-shout-box{ width: 263px;}
+#p2pu-shout-form .form-item{ margin-bottom: 0;}
+
+/* ---- Page footer ---- */
+
+/* -- Blocks --*/
+
+div#page-footer div.block{ float: left; margin-right: 10px;}
+div#page-footer div.block:last{ float: right;}
+
+
+
+
+
+

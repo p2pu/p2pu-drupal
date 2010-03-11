@@ -1,0 +1,4 @@
+; $Id$
+name = "P2PU Support"
+description = "P2P University module"
+core = 6.x

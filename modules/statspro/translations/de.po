@@ -1,0 +1,167 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Statspro\n"
+"POT-Creation-Date: 2008-11-18 12:46+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Alexander Meindl <alex@squatlabs.com>\n"
+"Language-Team: Squatlabs <alex@squatlabs.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: statspro.inc:38;38
+msgid "User registrations"
+msgstr "Benutzerregistrierungen"
+
+#: statspro.inc:39
+msgid "User online"
+msgstr "Benutzer Online"
+
+#: statspro.inc:40;40
+msgid "New nodes"
+msgstr "Neue Inhalte"
+
+#: statspro.inc:41;41
+msgid "Changed nodes"
+msgstr "Geänderter Inhalt"
+
+#: statspro.inc:42;42
+msgid "Comments"
+msgstr "Kommentare"
+
+#: statspro.inc:43
+msgid "Page impressions"
+msgstr "Page impressions"
+
+#: statspro.inc:44
+msgid "Page impressions, users"
+msgstr "Page impressions, Benutzer"
+
+#: statspro.inc:45;45
+msgid "Errors"
+msgstr "Fehlermeldungen"
+
+#: statspro.inc:46;46
+msgid "Errors, users"
+msgstr "Fehlermeldungen, Benutzer"
+
+#: statspro.inc:47;47
+msgid "Warnings"
+msgstr "Warnungen"
+
+#: statspro.inc:48;48
+msgid "Warnings, users"
+msgstr "Warnungen, Benutzer"
+
+#: statspro.module:76
+msgid "never"
+msgstr "nie"
+
+#: statspro.module:78
+msgid "Last statistics update: !updated"
+msgstr "Letztes Aktualisierung der Daten: !updated"
+
+#: statspro.module:101
+msgid "Content common"
+msgstr "Inhalt allgemein"
+
+#: statspro.module:107;130
+msgid "Name"
+msgstr "Name"
+
+#: statspro.module:107;130
+msgid "Value"
+msgstr "Wert"
+
+#: statspro.module:111
+msgid "No content data available for specified period."
+msgstr "Kein Daten für die ermittlung der Statistiken im angegebenen Zeitraum vorhanden."
+
+#: statspro.module:123
+msgid "PIs, errors and warnings"
+msgstr "PIs, Fehler und Warnungen"
+
+#: statspro.module:134
+msgid "No access and log files available for specified period."
+msgstr "Kein Zugriffsprotokoll und Berichte für den ausgewählten Zeitraum vorhanden."
+
+#: statspro.module:177
+msgid "Today"
+msgstr "Heute"
+
+#: statspro.module:178
+msgid "Yesterday"
+msgstr "Gestern"
+
+#: statspro.module:179
+msgid "Week, current"
+msgstr "Woche, aktuelle"
+
+#: statspro.module:180
+msgid "Week, last"
+msgstr "Woche, letzte"
+
+#: statspro.module:181
+msgid "Week, before last"
+msgstr "Woche, vorletzte"
+
+#: statspro.module:182
+msgid "Month, current"
+msgstr "Monat, aktuelles"
+
+#: statspro.module:183
+msgid "Month, last"
+msgstr "Monat, letztes"
+
+#: statspro.module:184
+msgid "Month, last 3"
+msgstr "Monat, letzten 4"
+
+#: statspro.module:185
+msgid "Month, last 6"
+msgstr "Monat, letzten 6"
+
+#: statspro.module:187
+msgid "Quarter, current"
+msgstr "Quartal, aktuelles"
+
+#: statspro.module:188
+msgid "Quarter, last"
+msgstr "Quartal, letztes"
+
+#: statspro.module:190
+msgid "Year, current"
+msgstr "Jahr, aktuelles"
+
+#: statspro.module:191
+msgid "Year, last"
+msgstr "Jahr, letztes"
+
+#: statspro.module:206
+msgid "Time period"
+msgstr "Zeitperiode"
+
+#: statspro.module:60;0
+msgid "statspro"
+msgstr "Statistiken Pro"
+
+#: statspro.module:60
+msgid "New statistics available"
+msgstr "Neue Statistiken verfügbar"
+
+#: statspro.module:33
+#: statspro.info:0
+msgid "Statistics pro"
+msgstr "Statistiken Pro"
+
+#: statspro.module:34
+msgid "Content statistics"
+msgstr "Inhaltstatistiken"
+
+#: statspro.info:0
+msgid "Statistics for nodes, comments, users and lots more"
+msgstr "Statistiken zu Inhalten, Benutzer und Systemdaten"
+

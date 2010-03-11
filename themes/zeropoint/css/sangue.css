@@ -1,0 +1,62 @@
+#top_bg {
+	background: transparent url(../images/sangue/fill_top.png) 0 100% repeat-x;
+}
+#top_left {
+	background: transparent url(../images/sangue/fill_top_left.png) 0 100% no-repeat;
+}
+#top_right {
+	background: transparent url(../images/sangue/fill_top_right.png) 100% 100% no-repeat;
+}
+
+a, a:link,
+.title, .title a,
+.node .terms,
+#aggregator .news-item .categories, #aggregator .source, #aggregator .age,
+#forum td .name,
+div.admin-panel .description {
+	color: #900;
+}
+
+.block.themed-block {
+	background: #fff url(../images/sangue/fill_block.png) 0 100% repeat-x;
+}
+
+h1, h2, h3 {
+	color: #900;
+}
+
+
+#navlist.links a, #navlinks ul li a {
+	background-color: #900;
+}
+#navlist li a:hover, #navlinks ul li a:hover {
+	color: #fff !important;
+	background-color: #ca0000 !important;
+}
+
+/* SUCKERFISHMENU */
+
+body.sfish #navlinks ul li.expanded a {
+	background: #900 url(../images/nav-down.png) 95% 50% no-repeat;
+}
+body.sfish #navlinks li ul a:link, 
+body.sfish #navlinks li ul a:visited {
+	background: #ca0000;
+	border-left: 1px solid #df0000;
+	border-top: 1px solid #df0000;
+	border-right: 1px solid #900;
+	border-bottom: 1px solid #900;
+}
+body.sfish #navlinks ul.menu li ul.menu li.expanded a,
+body.sfish #navlinks ul.menu li ul.menu li ul.menu li.expanded a,
+body.sfish #navlinks ul.menu li ul.menu li ul.menu li ul.menu li.expanded a {
+	background: #ca0000 url(../images/nav-right.png) 100% 50% no-repeat;
+}
+body.sfish #navlinks ul.menu li li.expanded ul.menu a, 
+body.sfish #navlinks ul.menu li li.expanded ul.menu li.expanded ul.menu a,
+body.sfish #navlinks ul.menu li li.expanded ul.menu li.expanded ul.menu li.expanded ul.menu a {
+	background: #ca0000;
+}
+body.sfish #navlinks li ul a:hover {
+	background-color: #df0000 !important;
+}

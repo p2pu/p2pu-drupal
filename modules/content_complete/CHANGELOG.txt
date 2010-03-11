@@ -1,0 +1,29 @@
+// $Id: CHANGELOG.txt,v 1.1.2.2 2009/09/30 08:46:24 pvhee Exp $
+
+Content Complete 1.2, ?
+--------------------------------
+- Complete calculation per node
+- Settings are stored along with the content type instead of in a separate
+  table
+- Completeness values are cached in the database
+- Views integration to retrieve completeness per node + style plugin to 
+  compute completeness over a series of nodes
+- Batch API integration to rebuild cache
+- To rebuild the cache, go to the settings menu at 
+  admin/content/content_complete
+- Blocks can be hidden when 100% is reached. This is configurable
+  in the block.
+- Rules integration now works on the current node, no content type
+  needs to be passed in the configuration
+
+Content Complete 1.1, 2009-04-22 
+--------------------------------
+- Theming options added to make the complete bar fully customizable 
+  (see README.txt for instructions)
+
+Content Complete 1.1, 2009-03-09 
+--------------------------------
+- First version of Content Complete released
+- Rules integration
+- Content Complete calculation per node content type, only first node
+  considered

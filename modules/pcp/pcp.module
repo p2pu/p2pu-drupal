@@ -1,0 +1,466 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Allows users with valid permissions to tag profile fields created
+ * from the profile module as required fields for a 
+ * users profile to be considered complete.
+ */
+
+/**
+ * Implementation of hook_perm()
+ */
+function pcp_perm() {
+  return array(
+    'administer pcp',
+    );
+}
+
+/**
+ * Implementation of hook_menu()
+ */
+function pcp_menu() {
+  $items = array();
+  
+  $items['admin/user/pcp'] = array(
+    'title' => 'Profile Complete Percentages',
+    'description' => 'Tag profile fields as required for percent complete handling.',
+    'page callback' => 'pcp_admin_settings',
+    'access arguments' => array('administer pcp'),
+    );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_block()
+ */
+function pcp_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $blocks = array();
+      $blocks[0]['info'] = t('Profile Complete Percentage');
+      return $blocks;
+      break;
+    case 'view':
+      $block = array();
+      switch ($delta) {
+        case 0:
+          global $user;
+          $complete_data = pcp_get_complete_percentage_data($user);
+          $block = array(
+            'subject' => t('Profile Complete'),
+            'content' => theme('pcp_profile_percent_complete', $complete_data),
+            );
+          break;
+      }
+      return $block;
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_form_alter()
+ */
+function pcp_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'profile_field_form' && user_access('administer pcp')) {
+    $fid = $form['fid']['#value'];
+    $tag = TRUE;
+    if ($fid) {
+      $field_data = pcp_get_tagged_profile_fields($fid);
+      if (!$field_data[0]['fid']) {
+        $tag = FALSE;
+      }
+    }
+    $form['pcp_settings'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('PCP Settings'),
+      '#weight' => 0,
+      );
+    $form['pcp_settings']['tag'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Make required for PCP module'),
+      '#description' => t('Checking this box will tag this field as a required field for completion of the users profile.'),
+      '#default_value' => $tag,
+      );
+    $form['#submit'][] = 'pcp_profile_field_form_submit';
+  }
+  
+  if ($form_id == 'user_profile_form' && arg(3) != '' && $_GET['fieldname'] != '') {
+    $fieldname = 'edit-'. preg_replace("/_/", "-", $_GET['fieldname']);
+    drupal_add_js("
+      $('#". $fieldname ."').css({
+        'border' : '2px solid red' 
+        });
+    ", 'inline', 'footer');
+  }
+}
+
+/**
+ * Called when a user submits a profile field form from the 
+ * profile module (when adding or editing a profile field).
+ */
+function pcp_profile_field_form_submit($form, &$form_state) {
+  $fid = $form_state['values']['fid'] ? $form_state['values']['fid'] : db_result(db_query("SELECT MAX(fid) FROM {profile_fields}"));
+  db_query("DELETE FROM {profile_pcp} WHERE fid = %d", $form_state['values']['fid']);
+  if ($form_state['values']['tag']) {
+    db_query("INSERT INTO {profile_pcp} (`fid`) VALUES (%d)", $fid);
+  }
+}
+
+/**
+ * Menu Callback Function
+ *  Build output of the pcp module settings which allows the
+ *  administrator to tag specific profile fields which will be 
+ *  used to determine the completion of a users profile.
+ */
+function pcp_admin_settings() {
+  $header = t('Checking a profile field below will add that field to the logic of the complete percentage.');
+  $form = drupal_get_form('pcp_admin_settings_form');
+  return $header . $form;
+}
+
+/**
+ * Admin settings form
+ */
+function pcp_admin_settings_form() {
+  $options = pcp_admin_settings_form_data();
+  $form = array();
+  $form['profile_fields'] = array(
+    '#title' => t('Profile Fields'),
+    '#type' => 'checkboxes',
+    '#options' => $options['profile_fields_options'],
+    '#default_value' => $options['default_values'],
+    );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+    );
+  return $form;
+}
+
+/**
+ * Admin settings form submit
+ */
+function pcp_admin_settings_form_submit($form, &$form_state) {
+  if (is_array($form_state['values']['profile_fields']) && !empty($form_state['values']['profile_fields'])) {
+    db_query("DELETE FROM {profile_pcp}");
+    foreach ($form_state['values']['profile_fields'] as $fid) {
+      if ($fid) {
+        db_query("INSERT INTO {profile_pcp} VALUES (%d)", $fid);
+      }
+    }
+    drupal_set_message("Your settings have been saved.");
+  }
+}
+
+/**
+ * Function that sets up parameters to be used 
+ * when the pcp_admin_settings_form() function
+ * is executed. 
+ *
+ * @return - assoc array
+ *  ['profile_fields_options'] 
+ *    - An associative array of all fields created from the profile module.
+ *  ['default_values']
+ *    - An indexed array of all (if any) default values for the form.
+ */
+function pcp_admin_settings_form_data() {
+  $profile_fields_options = array();
+  $default_values = array();
+  $profile_fields = pcp_get_profile_fields();
+  foreach ($profile_fields as $key => $value) {
+    $profile_fields_options[$value['fid']] = $value['title'];
+  }
+  $tagged_profile_fields = pcp_get_tagged_profile_fields();
+  foreach ($tagged_profile_fields as $key => $value) {
+    $default_values[] = $value['fid'];
+  }
+  $options = array();
+  $options['profile_fields_options'] = $profile_fields_options;
+  $options['default_values'] = $default_values;
+  return $options;
+}
+
+/**
+ * Return a users profile field values that have been saved
+ * for a given user.
+ *
+ * @param int $uid - The uid of the user we are returning data for.
+ *
+ * @return assoc array of all profile fields for the user.
+ */
+function pcp_get_user_profile_values($uid) {
+  $values = array();
+  if ($uid) {
+    $query = db_query("SELECT * FROM {profile_values} WHERE uid = %d", $uid);
+    while ($result = db_fetch_array($query)) {
+      $values[$result['fid']] = $result['value'];
+    }
+  }
+  return $values;
+}
+
+/**
+ * Get the profile complete percentage data for a given user.
+ *
+ * @param obj $user 
+*  - The user object to get data for.
+ *  
+ * @return assoc array of all values needed at the theme layer.
+ *  - Refer to comments in theme_pcp_profile_percent_complete() for specific values.
+ */
+function pcp_get_complete_percentage_data($user) {
+  $fields = pcp_get_tagged_profile_fields();
+  $user_values = pcp_get_user_profile_values($user->uid);
+  $percent = 0;
+  $complete = 0;
+  $nextfield_set = FALSE;
+  
+  if (is_array($fields) && !empty($fields)) {
+    foreach ($fields as $key => $value) {
+      if ($user_values[$value['fid']] == '') {
+        if ($nextfield_set === FALSE) {
+          $nextfield_set = TRUE;
+          $fid = $value['fid'];
+          $nextdata = db_fetch_array(db_query("SELECT title, name, category FROM {profile_fields} WHERE fid = %d", $fid));
+          $nextfield = $nextdata['title'];
+          $nextcategory = $nextdata['category'];
+          $nextname = $nextdata['name'];
+        }
+        continue;
+      }
+      $complete++;
+    }
+    
+    $dec = number_format(($complete / count($fields)), 2);
+    $percent = $dec * 100;
+    if ($nextfield_set) {
+      $next = number_format((($complete + 1) / count($fields)), 2);
+      $nextpercent = $next * 100;
+    }
+  }
+  $complete_data = array();
+  $complete_data['uid'] = $user->uid;
+  $complete_data['percent'] = $percent;
+  $complete_data['completed']  = $complete;
+  $complete_data['incomplete'] = count($fields) - $complete;
+  $complete_data['total'] = count($fields);
+  $complete_data['nextfield'] = $nextfield;
+  $complete_data['nextpercent'] = $nextpercent;
+  $complete_data['nextcategory'] = $nextcategory;
+  $complete_data['nextname'] = $nextname;
+  
+  return $complete_data;
+}
+
+/**
+ * Get all the profile fields that have been tagged.
+ * If an $fid is passed in, only the data for that field will be returned.
+ *
+ * @param int $fid - The fid of the field data should be returned for. If 0, all fields are returned.
+ *
+ * @return indexed array - All fields and their information returned from the query.
+ */
+function pcp_get_tagged_profile_fields($fid = 0) {
+  $where = '';
+  $args = '';
+  
+  if ($fid > 0) {
+    $where = " WHERE fid = %d";
+    $args = array($fid);
+  }
+  $query = db_query("SELECT * FROM {profile_pcp} LEFT JOIN {profile_fields} USING(fid) $where", $args);
+  $fields = array();
+  while ($result = db_fetch_array($query)) {
+    $fields[] = $result;
+  }
+  return $fields;
+}
+
+/**
+ * Get all the profile fields stored in the system, tagged or not tagged.
+ */
+function pcp_get_profile_fields() {
+  $query = db_query("SELECT * FROM {profile_fields}");
+  $fields = array();
+  while ($result = db_fetch_array($query)) {
+    $fields[] = $result;
+  }
+  return $fields;
+}
+
+
+function pcp_theme() {
+  return array(
+    'pcp_profile_percent_complete' => array(
+      'arguments' => array('complete_data' => NULL),
+    ),
+  );
+}
+
+/**
+ * Block Theme function that displays the default output of a users
+ * profile complete percent. Use this theme function to override
+ * the output / display of this block.
+ *
+ * @param - assoc array $complete_data
+ *  ['uid'] - int - The user ID of the user viewing the page.
+ *  ['percent'] - int - A number that represents the total percent complete (ie 50).
+ *  ['completed'] - int - How many fields total that have been completed (filled out) by $user.
+ *  ['incomplete'] - int - How many fields still need to be filled out.
+ *  ['total'] - int - The count of all tagged profile fields.
+ *  ['nextfield'] - str - The next field to fill out that is currently empty.
+ *  ['nextpercent'] - int - What the users total percent complete value will be when ['nextfield'] is complete.
+ *  ['nextcategory] - str - The category the next field falls under for targeting with a link.
+ *  ['nextname'] - str - The field name of the next field for field focus after linked to the profile field.
+ */
+function theme_pcp_profile_percent_complete($complete_data) {
+  $output = '<style type="text/css">';
+  $output .= '#pcp-percent-bar-wrapper {width: 100%; border: 1px solid #000; padding: 1px;}';
+  $output .= '#pcp-percent-bar { width: '. $complete_data['percent'] .'%; height: 10px; background-color: #777777;}';
+  $output .= '</style>';
+  
+  $output .= '<div id="pcp-wrapper">';
+  $output .= t('!complete% Complete', array('!complete' => $complete_data['percent']));
+  $output .= '<div id="pcp-percent-bar-wrapper">';
+  $output .= '<div id="pcp-percent-bar"></div>';
+  $output .= '</div>';
+  $output .= '</div>';
+  
+  if ($complete_data['nextfield'] && $complete_data['nextpercent']) {
+    $output .= t('Filling out ') . '<i> ' . l($complete_data['nextfield'], 'user/'. $complete_data['uid'] .'/edit/'. $complete_data['nextcategory'], array('query' => 'fieldname='. $complete_data['nextname'])) .'</i> ' . t('will bring your profile to') . ' ' . t('!complete% Complete', array('!complete' => $complete_data['nextpercent']));
+  }
+    
+  return $output;
+}
+
+/**
+ * Implementation of hook_rules_condition_info().
+ * 
+ * @ingroup rules
+ * @see content_complete_completeness_percentage_form
+ */
+function pcp_rules_condition_info() {
+  return array(
+    'pcp_condition_check_profile_fields_completeness' => array(
+      'label' => t('Check profile fields completeness'),
+      'arguments' => array(
+        'user' => array('type' => 'user', 'label' => t('User')),
+      ),
+      'help' => 'Evaluates to TRUE, if all the the selected user profile fields are filled in.',
+      'module' => 'Profile Complete Percent',
+    ),
+  );
+}
+
+/**
+ * Rules Condition form configuration - select the profile fields to check
+ * 
+ * @see pcp_rules_condition_info
+ */
+function pcp_condition_check_profile_fields_completeness_form($settings = array(), &$form) {
+
+  $options = pcp_admin_settings_form_data();
+  $form['settings']['profile_fields'] = array(
+    '#title' => t('Profile Fields'),
+    '#type' => 'checkboxes',
+    '#options' => $options['profile_fields_options'],
+    '#default_value' => isset($settings['profile_fields']) ? $settings['profile_fields'] : array(),
+    '#description' => t('Check which fields the user has to fill in'),
+    );
+}
+
+/**
+ * Rules Condition - Are the selected user profile fields filed in?
+ * 
+ * @param $user 
+ *   The user for which the condition is checked.
+ * @param $settings
+ *   The configured settings of the rule condition
+ * 
+ * @see pcp_condition_check_profile_fields_completeness_form
+ * @see pcp_rules_condition_info
+ * 
+ * @return TRUE or FALSE
+ */
+function pcp_condition_check_profile_fields_completeness($user, $settings) {
+	
+	$edit_categories = array();
+	profile_load_profile($user);
+	if ($settings['profile_fields']) {
+		$result = db_query("SELECT fid, title, name, category FROM {profile_fields} WHERE fid IN (%s)", implode(', ', $settings['profile_fields']));
+		while ($field = db_fetch_object($result)) {
+			if (!$user->{$field->name}) {
+				return FALSE;		
+			}
+		}
+	} 
+	return TRUE;
+}
+
+/**
+ * Implementation of hook_rules_action_info
+ */
+function pcp_rules_action_info() {
+  return array(
+    'pcp_action_redirect_user_to_editform' => array(
+      'label' => t('Redirect the user to his own profile edit page'),
+      'arguments' => array(
+        'user' => array('type' => 'user', 'label' => t('User whos profile fields should be filled in')),
+      ),
+      'module' => 'Profile Complete Percent',
+    ),
+  );
+}
+
+/**
+ * Rules Action - Redirect the user to his profile edit page
+ * 
+ * @param $user 
+ *   The user for which the action is performed.
+ * @param $settings
+ *   The configured settings of the rule action
+ * 
+ * @see pcp_rules_action_info
+ * 
+ * @return Perform the redirection
+ */
+function pcp_action_redirect_user_to_editform($user, $settings) {
+	$settings = pcp_get_condition_settings('pcp_condition_check_profile_fields_completeness');
+	$edit_categories = array();
+	profile_load_profile($user);
+	if ($settings['profile_fields']) {
+		$result = db_query("SELECT fid, title, name, category FROM {profile_fields} WHERE fid IN (%s)", implode(', ', $settings['profile_fields']));
+		while ($field = db_fetch_object($result)) {
+			if (!$user->{$field->name}) {
+				drupal_set_message(t('Please fill in "<i>'.$field->category.'</i>".'), 'warning');
+
+				// Necessary to avoid redirect loop or malfunctioning
+				unset($_REQUEST['destination']);
+				unset($_REQUEST['edit']['destination']);
+				drupal_goto('user/'.$user->uid.'/edit/'.$field->category);
+			}
+		}
+	} 
+}
+
+/**
+ * Helper function to get the setting of a particular condition
+ *
+ * @param Condition name $name
+ * @return Array settings
+ */
+function pcp_get_condition_settings($name) {
+	$rules = rules_get_configured_items('rules');
+	foreach ($rules as $rule) {
+		if ($rule['#conditions']) {
+			foreach ($rule['#conditions'] as $condition) {
+				if ($condition['#name'] == $name) {
+					return $condition['#settings'];
+				}
+			}
+		}
+	}
+}

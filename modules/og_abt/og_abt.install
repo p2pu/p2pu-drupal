@@ -1,0 +1,16 @@
+<?php
+// $Id: og_abt.install,v 1.1.2.1.2.1 2008/06/16 16:46:00 jrbeeman Exp $
+
+/**
+ * @file
+ * Installation scripts for Organic Groups Audience by Type module
+ */
+
+
+/**
+ * Implementation of hook_enable().
+ */
+function og_abt_enable() {
+  // Put this module after OG and OG Access so it can form_alter as needed.
+  db_query("UPDATE {system} SET weight = 2 WHERE name = 'og_abt'");
+}

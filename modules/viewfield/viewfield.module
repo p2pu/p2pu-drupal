@@ -1,0 +1,345 @@
+<?php
+// $Id: viewfield.module,v 1.21 2009/11/30 04:12:35 darrenoh Exp $
+
+/**
+ * @file
+ * Core functions.
+ */
+
+/**
+ * Implementation of hook_field_info().
+ */
+function viewfield_field_info() {
+  return array(
+    'viewfield' => array(
+      'label' => t('View field'),
+      'description' => t('Defines a field type that displays the contents of a view in a node.'),
+      'callbacks' => array(
+        'tables' => CONTENT_CALLBACK_NONE,
+        'arguments' => CONTENT_CALLBACK_NONE,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_field_settings().
+ */
+function viewfield_field_settings($op, $field) {
+  switch ($op) {
+    case 'form':
+      $form['allowed_views'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Allowed views'),
+        '#default_value' => is_array($field['allowed_views']) ? $field['allowed_views'] : array(),
+        '#options' => drupal_map_assoc(array_keys(views_get_all_views())),
+        '#description' => t('Only allow users to select from the specified views. If no views are selected, all will be available.'),
+      );
+      $form['super_default'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Use a common default value for all nodes if the user does not override it on the node form.'),
+        '#default_value' => $field['super_default'],
+      );
+      if (module_exists('token')) {
+        $form['token_enabled'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Enable token replacements.'),
+          '#description' => t('Token replacements will affect the site performance if using a Viewfield inside a View that has <em>field</em> row style.'),
+          '#default_value' => $field['token_enabled'],
+        );
+      }
+      $form_state = NULL;
+      $form['#node'] = (object) array('type' => $field['type_name']);
+      module_load_include('inc', 'content', 'includes/content.node_form');
+      $field_form = content_field_form($form, $form_state, $field, 0);
+      $form['super_default_widget'] = &$field_form[$field['field_name']][0];
+      $form['super_default_widget']['#tree'] = TRUE;
+      unset($form['super_default_widget']['#weight']);
+      return $form;
+    case 'validate':
+      if ($field['force_default'] && $field['multiple']) {
+        form_set_error('multiple', t('Multiple views are not supported if force default is enabled.'));
+      }
+      break;
+    case 'save':
+      return array('allowed_views', 'super_default', 'token_enabled', 'super_default_widget');
+    case 'database columns':
+      return array(
+        'vname' => array('type' => 'varchar', 'not null' => FALSE, 'length' => 32),
+        'vargs' => array('type' => 'varchar', 'not null' => FALSE, 'length' => 255),
+      );
+  }
+}
+
+/**
+ * Implementation of hook_field().
+ */
+function viewfield_field($op, &$node, $field, &$items, $teaser, $page) {
+  switch ($op) {
+    case 'presave':
+      foreach ($items as $delta => $item) {
+        if ($field['super_default'] && empty($item['override_default']) || $field['widget']['force_default']) {
+          $items[$delta] = array('vname' => NULL, 'vargs' => NULL);
+        }
+        elseif (empty($item['vname'])) {
+          unset($items[$delta]);
+        }
+      }
+      break;
+    case 'sanitize':
+      foreach ($items as $delta => $item) {
+        $item = empty($item['vname']) || $field['widget']['force_default'] ? $field['super_default_widget'] : $item;
+        if ($field['super_default']) {
+          $item['override_default'] = !empty($item['vname']);
+        }
+        $item['token_enabled'] = _viewfield_token_enabled($field);
+        $items[$delta] = $item;
+      }
+      return array($field['field_name'] => $items);
+  }
+}
+
+/**
+ * Implementation of hook_content_is_empty().
+ */
+function viewfield_content_is_empty($item, $field) {
+  return empty($item['vname']);
+}
+
+/**
+ * Implementation of hook_field_formatter_info().
+ */
+function viewfield_field_formatter_info() {
+  return array(
+    'default' => array(
+      'label' => t('Default'),
+      'field types' => array('viewfield')
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_widget_info().
+ */
+function viewfield_widget_info() {
+  return array(
+    'viewfield_select' => array(
+      'label' => 'Select List',
+      'field types' => array('viewfield'),
+      'multiple_values' => CONTENT_HANDLE_CORE,
+      'callbacks' => array(
+        'default value' => CONTENT_CALLBACK_NONE,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_widget_settings().
+ */
+function viewfield_widget_settings($op, $widget) {
+  switch ($op) {
+    case 'form':
+      $form['force_default'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Force default'),
+        '#default_value' => $widget['force_default'],
+        '#description' => t('If checked, the user will not be able to change anything about the view at all. It will not even be shown on the edit node page. The default value will be used instead.'),
+      );
+      return $form;
+    case 'save':
+      return array('force_default');
+  }
+}
+
+/**
+ * Implementation of hook_widget().
+ */
+function viewfield_widget(&$form, &$form_state, $field, $items, $delta = 0) {
+  // Since tabledrag.js currently cannot handle nested tables, if we are
+  // adding/editing a node we have to show the token help just below the
+  // viewfield select widget.
+  if ($delta == 0 && $field['multiple'] && !$field['widget']['force_default'] && _viewfield_token_enabled($field)) {
+    $form['token_help'] = _viewfield_get_token_help($field);
+    $form['token_help']['#weight'] = $field['widget']['weight'] + 1;
+  }
+  $element = array(
+    '#type' => $field['widget']['type'],
+    '#default_value' => isset($items[$delta]) ? $items[$delta] : $field['super_default_widget'],
+  );
+  return $element;
+}
+
+/**
+ * Implementation of FAPI hook_elements().
+ */
+function viewfield_elements() {
+  return array(
+    'viewfield_select' => array(
+      '#input' => TRUE,
+      '#columns' => array('vname', 'vargs'),
+      '#delta' => 0,
+      '#process' => array('viewfield_select_process'),
+    ),
+  );
+}
+
+function viewfield_select_process($element, $edit, $form_state, $form) {
+  $field = $form['#field_info'][$element['#field_name']];
+  $element['#field_info'] = $form['#field_info'];
+  $node = isset($form['#node']) ? $form['#node'] : (object) array('type' => $field['type_name']);
+  $field_settings = !isset($node->uid);
+  // This form is used for both the default value field in the admin as well as
+  // the node edit form, so we have to make sure we show the default value field
+  // always.
+  if ($field['widget']['force_default'] && !$field_settings) {
+    $element['vname'] = array(
+      '#type' => 'value',
+      '#value' => $element['#default_value']['vname'],
+    );
+    $element['vargs'] = array(
+      '#type' => 'value',
+      '#value' => $element['#default_value']['vargs'], // All views share args (for now).
+    );
+  }
+  else {
+    // Display the form to let the user pick a view.
+    $options = _viewfield_potential_references($field_settings, $field, $element['#delta']);
+    // Provide our own overriding of defaults.
+    if ($field['super_default'] && !$field_settings) {
+      $element['override_default'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Override default'),
+        '#default_value' => $element['#value']['override_default'],
+      );
+    }
+    if (count($options) > 1) {
+      $element['vname'] = array(
+        '#type' => 'select',
+        '#options' => $options,
+        '#default_value' => $element['#default_value']['vname'],
+        '#title' => $element['#title'],
+        '#required' => $element['#required'],
+        '#description' => $element['#description'],
+        '#field_name' => $element['#field_name'],
+        '#type_name' => $element['#type_name'],
+        '#delta' => $element['#delta'],
+        '#columns' => $element['#columns'],
+      );
+      $args_title = t('Arguments');
+    }
+    else {
+      // There's only the one view, so only show the arguments.
+      list($key, $label) = each($options);
+      $element['vname'] = array(
+        '#type' => 'value',
+        '#value' => $key,
+      );
+      $args_title = $field_settings ? t('Arguments') : $field['widget']['label'] ." ($label) ". t('arguments');
+    }
+    $element['vargs'] = array(
+      '#type' => 'textfield',
+      '#title' => $args_title,
+      '#default_value' => $element['#default_value']['vargs'],
+      '#required' => FALSE,
+      '#description' => t('Provide a comma separated list of arguments to pass to the view. These arguments will be passed to EACH selected view. If an argument contains commas or double quotes, enclose it in double quotes. Replace double quotes that are part of the argument with pairs of double quotes.'),
+      '#field_name' => $element['#field_name'] .' '. t('arguments'),
+      '#type_name' => 'text',
+      '#delta' => $element['#delta'],
+      '#columns' => $element['#columns'],
+    );
+    $token_desc = ($token_enabled = _viewfield_token_enabled($field)) ?
+      t('Use the syntax [token] if you want to insert a replacement pattern.') :
+      t('You may use %nid for the node id of the current node. %author for the node author and %viewer for user viewing the node.');
+    $element['vargs']['#description'] .= "<br/>\n$token_desc";
+    // Since tabledrag.js currently cannot handle nested tables, we show the
+    // token help inside the fieldset only in the field settings form or in
+    // single-value mode.
+    if ($token_enabled && ($field_settings || !$field['multiple'])) {
+      $element['token_help'] = _viewfield_get_token_help($field);
+    }
+  }
+  return $element;
+}
+
+/**
+ * Prepare a list of views for selection.
+ */
+function _viewfield_potential_references($field_settings = TRUE, $field = array(), $delta = 0) {
+  $options = array();
+  $field['allowed_views'] = isset($field['allowed_views']) ? array_filter($field['allowed_views']) : array();
+  $field['allowed_views'] = empty($field['allowed_views']) ? array_keys(views_get_all_views()) : $field['allowed_views'];
+  foreach ($field['allowed_views'] as $view_name) {
+    $view = views_get_view($view_name);
+    foreach ($view->display as $display) {
+      $options[$view->name .'|'. $display->id] = $view->name .' - '. $display->display_title;
+    }
+  }
+  // Add a null option for non-required or multiple fields: handle multiple
+  // views by adding an empty option, otherwise at each submit the user would
+  // add a new view. If the field is required AND multiple the first widget has
+  // no empty choice.
+  if (!$field_settings && (!$field['required'] || ($field['multiple'] && $delta > 0))) {
+    array_unshift($options, '<'. t('none') .'>');
+  }
+  return $options;
+}
+
+/**
+ * Return the token replacement help
+ */
+function _viewfield_get_token_help($field) {
+  // TODO: Token support right now is a bit hacked on, needs better integration,
+  // eventually a checkbox to enable/disable use of token-module here.
+  $token_help = array(
+    '#title' => t('Token replacement patterns'),
+    '#type' => 'fieldset',
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#weight' => $field['widget']['weight']
+  );
+  $token_help['help'] = array(
+    '#value' => theme('token_help', 'node'),
+  );
+  return $token_help;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function viewfield_theme() {
+  return array(
+    'viewfield_select' => array(
+      'arguments' => array('element' => NULL),
+      'file' => 'theme/viewfield.theme.inc',
+    ),
+    'viewfield_formatter_default' => array(
+      'arguments' => array('element' => NULL),
+      'file' => 'theme/viewfield.theme.inc',
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_views_api().
+ */
+function viewfield_views_api() {
+  return array(
+    'api' => 2.0,
+    'path' => drupal_get_path('module', 'viewfield') .'/includes',
+  );
+}
+
+/**
+ * If the super defaults are enabled return them, otherwise return blank values
+ */
+function _viewfield_get_super_defaults($field) {
+  return $field['super_default'] ? $field['super_default_widget'] : array('vname' => NULL, 'vargs' => NULL);
+}
+
+/**
+ * Check if the token replacements are enabled
+ */
+function _viewfield_token_enabled($field) {
+  return $field['token_enabled'] && module_exists('token');
+}

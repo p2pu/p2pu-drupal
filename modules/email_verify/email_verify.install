@@ -1,0 +1,63 @@
+<?php
+// $Id: email_verify.install,v 1.2.2.2 2009/04/11 11:07:12 dbr Exp $
+/**
+ * @file
+ * Install the email verify module
+ */
+
+/**
+ * Implementation of hook_enable().
+ */
+function email_verify_enable() {
+  // Check that fsockopen() works on port 25.
+  // See: http://drupal.org/node/147883
+
+  // What follows is an adapted version of email_verify_check().
+  // The documentation http://api.drupal.org/api/5/function/hook_install says:
+  //   "Note that since this function is called from a full bootstrap, all functions 
+  //    (including those in modules enabled by the current page request) are available 
+  //    when this hook is called. Use cases could be displaying a user message, or 
+  //    calling a module function necessary for initial setup, etc."
+  // However, this does not seem to be the case, so we can't reuse email_verify_check().
+
+  $host = 'drupal.org';
+  // What SMTP servers should we contact?
+  $mx_hosts = array();
+
+  // checkdnsrr and getmxrr were added to Windows platform in PHP 5.3 
+  // http://www.php.net/checkdnsrr http://www.php.net/manual/en/function.getmxrr.php
+  if (stristr(PHP_OS, 'WIN') && PHP_VERSION < 5.3) {
+    drupal_set_message(t('Email Verify could not contact the mail host because the server is running on Windows with a version of PHP below 5.3. The module can be enabled, but will not perform any address checking.'), 'warning');
+    return;
+  }
+
+  if (!getmxrr($host, $mx_hosts)) {
+    // When there is no MX record, the host itself should be used
+    $mx_hosts[] = $host;
+  }
+
+  // Try to connect to one SMTP server
+  foreach ($mx_hosts as $smtp) {
+    $connect = @fsockopen($smtp, 25, $errno, $errstr, 15);
+    if (!$connect) {
+      continue;
+    }
+
+    if (ereg("^220", $out = fgets($connect, 1024))) {
+      // OK, we have a SMTP connection
+      break;
+    }
+
+  }
+
+  if (!$connect) {
+    $message = t('Email verify has tried contacting the mail host but did not receive a reply.'
+      .' Check with your hosting provider that the function fsockopen() is properly configured on your server,'
+      .' and that port 25 is open. The module has been disabled.');
+
+    watchdog('email_verify', $message, WATCHDOG_ERROR);
+    drupal_set_message($message, 'error');
+    module_disable(array('email_verify'));
+  }
+}
+

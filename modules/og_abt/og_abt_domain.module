@@ -1,0 +1,120 @@
+<?php
+// $Id: og_abt_domain.module,v 1.1.2.3.2.3 2008/11/04 18:23:34 jrbeeman Exp $
+
+/**
+ * @file
+ * Organic Groups Audience By Type Domain module
+ *
+ * See details in README.txt
+ */
+
+
+/**
+ * Implementation of hook_menu().
+ */
+function og_abt_domain_menu() {
+  $items = array();
+
+  $items['admin/og/og_abt_domain'] = array(
+    'title' => 'Audience selector domain settings',
+    'description' => 'Configure domain vocabulary definitions and module behavior.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('og_abt_domain_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'og_abt_domain.admin.inc',
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implementation of hook_og_abt_alter()
+ */
+function og_abt_domain_og_abt_alter(&$options, $og_type, $type, $suffix = NULL) {
+  $vid = variable_get('og_abt_domain_vid', 0);
+  if (!$vid) {
+    return;
+  }
+  if (is_array($options) && count($options)) {
+    $settings = variable_get('og_abt_'. $og_type .'-'. $type, og_abt_defaults());
+    if ($suffix != 'my' && count($settings['admin_roles'])) {
+      global $user;
+      $matched = FALSE;
+      foreach ($settings['admin_roles'] as $role) {
+        if (array_key_exists($role, $user->roles)) {
+          $matched = TRUE;
+        }
+      }
+      if ($matched) {
+        return;
+      }
+    }
+    foreach ($options as $nid => $name) {
+      if (!og_abt_domain_group_in_domain($nid)) {
+        unset($options[$nid]);
+      }
+    }
+  }
+}
+
+
+/**
+ * Check if the given node is in the current domain
+ */
+function og_abt_domain_group_in_domain($nid) {
+  $curr_domain = og_abt_domain_get_domain();
+  $vid = variable_get('og_abt_domain_vid', 0);
+  $node = og_abt_domain_node_load($nid);
+  $domains = taxonomy_node_get_terms_by_vocabulary($node, $vid);
+  $strict = variable_get('og_abt_domain_strict', 0);
+  $property = variable_get('og_abt_domain_property', 'name');
+  
+  // Group has domains, check for match
+  if (count($domains)) {
+    $pass = FALSE;
+    foreach ($domains as $domain) {
+      // Explode domains, if necessary, per http://drupal.org/node/330069
+      $domainlist = explode(',', $domain->$property);
+      foreach ($domainlist as $k=>$d) {
+        $domainlist[$k] = strtolower(trim($d));
+      }
+      if (in_array($curr_domain, $domainlist)) {
+        $pass = TRUE;
+      }
+    }
+  }
+  // Group has no domains mapped
+  else {
+    // If we're strictly checking, fail
+    if ($strict) {
+      $pass = FALSE;
+    }
+    // Pass if not strictly checking
+    else {
+      $pass = TRUE;
+    }
+  }
+  
+  return $pass;
+}
+
+
+/**
+ * A very light-weight way to load a node that can be used by taxonomy_node_get_terms_by_vocabulary
+ */
+function og_abt_domain_node_load($nid) {
+  $result = db_query("SELECT nid, MAX(vid) as vid FROM {term_node} WHERE nid = %d GROUP BY nid", $nid);
+  while ($row = db_fetch_object($result)) {
+    $node = $row;
+  }
+  return $node;
+}
+
+
+/**
+ * Get the current domain
+ */
+function og_abt_domain_get_domain() {
+  return strtolower(implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
+}

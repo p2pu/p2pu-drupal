@@ -1,0 +1,247 @@
+<?php
+// $Id: statspro.module,v 1.3 2009/04/19 10:15:13 mr3dblond Exp $
+
+/**
+ * @file
+ *   Main module of Statistcs pro module
+ *
+ */
+
+/**
+ * Implementation of hook_theme().
+ */
+function statspro_theme() {
+  return array(
+  'graphstat_filter_form' => array(
+    'arguments' => array('form' => NULL),
+  ),
+  'graphstat_graph' => array(
+    'arguments' => array('url' => NULL, 'title' => '', 'description' => '', 'attributes' => array()),
+  ),
+  'statspro_content' => array(
+    'arguments' => array('title', 'data'),
+  ),
+  'statspro_log' => array(
+    'arguments' => array('title', 'data'),
+  ),
+  );
+}
+
+/**
+ * Implementation of hook_views_api().
+ */
+function statspro_views_api() {
+
+  return array(
+  'api' => 2,
+  'path' => drupal_get_path('module', 'statspro') .'/views',
+  );
+}
+
+/**
+ * Implementation of hook_menu().
+ *
+ * @return array
+ */
+function statspro_menu() {
+  $items = array();
+  $items['admin/reports/statspro'] = array(
+  'title' => 'Statistics pro',
+  'description' => 'Content statistics',
+  'page callback' => 'statspro_overview',
+  'access arguments' => array('access statistics'),
+  'file' => 'statspro.reports.inc',
+  'type' => MENU_NORMAL_ITEM
+  );
+
+  $items['admin/reports/statspro/common'] = array(
+  'title' => 'Common',
+  'access arguments' => array('access statistics'),
+  'type' => MENU_DEFAULT_LOCAL_TASK,
+  'file' => 'statspro.reports.inc',
+  'weight' => -10,
+  );
+
+  $items['admin/reports/statspro/tools'] = array(
+  'title' => 'Tools',
+  'page callback' => 'drupal_get_form',
+  'page arguments' => array('statspro_tools'),
+  'access arguments' => array('administer site configuration'),
+  'file' => 'statspro.tools.inc',
+  'type' => MENU_LOCAL_TASK,
+  'weight' => -9,
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function statspro_cron() {
+
+  require_once drupal_get_path('module', 'statspro') .'/statspro.inc';
+
+  $statspro = new statspro();
+
+  $last_run = variable_get('statspro_last_run', 0);
+
+  // force rebuild
+  //$last_run = 0;
+
+  $days = $statspro->get_days_data($last_run);
+  if (count($days)>0) {
+
+  foreach ($days AS $date => $values) {
+    $statspro->store_day($date, $values);
+  }
+
+  watchdog('statspro', 'New statistics available');
+  }
+
+  $term_rebuild = variable_get('statspro_term_rebuild', FALSE);
+  if ($term_rebuild) {
+    db_query('TRUNCATE TABLE {statspro_term}');
+    $statspro->generate_term_stats();
+    variable_set('statspro_term_rebuild', FALSE);
+  }
+
+  // we always store last run
+  variable_set('statspro_last_run', mktime());
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function statspro_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+
+  $term_rebuild = variable_get('statspro_term_rebuild', FALSE);
+
+  if (!$term_rebuild) {
+    switch ($op) {
+      case 'insert':
+          variable_set('statspro_term_rebuild', TRUE);
+          break;
+        case 'update':
+          variable_set('statspro_term_rebuild', TRUE);
+          break;
+        case 'delete':
+          variable_set('statspro_term_rebuild', TRUE);
+          break;
+    }
+  }
+}
+
+/**
+ * Get items for period selection
+ *
+ * @return array
+ */
+function statspro_get_period_items() {
+
+  return array(
+              'today'       => t('Today'),
+              'yesterday'     => t('Yesterday'),
+              'week_current'  => t('Week, current'),
+              'week_last'     => t('Week, last'),
+              'week_last2'    => t('Week, before last'),
+              'month_current'   => t('Month, current'),
+              'month_last'    => t('Month, last'),
+              'month_last3'   => t('Month, last 3'),
+              'month_last6'   => t('Month, last 6'),
+//              'month_avg'     => t('Month, average'),
+              'quarter_current' => t('Quarter, current'),
+              'quarter_last'  => t('Quarter, last'),
+//              'quarter_avg'   => t('Quarter, average'),
+              'year_current'  => t('Year, current'),
+              'year_last'     => t('Year, last'),
+//              'year_avg'    => t('Year, average'),
+        );
+}
+
+/**
+ * Form generating function for search_engine_referers settings
+ */
+function statspro_settings_form() {
+
+  require_once drupal_get_path('module', 'statspro') .'/statspro_date.inc';
+
+  $form = array();
+
+  $form['statspro_period'] = array(
+  '#type' => 'select',
+  '#title' => t('Time period'),
+  '#default_value' => variable_get('statspro_period', 'today'),
+  '#options' => statspro_get_period_items(),
+  );
+/*
+  $start_stamp = variable_get('statspro_start', strtotime('-1 week'));
+  $end_stamp   = variable_get('statspro_end', mktime());
+
+  $form['statspro_start'] = array(
+                '#type' => 'date_popup',
+                '#default_value' => statspro_from_timestamp($start_stamp),
+                '#title' => t('From'),
+                '#date_format' => statspro_date_format());
+
+  $form['statspro_end'] = array(
+                '#type' => 'date_popup',
+                '#default_value' => statspro_from_timestamp($end_stamp),
+                '#title' => t('Till'),
+                '#date_format' => statspro_date_format());
+  */
+
+  return system_settings_form($form);
+}
+
+function statspro_settings_form_validate($form, &$form_state) {
+/*
+  $start_stamp = statspro_get_stamp($form_state['values']['statspro_start']);
+  $end_stamp   = statspro_get_stamp($form_state['values']['statspro_end']);
+
+  if ($start_stamp >= $end_stamp) {
+  form_set_error('statspro', t('From date has to be older than end date.'));
+  }
+  else {
+  $form_state['values']['statspro_start'] = $start_stamp;
+  $form_state['values']['statspro_end']   = $end_stamp;
+  }
+  */
+}
+
+/**
+ * Reset statsitics pro
+ *
+ */
+function statspro_reset_stats() {
+
+  variable_set('statspro_last_run', 0);
+  db_query('TRUNCATE TABLE {statspro}');
+  drupal_set_message(t('You have to run cron to recreate statistics. !url',
+            array('!url' => l('You can run cron manually.', 'admin/reports/status/run-cron'))));
+}
+
+/**
+ * Implementation of hook_requirements().
+ */
+function statspro_requirements($phase) {
+  $requirements = array();
+
+  if ($phase == 'runtime') {
+
+    $last_run = variable_get('statspro_last_run', 0);
+
+    if (empty($last_run)) {
+      $requirements['statspro'] = array(
+      'title' => t('Statistics Pro'),
+
+      'description' => t('Statistics pro requires to run cron. !url',
+              array('!url' => l('You can run cron manually.', 'admin/reports/status/run-cron'))),
+      'severity' => REQUIREMENT_ERROR,
+      'value' => t('No data generated'),
+      );
+    }
+  }
+
+  return $requirements;
+}

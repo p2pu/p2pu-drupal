@@ -1,0 +1,60 @@
+# $Id: de.po,v 1.1.2.2 2009/07/13 15:36:01 deekayen Exp $
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  r4032login.module,v 1.3.2.2 2008/10/09 14:54:29 deekayen
+#  r4032login.info,v 1.2 2008/10/03 20:26:08 deekayen
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Redirect 403 Login\n"
+"POT-Creation-Date: 2009-03-14 19:47+0100\n"
+"PO-Revision-Date: 2009-03-14 20:00+0100\n"
+"Last-Translator: Frank Ralf <webmaster@grundschule-heidhorst.de>\n"
+"Language-Team: German\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: r4032login.module:42
+msgid "Display access denied message on login page"
+msgstr "\"Zugriff verweigert\"-Meldung auf der Login-Seite anzeigen"
+
+#: r4032login.module:47
+msgid "User register message"
+msgstr "Meldung für Benutzerregistrierung"
+
+#: r4032login.module:48
+msgid "The message to display when a logged-in user tries to register another account through the !new_account. Drupal does not allow it, so regular users must log out first. Administrators should create new users in !link."
+msgstr "Die Nachricht, die angezeigt wird, wenn ein angemeldeter Benutzer versucht, sich über !new_account erneut zu registrieren. Drupal erlaubt dies nicht. Daher müssen sich reguläre Benutzer zuerst ausloggen. Administratoren sollten neue Benutzer über !link erstellen."
+
+#: r4032login.module:48
+msgid "User management"
+msgstr "Benutzerverwaltung"
+
+#: r4032login.module:49;98;103
+msgid "You are not authorized to access this page."
+msgstr "Sie sind nicht berechtigt, auf diese Seite zuzugreifen!"
+
+#: r4032login.module:79
+msgid "Access denied. You must login to view this page."
+msgstr "Zugriff verweigert! Sie müssen sich anmelden, um diese Seite angezeigt zu bekommen."
+
+#: r4032login.module:97;102
+msgid "Access denied"
+msgstr "Zugriff verweigert"
+
+#: r4032login.module:20;0
+#: r4032login.info:0
+msgid "r4032login"
+msgstr "r4032login"
+
+#: r4032login.module:21
+msgid "Toggle display of denied message on login page."
+msgstr "\"Zugriff verweigert\"-Meldung auf Login-Seite wechseln."
+
+#: r4032login.info:0
+msgid "Redirect anonymous users from 403 Access Denied pages to the /user/login page."
+msgstr "Anonyme Benutzer (Gäste) werden von der Seite \"403 Zugriff verweigert\" zur Login-Seite /user/login umgeleitet."
+

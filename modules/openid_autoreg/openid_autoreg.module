@@ -1,0 +1,76 @@
+<?php
+/**
+ * $Id: openid_autoreg.module,v 1.2 2009/04/10 04:59:21 valthebald Exp $
+ * openid_autoreg module.
+ * @author Valery "valthebald" Lourie <valery@valthebald.net>
+ * For short description, see README.txt
+ */
+
+
+/**
+ * hook_form_FORM_ID_alter implementation
+ */
+function openid_autoreg_form_user_register_alter(&$form, &$form_state) {
+  if (variable_get('openid_autoreg_enabled', TRUE) &&
+    $form_state['values']['response']['status'] == 'success' 	
+  ) {
+  	$uniqid = uniqid();
+  	$thisdate = date('YmdHis');
+  	if(empty($form_state['values']['mail'])) {
+  	  // Skip captcha for autoregistration (see README for details).
+  	  $_SESSION['captcha']['user_register']['success'] = TRUE;
+  	  $_SESSION['captcha']['success'] = TRUE;
+  	  $replacement_email = variable_get('openid_autoreg_email', 'openid_auto_!randomid@!site');
+  	  // Use preg_replace to allow multiple pattern occurences.
+  	  $replacement_email = preg_replace('/!randomid/', $uniqid, $replacement_email);
+  	  $replacement_email = preg_replace('/!date/', $thisdate, $replacement_email);
+  	  $replacement_email = preg_replace('/!site/', $_SERVER['HTTP_HOST'], $replacement_email);
+  	  $form_state['values']['mail'] = $replacement_email;
+  	}
+  	// Validate function returns nothing if there were no errors.
+  	if(user_validate_name($form_state['values']['name'])) {
+  	  $replacement_name = variable_get('openid_autoreg_name', 'OpenID user !randomid');
+  	  // Use preg_replace to allow multiple pattern occurences.
+  	  $replacement_name = preg_replace('/!randomid/', $uniqid, $replacement_name);
+  	  $replacement_name = preg_replace('/!date/', $thisdate, $replacement_name);
+  	  $replacement_name = preg_replace('/!site/', $_SERVER['HTTP_HOST'], $replacement_name);
+  	  $form_state['values']['name'] = $replacement_name;
+    }
+  }
+}
+
+/**
+ * hook_form_FORM_ID_alter implementation
+ */
+function openid_autoreg_form_user_admin_settings_alter(&$form, &$form_state) {
+  $form['openid_autoreg'] = array('#type' => 'fieldset',
+    '#title' => t('OpenID autoregistration settings'),
+    '#collapsible' => TRUE,
+  	'#collapsed' => TRUE,
+  	'#weight' => $form['registration']['#weight']-1,
+  );
+  	
+  $form['openid_autoreg']['openid_autoreg_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable OpenID users autoregistration'),
+    '#default_value' => variable_get('openid_autoreg_enabled', TRUE),
+    '#description' => t('If this box is checked, OpenID users will be automatically registered, even if OpenID provides incomplete data.')
+  );
+  $tokens_help = t('Available variables are:') .' !randomid, !site, !date.';
+
+  $form['openid_autoreg']['openid_autoreg_email'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Email'),
+    '#default_value' => variable_get('openid_autoreg_email', 'openid_auto_!randomid@!site'),
+    '#maxlength' => 180,
+    '#description' => t('Fake email assigned to new drupal user if incorrect or not supplied by openid provider.').$tokens_help,
+  );
+  $form['openid_autoreg']['openid_autoreg_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('User name'),
+    '#default_value' => variable_get('openid_autoreg_name', 'OpenID user !randomid'),
+    '#maxlength' => 180,
+    '#description' => t('Name assigned to new drupal user if incorrect or not supplied by openid provider.').$tokens_help,
+  );
+  return $form;
+}

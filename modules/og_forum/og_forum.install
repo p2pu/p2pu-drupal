@@ -1,0 +1,51 @@
+<?php
+/** 
+ * $Id: og_forum.install,v 1.6.4.7.2.3 2009/05/07 13:12:24 paulbooker Exp $
+ * @package OG_Forum
+ */
+ 
+/**
+* Implementation of hook_install().
+*/
+function og_forum_install() {
+  // Create tables.
+  drupal_install_schema('og_forum');
+}
+
+/**
+* Implementation of hook_schema().
+*/
+function og_forum_schema() {
+  $schema['og_term'] = array(
+    'fields' => array(
+      'tid' => array('type' => 'int', 'disp-width' => '10','unsigned' => TRUE, 'not null' => TRUE, 'default' => '0'), 
+      'nid' => array('type' => 'int', 'disp-width' => '10','unsigned' => TRUE, 'not null' => TRUE, 'default' => '0'),
+      'public' => array('type' => 'int', 'disp-width' => '1','unsigned' => TRUE, 'not null' => TRUE, 'default' => '0'),
+    ),   
+    'primary key' => array('tid','nid')
+  );
+  
+  db_query("UPDATE {system} SET weight = %d WHERE name = '%s'", 2, 'og_forum');
+  $vid = variable_get('forum_nav_vocabulary', '');
+  db_query("UPDATE {vocabulary} SET weight = %d WHERE vid = %d", -10, $vid);
+    
+  return $schema;
+} 
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function og_forum_uninstall() {
+  drupal_uninstall_schema('og_forum');
+
+// Delete variables
+  $variables = array(
+    'forum_default_name', 'forum_default_container_yn', 'forum_default_container',
+    'forum_allow_public', 'forum_all_public', 'forum_auto_public',
+    'forum_limit',
+
+  );
+  foreach ($variables as $variable) {
+    variable_del($variable);
+  }
+}

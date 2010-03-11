@@ -1,0 +1,12 @@
+; $Id $
+core=6.x
+name = Form Defaults
+description = "Modifies help text and descriptions on any form in drupal."
+
+
+; Information added by drupal.org packaging script on 2008-03-15
+version = "6.x-1.0"
+core = "6.x"
+project = "formdefaults"
+datestamp = "1205611509"
+

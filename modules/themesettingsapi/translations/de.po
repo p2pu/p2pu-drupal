@@ -1,0 +1,31 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Theme Settings API 6.x-1.x\n"
+"POT-Creation-Date: 2007-11-25 11:27-0700\n"
+"PO-Revision-Date: 2007-11-25 11:27-0700\n"
+"Last-Translator: Alexander Hass\n"
+"Language-Team: Alexander Hass\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: themesettingsapi.admin.inc:57
+msgid "Use administration theme when configuring theme settings"
+msgstr "Das Verwaltungs-Theme bei der Konfiguration der Themeeinstellungen verwenden"
+
+#: themesettingsapi.admin.inc:58
+msgid "If this setting is disabled or if using the \"System default\" theme, the theme settings pages will be switched to the theme being configured."
+msgstr "Die Einstellungenseiten der Themes werden auf das zu konfigurierende Theme umgeschaltet, wenn diese Einstellung deaktiviert oder das Theme „Systemstandard“ verwendet wird."
+
+#: themesettingsapi.info:0
+msgid "Theme Settings API"
+msgstr "Theme Einstellungen API"
+
+#: themesettingsapi.info:0
+msgid "Allows themes to add options to the themes settings page"
+msgstr "Erlaubt Themes weitere Optionen zur Einstellungen Seite des Themes hinzuzufügen"
+

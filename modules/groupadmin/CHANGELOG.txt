@@ -1,0 +1,26 @@
+Tue 23 Feb 2010 12:04:39 CET 
+
+ * #722262 - nhepner1 - Fixed missing { } for table og_uid.
+
+Wed 30 Sep 2009 04:40:02 PM CEST 
+
+* Added 'manage' heading for add/remove links.
+
+Wed 30 Sep 2009 03:46:59 PM CEST 
+
+* #591958 by VladSavitsky, hide standard OG "Add members" tab.
+* Added configurable option to prevent display/search of email addresses (for privacy.)
+
+Fri 25 Sep 2009 12:48:31 PM CEST 
+
+* Code tidy-up.
+
+Fri 17 Apr 2009 02:12:24 PM CEST 
+
+* Page moved to tab at /og/users/1234/groupadmin where 1234 is gid.
+* Help added (see config to configure nid for help.)
+* After adding member, blank search criteria on return to list.
+
+Thu 05 Feb 2009 03:39:32 AM CET 
+Initial release.
+

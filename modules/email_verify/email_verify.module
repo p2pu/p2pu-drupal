@@ -1,0 +1,67 @@
+<?php
+// $Id: email_verify.module,v 1.9.2.1 2009/04/11 10:41:10 dbr Exp $
+/**
+ * @file
+ * Verifies thoroughly that email addresses are correctly entered
+ * Copyright: Daniel Bonniot <bonniot@users.sourceforge.net>
+ * License:   GNU GPL v2 or later
+ */
+
+/**
+ * Implementation of hook_help().
+ * @return
+ * Help text for section.
+ */
+function email_verify_help($path, $arg) {
+  if ($path == 'admin/help#email_verify') {
+    $txt = 'This module verifies that email addresses are valid during account registration or edit.';
+    return '<p>'. t($txt) .'</p>';
+  }
+}
+
+/**
+ * Implementation of hook_user().
+ */
+function email_verify_user($op, &$edit, &$account, $category = NULL) {
+  if ($op == 'validate' && $category == 'account') {
+    return email_verify_edit_validate(arg(1), $edit);
+  }
+}
+
+function email_verify_edit_validate($uid, &$edit) {
+  // Validate the e-mail address:
+  if ($error = email_verify_check($edit['mail'])) {
+    form_set_error('mail', $error);
+  }
+  return $edit;
+}
+
+/**
+ * Verifies whether the given mail address exists.
+ * @param $mail
+ * Email address to verify.
+ * @return
+ * NULL if the address exists, or an error message if we found a problem with the address.
+ */
+function email_verify_check($mail) {
+  include_once dirname(__FILE__) .'/email_verify.inc.php';
+  return _email_verify_check($mail);
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function email_verify_menu() {
+  $items['admin/user/user/email_verify'] = array(
+    'title' => 'Email Verify',
+    'page callback' => 'email_verify_checkall',
+    'access arguments' => array('administer users'),
+    'type' => MENU_LOCAL_TASK, 
+    'file' => 'email_verify.check.inc',
+  );
+  return $items;
+}
+
+// Local Variables:
+// mode: php
+// End:

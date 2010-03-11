@@ -1,0 +1,15 @@
+<?php
+// $Id: og_book_inheritance.install,v 1.1 2009/05/19 14:10:08 agileware Exp $
+
+/**
+ * @file
+ * The install file for the og_book_inheritance module.
+ */
+
+/**
+ * Implementation of hook_install()
+ */
+function og_book_inheritance_install() {
+  // Put this module after OG so it can form_alter as needed.
+  db_query("UPDATE {system} SET weight = 1 WHERE name = 'og_book_inheritance'");
+}

@@ -1,0 +1,73 @@
+<?php
+// $Id: viewreference.install,v 1.2.2.4 2009/11/14 06:19:47 danielb Exp $
+
+/**
+ * Implementation of hook_install().
+ */
+function viewreference_install() {
+  drupal_install_schema('viewreference');
+  content_notify('install', 'viewreference');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function viewreference_uninstall() {
+  drupal_uninstall_schema('viewreference');
+  content_notify('uninstall', 'viewreference');
+}
+
+/**
+ * Implementation of hook_enable().
+ *
+ * Notify content module when this module is enabled.
+ */
+function viewreference_enable() {
+  content_notify('enable', 'viewreference');
+}
+
+/**
+ * Implementation of hook_disable().
+ *
+ * Notify content module when this module is disabled.
+ */
+function viewreference_disable() {
+  content_notify('disable', 'viewreference');
+}
+
+/**
+ * Implementation of hook_schema().
+ *
+ * Create a table of views we can easily query.
+ */
+function viewreference_schema() {
+  $schema['viewreference'] = array(
+    'fields' => array(
+      'view_id'     => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
+      'name'        => array('type' => 'varchar','length' => '32','default' => '','not null' => TRUE),
+      'position'    => array('type' => 'varchar','length' => '64','default' => '','not null' => TRUE),
+      'title'       => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => ''),
+    ),
+    'primary key' => array('view_id'),
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_update_N().
+ *
+ * Change view_id field's 'not null' value to FALSE.
+ */
+function viewreference_update_6212() {
+  $ret = array();
+  db_drop_primary_key($ret, 'viewreference');
+  db_change_field(
+    $ret, 
+    'viewreference', 
+    'view_id', 
+    'view_id',
+    array('type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE, 'default' => 0),
+    array('primary key' => array('view_id'))
+  );
+  return $ret;
+}

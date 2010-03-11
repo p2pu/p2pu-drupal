@@ -1,0 +1,14 @@
+; $Id: menu_per_role.info,v 1.2.2.2 2008/12/28 10:06:46 alexiswilke Exp $
+name = Menu Per Role
+description = Allows restricting access to menu items per role. WARNING: There is a Drupal Core patch coming with this module. You should apply it for this module to fully function (i.e. otherwise the role information will be ignored when adding new menu items.) See the README.txt file and http://drupal.org/node/326210 for more information.
+dependencies[] = menu
+package = Other
+core = 6.x
+
+
+; Information added by drupal.org packaging script on 2010-02-28
+version = "6.x-1.4"
+core = "6.x"
+project = "menu_per_role"
+datestamp = "1267396809"
+

@@ -1,0 +1,52 @@
+<?php
+// $Id: views_cycle.module,v 1.1.2.1 2009/10/08 22:43:21 crell Exp $
+
+/**
+ * Implementation of hook_init().
+ */
+function views_cycle_init() {
+
+  //$module_path = drupal_get_path('module', 'views_cycle');
+  //drupal_add_css($module_path .'/views_cycle.css');
+
+}
+
+/**
+ *  Implementation of hook_views_api().
+ */
+function views_cycle_views_api() {
+  return array(
+    'api' => 2.0,
+  );
+}
+
+/**
+ * Implementation of hook_views_cycle_skins().
+ */
+function views_cycle_views_cycle_skins() {
+  $skins['default'] = array(
+    'title' => t('Default'),
+    'pager_location' => 'none',
+    'stylesheets' => array(
+      'views_cycle_default.css',
+    ),
+  );
+
+  $skins['sidelist_right'] = array(
+    'title' => t('Side list (right)'),
+    'pager_location' => 'before',
+    'stylesheets' => array(
+      'views_cycle_sidelist_right.css',
+    ),
+  );
+  
+  $skins['sidelist_bottom'] = array(
+    'title' => t('Side list (bottom)'),
+    'pager_location' => 'after',
+    'stylesheets' => array(
+      'views_cycle_sidelist_bottom.css',
+    ),
+  );
+
+  return $skins;
+}

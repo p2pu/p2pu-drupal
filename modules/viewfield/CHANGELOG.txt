@@ -1,0 +1,84 @@
+$Id: CHANGELOG.txt,v 1.9 2009/12/02 23:53:55 darrenoh Exp $
+
+Viewfield x.x-x.x, xxxx-xx-xx
+-----------------------------
+#118764 by alex_b: Fixed typo in translating arguments.
+#100085 by Eaton: Implemented plugins as formatters.
+#235572 by plach. Updated to Drupal 6.
+by Zoltan Balogh: Added Hungarian translation.
+#348257 by jerdavis: Added selection of available view displays to viewfield
+  drop-down lists.
+  Allows users to select a specific view display rather than forcing them to
+  create a new default display for each view.
+#367799 by webchick, jerdavis: Fixed metric boat-loads of notices.
+  Cleaned up some code to remove some of the notices being thrown if
+  error_reporting is E_ALL.
+#301503 by plach, artis, radman16, jerdavis: Fixed SQL error on non-node views.
+  Added $table_queue check on $query to make sure we've got a node table in the
+  queue before altering the query.
+#367799 by Darren Oh: Fixed more error notices.
+#386430 by muhleder: Fixed default value not being used until node is saved.
+#312131 by plach: Fixed argument caching.
+#376433 by revimage, jerdavis: Fixed lost settings when node is modified from
+  outside the node edit form.
+  Removed fieldset from viewfield in viewfield_select_process() and
+  viewfield_field().
+#399872 by burlap, jerdavis: Fixed views access control.
+  Added $view->access() check to view execution and rendering in
+  _viewfield_get_view_content().
+#416922 by Darren Oh: Fixed lost settings on default views.
+by Darren Oh: Fixed error notice when force default is on.
+by Darren Oh: Reverted previous commit.
+  Arguments would not display on the field settings page when force default was
+  on.
+#386430 by Darren Oh: Reverted patch.
+  Patch prevented nodes from overriding default values.
+by Darren Oh: Organized code and fixed coding standards compliance.
+by Darren Oh: Fixed more error notices.
+by Darren Oh: Added translation template.
+by Darren Oh: Fixed typo in changelog.
+by Darren Oh: Moved theme functions file to theme directory.
+by Darren Oh: Changed install file description.
+by Darren Oh: Fixed update to enable fields.
+by Zoltan Balogh: Updated Hungarian translation.
+#373373 by ramsalt: Fixed page view changing node title.
+#416922 by Darren Oh: Fixed upgrade for existing fields.
+#434920 by Darren Oh: Fixed argument defaults being lost on save.
+by Darren Oh: Fixed user keyword.
+by Darren Oh: Fixed caching error.
+#480432 by Aren Cambre, hadsie, scottrigby, jerdavis: Error when creating new
+  viewfield.
+  Added is_array() check to prevent errors when the field is first being
+  created.
+#480432 by Darren Oh: Improved original fix to prevent error on line 276.
+by Darren Oh: Fixed undefined variable errors.
+#568304 by Darren Oh: Fixed rendering of fieldgroups after fieldgroup containing
+  viewfield.
+  A viewfield in a fieldgroup would prevent subsequent fieldgroups from being
+  rendered if the build mode was not full.
+#568304 by Darren Oh: Fixed missing fieldgroups in full node view after last
+  change.
+
+
+Viewfield 5.x-1.x, 2007-02-05
+-----------------------------
+by mfredrickson: Fixed ID for author argument token.
+  Was using node ID instead of user ID.
+#100971 by eaton, webchick, alex_b, yched, and stefano73: Updated to Drupal 5.
+  Some changes to the implementation:
+  * More reliance on the views formatters (as seems to be the norm for CCK
+    fields now) for formatting regular node views.
+  * The full node formatter is now the "default". This may break some existing
+    views. It's worth the pain.
+  * Added paging as per stefano73/alex_b's work. Relatively untested, but it
+    looks good so far. (Thanks!)
+
+
+Viewfield 4.7.x-1.x, 2006-11-10
+-------------------------------
+by mfredrickson: Initial commit.
+  Nodes hold content. Views save queries. Wouldn't be great if a node could hold
+  a saved query? Now it can. Viewfield is a CCK field module that allows
+  administrators to put views directly into nodes. When creating a node, users
+  can select from a list of views. When the node is displayed, the view is run
+  and the content is inserted into the body of the node.

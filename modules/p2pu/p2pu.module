@@ -358,7 +358,7 @@ function p2pu_menu_alter(&$items) {
  */
 function p2pu_cron() {
   //adw: this may start running slow later, will need to find the bug sometime
-  db_result(db_query("insert into node_access (nid,gid,realm,grant_view,grant_update,grant_delete)  select nid,0,'all',1,0,0 from node where nid not in (select nid from node_access where realm='all')"));
+  db_query("insert into node_access (nid,gid,realm,grant_view,grant_update,grant_delete)  select nid,0,'all',1,0,0 from node where nid not in (select nid from node_access where realm='all')");
 }
 
 /**

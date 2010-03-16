@@ -511,7 +511,8 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
   }
 
   //Redirect these submits to the dashboard view of group
-  if ($form_id == 'announcement_node_form' ||
+  //adw this #redirect breaks the delete function, so this is out for now
+  /* if ($form_id == 'announcement_node_form' ||
       $form_id == 'assignment_node_form' ||
       $form_id == 'submission_node_form' ||
       $form_id == 'assignment_template_node_form' ||
@@ -520,7 +521,7 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
 
     $group = og_get_group_context();
     $form['#redirect'] = array('node/'.$group->nid);
-  }
+  }*/
 
   //Redirect the submit of a discussion to the discussion page on the group
   if ($form_id == 'discussion_node_form' ) { 
@@ -763,7 +764,13 @@ function p2pu_og_links_alter(&$links, $node) {
     unset($links['create_submission']);
     unset($links['create_shout_box']);
   }
-
+  $nid = $node->nid;
+  foreach ($links as $key => $link) {
+    if (strpos($key,'create') === 0) {
+      $newlink = preg_replace('/href="([^"]*)"/',"href=\"$1&destination=/node/$nid\"",$link);
+      $links[$key] = $newlink;
+    }
+  }
 }
 
 /*

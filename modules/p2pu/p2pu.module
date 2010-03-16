@@ -1022,3 +1022,11 @@ function p2pu_toggle_signup($node) {
   db_result(db_query("update og set og_selective=%d where nid=%d",$new,$node->nid));
   return 'Applications for <a href="/node/'.$node->nid.'">'.$node->title.'</a> is now '.$text;
 }
+
+function p2pu_delete_incorrect_report_cards() { 
+  $result = db_query(" select n.nid from node n, og_ancestry oga, content_type_report_card rc where n.nid=oga.nid and n.vid=rc.vid and oga.group_nid*10000+rc.field_report_card_user_uid not in  (select nid*10000+uid as code from og_uid)");
+  while ($row = db_fetch_array($result)) {
+    print "Deleting node ".$row['nid']."\n";
+    node_delete($row['nid']);
+  }
+}

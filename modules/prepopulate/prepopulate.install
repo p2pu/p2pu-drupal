@@ -1,0 +1,13 @@
+<?php
+// $Id: prepopulate.install,v 1.4 2008/05/03 18:04:54 add1sun Exp $
+
+/**
+ * Implementation of hook_install().
+ */
+function prepopulate_install() {
+  $ret = array();
+  // Ensure that prepopulate sinks to the bottom during hook calls
+  // there should be a UI for this at some point.
+  $ret[] = db_query("UPDATE {system} SET weight = 10 WHERE name = 'prepopulate'");
+  return $ret;
+}

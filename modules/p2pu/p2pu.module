@@ -46,7 +46,27 @@ function p2pu_init() {
 function p2pu_perm() {
   return array('administer p2pu settings','schedule courses');
 }
-
+/**
+ * Implementation of hook_block().
+ *
+ */
+function p2pu_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $blocks[0]['info'] = t('P2PU custom comment block');
+      $block[0]['cache'] = BLOCK_NO_CACHE;
+      return $blocks;
+    case 'view':
+      if (user_access('post comments')) {
+        // Confirm that we are displaying this on the course node, discussion variant
+        if (arg(0) == 'node' && is_numeric(arg(1)) && arg(2) == 'discussions' && is_numeric(arg(3))) {
+          $block['subject'] = t('Add a comment');
+          $block['content'] = drupal_get_form('comment_form', array('nid' => arg(3)));
+        }
+      }
+      return $block;
+  }
+}      
 /**
  * Implementation of hook_block().
  *
@@ -234,6 +254,7 @@ function p2pu_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
         case 'announcement':
         case 'assignment':
         case 'assignment_template':
+        case 'submission':
         case 'discussion':
         case 'document':
         case 'event':
@@ -539,12 +560,14 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
   //Redirect comments
   if ($form_id == 'comment_form') {
     $node = node_load($form['nid']['#value']);
-    
     //Discussions
-    if ($node->type == 'discussion') {
-      $group = og_get_group_context();
-      $form['#redirect'] = array('node/'.$group->nid.'/discussions');
-    }
+    // CHARLES: I've removed Diricia's redirect, so that we redirect to the
+    // course discussion which lists the comments - it was redirectint to the
+    // discussions page, not sure why?
+    //if ($node->type == 'discussion') {
+    //  $group = og_get_group_context();
+    //  $form['#redirect'] = array('node/'.$group->nid.'/discussions');
+    //}
   }
 
   //Modify the organic group subscribe form to ask for the submission requirement and save the application

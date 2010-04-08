@@ -58,11 +58,26 @@ function p2pu_block($op = 'list', $delta = 0, $edit = array()) {
       return $blocks;
     case 'view':
       if (user_access('post comments')) {
-        // Confirm that we are displaying this on the course node, discussion variant
-        if (arg(0) == 'node' && is_numeric(arg(1)) && arg(2) == 'discussions' && is_numeric(arg(3))) {
-          $block['subject'] = t('Add a comment');
-          $block['content'] = drupal_get_form('comment_form', array('nid' => arg(3)));
+        // Confirm that we are displaying this on the course node, discussion variant (node/765/discussions/3082) OR
+        // On the assignment submission page (assignment-submission/rebeccas-assignment) OR
+        // On the document page (node/765/document/3082)
+        $subject = t('Add a comment');
+        $anchor = "<a id='add-comment-anchor'></a>\n";
+        if (arg(0) == 'node' && is_numeric(arg(1)) && (arg(2) == 'discussions' || arg(2) == 'document') && is_numeric(arg(3))) {
+          $block['subject'] = $subject;
+          // We want to put in an anchor here so that we can target the add comment
+          // form from the add comment link
+          $block['content'] = $anchor;
+          $block['content'] .= drupal_get_form('comment_form', array('nid' => arg(3)));
         }
+        // Now for assignment submissions which is displayed with a slightly different path
+        $alias = drupal_get_path_alias($_GET['q']);
+        $alias_parts = explode('/', $alias);
+        if (arg(0) == 'node' && is_numeric(arg(1)) && $alias_parts[1] == 'assignment-submission') {
+          $block['subject'] = $subject;
+          $block['content'] = $anchor;
+          $block['content'] .= drupal_get_form('comment_form', array('nid' => arg(1)));
+        }        
       }
       return $block;
   }
@@ -368,11 +383,19 @@ function p2pu_menu_alter(&$items) {
   $items['user/password']['weight'] = 2;
 }
 
-//function p2pu_link_alter(&$links, $node) {
-//  echo '<pre>';
-//  print_r($links);
-//  print '</pre>';
-//}
+function p2pu_link_alter(&$links, $node) {
+  // We want to change the 'add new comment' link so that on click it takes
+  // to an anchor on the same page. This anchor is set in our p2pu comment block
+  $content_types = array(
+    'discussion',
+    'document',
+    'submission',
+  );
+  if (in_array($node->type, $content_types) && isset($links['comment_add'])) {
+    $links['comment_add']['href'] = $_GET['q'];
+    $links['comment_add']['fragment'] = 'add-comment-anchor';
+  }
+}
 
 /**
  * Implementation of hook_cron

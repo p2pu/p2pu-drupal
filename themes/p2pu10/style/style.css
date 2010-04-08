@@ -202,7 +202,7 @@ html.js .resizable-textarea textarea { height: 70px;}
 form#contact-mail-page table.cke_editor td#cke_contents_edit-message,
 form#comment-form table.cke_editor td#cke_contents_edit-comment { height: 100px;}
 form#contact-mail-page .resizable-textarea,
-form#comment-form .resizable-textarea { width: 50%;}
+form#comment-form .resizable-textarea { width: 95%;}
   
 /* Main calendar styles */
 

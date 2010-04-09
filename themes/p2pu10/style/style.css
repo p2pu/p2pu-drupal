@@ -173,16 +173,19 @@ div.node-teaser ul.links{ padding: 0 10px;}
 div.view-profile-info label{ display: block; float: left; width: 40%;}
 div.view-profile-info label.views-label-field-profile-url-url{ float: none; padding: 20px 0 10px 0;}
 div#content-column .view-og-mytracker .views-row{ background: #f4af59;}
+div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row{ background: #f4af59; clear: both; clear:both; margin:6px 0; min-height:30px; border-style: solid none; border-width:1px; border-color:#FFD8A4;}
 div#content-column .view-course-shouts table td { border-color: #f3f130; }
 div.views-table caption { font-family: georgia; font-size: 16px; }
 div.view-course-discussions div.views-row{ background: #F9F898;}
 div.view-course-discussions div.views-row div.box{ padding: 10px;}
 div.view-course-discussions div.views-row div.box h2{ font: 130% georgia;}
 div.view-course-list .views-field-title a{ font-size: 13px; font-family: Georgia; color: #fff;}
-div.view-course-list .views-field-subscribe a{ text-decoration: none; font-family: Georgia; font-size: 150%; }
-body.page-course div.view-course-list .views-field-subscribe a{ color: #333; text-decoration: none;}
+div.view-course-list .views-field-subscribe a{ text-decoration: none;}
+body.page-course div.view-course-list .views-field-subscribe a{ color: #333; text-decoration: none;font-style: italic;}
+body.page-course div.view-course-list .views-field-subscribe {font-style: italic;}
 div.view-course-list .views-field-subscribe a:hover{ color: #333;}
 div.view-og-mytracker p{ margin: 5px 0;}
+div.view-og-mytracker.view-display-id-panel_pane_1 .picture{float:left; padding-right: 2px;}
 body.page-course div.view-course-list a{ color: #fff; text-decoration: underline;}
 body.page-course div.view-course-list a:hover{ color: #222; text-decoration: none;}
 body.page-course div.view-course-list td.views-field-name{ width: 120px;}
@@ -190,7 +193,7 @@ body.page-course div.view-course-list td.views-field-name .picture{ padding: 6px
 div.view-course-shouts h2.pane-title{ margin: 0;}
 div.view-course-events .view-header a{ font-family: georgia; font-size: 150%; text-decoration: none;}
 div.view-id-og_members_faces table td{ vertical-align: top;}
-
+div.view-course-list td.views-field-title {width:600px;}
 /* Comments */
 div.comment{ background: #fff; margin: 0;}
 div.comment ul.links{ padding-bottom: 10px;}

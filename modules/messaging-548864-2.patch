@@ -1,0 +1,32 @@
+Index: messaging_phpmailer.module
+===================================================================
+--- messaging_phpmailer.module	(revision 1258)
++++ messaging_phpmailer.module	(working copy)
+@@ -194,6 +194,14 @@
+   if (!empty($matches[2])) {
+     $from['email'] = $matches[2];
+   }
++  $matches = array();
++  preg_match('/["\']?(.*)["\']? <(.*)>/', $message['headers']['Reply-To'], $matches);
++  if (!empty($matches[1])) {
++    $replyto['name'] = $matches[1];
++  }
++  if (!empty($matches[2])) {
++    $replyto['email'] = $matches[2];
++  }
+   $mail->From = !empty($from['email']) ? $from['email'] : $message['headers']['From'];
+   $mail->FromName = !empty($from['name']) ? $from['name'] : '';
+   if(variable_get('messaging_phpmailer_bcc', 0)) {
+@@ -213,9 +221,9 @@
+   if(!empty($message['headers']['Message-ID'])) {
+     $mail->MessageID = $message['headers']['Message-ID'];
+   }
+-  if(!empty($message['headers']['Reply-To'])) {
+-    $mail->AddReplyTo($message['headers']['Reply-To']);
+-  }
++  if (!empty($replyto['name']) && !empty($replyto['email'])) {
++    $mail->AddReplyTo($replyto['email'], $replyto['name']);
++  }
+   // Strip HTML out of $body for plaintext equivalent of HTML email.
+   $mail->AltBody = drupal_html_to_text($body);
+ 

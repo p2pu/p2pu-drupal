@@ -1,0 +1,9 @@
+; $Id$
+
+name = P2PU Custom Scripts
+description = Stores custom scripts that we might want re-use.
+core = 6.x
+package = P2PU
+dependencies[] = og
+dependencies[] = notifications
+dependencies[] = devel

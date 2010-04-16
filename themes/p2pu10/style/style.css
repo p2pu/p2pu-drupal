@@ -182,18 +182,17 @@ div.view-course-discussions div.views-row div.box h2{ font: 130% georgia;}
 div.view-course-list .views-field-title a{ font-size: 13px; font-family: Georgia; color: #fff;}
 div.view-course-list .views-field-subscribe a{ text-decoration: none;}
 body.page-course div.view-course-list .views-field-subscribe a{ color: #333; text-decoration: none;font-style: italic;}
-body.page-course div.view-course-list .views-field-subscribe {font-style: italic;}
 div.view-course-list .views-field-subscribe a:hover{ color: #333;}
 div.view-og-mytracker p{ margin: 5px 0;}
 div.view-og-mytracker.view-display-id-panel_pane_1 .picture{float:left; padding-right: 2px;}
 body.page-course div.view-course-list a{ color: #fff; text-decoration: underline;}
 body.page-course div.view-course-list a:hover{ color: #222; text-decoration: none;}
 body.page-course div.view-course-list td.views-field-name{ width: 120px;}
+div.view-course-list td.views-field-subscribe {width:150px;font-style:italic;}
 body.page-course div.view-course-list td.views-field-name .picture{ padding: 6px 0 0 0;}
 div.view-course-shouts h2.pane-title{ margin: 0;}
 div.view-course-events .view-header a{ font-family: georgia; font-size: 150%; text-decoration: none;}
 div.view-id-og_members_faces table td{ vertical-align: top;}
-div.view-course-list td.views-field-title {width:600px;}
 /* Comments */
 div.comment{ background: #fff; margin: 0;}
 div.comment ul.links{ padding-bottom: 10px;}

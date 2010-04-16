@@ -22,8 +22,13 @@
  // We want to changed the text that appears in views when displaying course status
  // from 'Closed' to 'Running'
  // This is set in og/modules/og_views/includes/og_views_handler_field_og_subscribe
+ // Can override using translation UI - this is already done for the "Join" text
+ // is set here: admin/build/translate/edit/2482
+ // For Closed: http://local.p2pu.org/admin/build/translate/edit/4838
+ // A request was made for the "Click here" text to be bold. This is done here,
+ // but it's not elegant, and won't work if there's a translation.
 ?>
-<?php if ($output == '<em>Closed</em>'):?>
-	<?php $output = '<em>'. t('Running'). '</em>';?>
+<?php if (stristr($output, 'Click here.')):?>
+	<?php $output = str_replace('Click here.', '<strong>Click here.</strong>', $output);?>
 <?php endif;?>
 <?php print $output; ?>

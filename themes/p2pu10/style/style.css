@@ -181,7 +181,7 @@ div.view-course-discussions div.views-row{ background: #F9F898;}
 div.view-course-discussions div.views-row div.box{ padding: 10px;}
 div.view-course-discussions div.views-row div.box h2{ font: 130% georgia;}
 div.view-course-list .views-field-title a{ font-size: 13px; font-family: Georgia; color: #fff;}
-div.view-course-list .views-field-subscribe a{ text-decoration: none;}
+div.view-course-list .views-field-subscribe a{ text-decoration: none; font-weight: bold;}
 body.page-course div.view-course-list .views-field-subscribe a{ color: #333; text-decoration: none;font-style: italic;}
 div.view-course-list .views-field-subscribe a:hover{ color: #333;}
 div.view-og-mytracker p{ margin: 5px 0;}

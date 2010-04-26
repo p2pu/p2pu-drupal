@@ -30,7 +30,7 @@ function p2pu_init() {
   $path = $item['path'];
 
   // Check if this is an existing node.
-  if ($path == 'node/%/document' || $path == 'node/%/course/admin' || $path == 'node/%/shoutbox' || $path == 'node/%/dashboard' || $path == 'node/%/discussions') {
+  if ($path == 'node/%/document' || $path == 'node/%/course/admin' || $path == 'node/%/shoutbox' || $path == 'node/%/dashboard' || $path == 'node/%/discussions' || $path == 'node/%/forums') {
     $node = menu_get_object('pm_arg', 1);
     $node = $node->data;
   }
@@ -381,6 +381,22 @@ function p2pu_menu_alter(&$items) {
   unset($items['user/%user/imce']);
   $items['user/register']['weight'] = 1;
   $items['user/password']['weight'] = 2;
+  // We want to redirect the course forum to the General Discussion forum immediately
+  $items['node/%og_forum_group_type/og/forum']['page callback'] = 'p2pu_og_forum_link_redirect';
+  unset($items['node/%og_forum_group_type/og/forum']['file']);
+  unset ($items['node/%og_forum_group_type/og/forum']['file path']);
+}
+
+function p2pu_og_forum_link_redirect($ctid = 0) {
+      global $user;
+     $children = taxonomy_get_children($ctid);
+     $children_tids = array_keys($children);
+     $tid = $children_tids[0];
+     if (og_forum_is_public($tid) || (!empty($user->og_groups) && array_key_exists($arg, $user->og_groups)) || user_access('administer forums')){
+         drupal_goto('forum/'.$tid);
+     }
+     else
+       return FALSE;
 }
 
 function p2pu_link_alter(&$links, $node) {

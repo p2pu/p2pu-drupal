@@ -3,7 +3,7 @@
 <?php if ($page == 0): ?>
   <h2 class="title"><a href="<?php print $node_url; ?>" title="<?php print $title ?>"><?php print $title; ?></a></h2>
 <?php endif; ?>
-
+  <?php print $back_to_course_link; ?>
   <div class="meta">
     <?php
     print theme('user_picture',user_load(array('uid'=>$node->uid)));

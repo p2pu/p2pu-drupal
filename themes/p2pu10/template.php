@@ -45,7 +45,10 @@ function p2pu10_preprocess_node($vars = array()) {
       'node-'.$vars['node']->type.'-teaser',
     );
   }
-
+  if ($vars['type'] == 'forum' && !empty($vars['og_forum_nid'])) {
+    $course_name = array_values($vars['og_groups_both']);
+    $vars['back_to_course_link'] = l(t('Go back to this course: ') . $course_name[0], 'node/' . $vars['og_forum_nid']);
+  }
   return $vars;
 }
 

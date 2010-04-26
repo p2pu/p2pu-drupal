@@ -1,0 +1,16 @@
+Index: realname_content_profile.inc
+===================================================================
+RCS file: /cvs/drupal-contrib/contributions/modules/realname/Attic/realname_content_profile.inc,v
+retrieving revision 1.1.2.7
+diff -u -p -r1.1.2.7 realname_content_profile.inc
+--- realname_content_profile.inc	1 Oct 2009 15:25:11 -0000	1.1.2.7
++++ realname_content_profile.inc	8 Jan 2010 14:31:57 -0000
+@@ -41,8 +41,6 @@ function content_profile_load_profile(&$
+       }
+     }
+   }
+-  
+-  $account->title = $profile->title;
+ }
+ 
+ function realname_content_profile_get_types() {

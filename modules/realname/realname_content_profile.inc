@@ -41,8 +41,6 @@ function content_profile_load_profile(&$account, $type = NULL) {
       }
     }
   }
-  
-  $account->title = $profile->title;
 }
 
 function realname_content_profile_get_types() {

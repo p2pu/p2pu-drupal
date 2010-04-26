@@ -46,6 +46,10 @@ function p2pu10_preprocess_node($vars = array()) {
     );
   }
   if ($vars['type'] == 'forum' && !empty($vars['og_forum_nid'])) {
+    // We're using our own node-forum.tpl.php so set up some variables to use
+    $vars['p2pu_forum_author'] = isset($vars['node']->uid) ? theme('username', $vars['node']) : '';
+    $vars['p2pu_forum_time'] = isset($vars['node']->created) ? format_interval(time() - $vars['node']->created) : '';
+  
     $course_name = array_values($vars['og_groups_both']);
     $vars['back_to_course_link'] = l(t('Go back to this course: ') . $course_name[0], 'node/' . $vars['og_forum_nid']);
   }

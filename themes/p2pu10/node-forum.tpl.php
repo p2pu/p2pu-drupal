@@ -8,7 +8,16 @@
     <?php
     print theme('user_picture',user_load(array('uid'=>$node->uid)));
     ?>
-    <span class="created-date"><?php print $date; ?></span>
+    <?php if ($p2pu_forum_time): ?>
+      <span><?php print t(
+      'Submitted by !author @time ago on @date', array(
+        '@time' => $p2pu_forum_time,
+        '!author' => $p2pu_forum_author,
+        '@date' => $date,
+        )); ?></span>
+        
+    <?php endif; ?>
+    
   </div>
 
   <div class="content">

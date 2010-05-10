@@ -10,7 +10,16 @@
 <?php
 
 //George: We want the forum post author information to match that of the comments author info
-$submitted = str_replace("Submitted by",$picture, $submitted);
+  $puser = user_load($node -> uid);
+
+  $imagecache_id = variable_get('user_picture_imagecache_profiles_default', FALSE);
+
+  if ($imagecache_id){
+    $preset = imagecache_preset($imagecache_id);
+    $picture = theme('imagecache', $preset['presetname'], $puser->picture);
+  }
+
+  $submitted = str_replace("Submitted by",$picture, $submitted);
 ?>
     <span class="submitted"><?php print $submitted ?></span>
 <?php endif;?>
@@ -36,3 +45,4 @@ $submitted = str_replace("Submitted by",$picture, $submitted);
 
 
 </div>
+

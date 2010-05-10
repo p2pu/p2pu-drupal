@@ -205,17 +205,17 @@ html.js .resizable-textarea textarea { height: 70px;}
 /* -- Changes by George Z for Forum display, to be merged with rest of stylesheet on approval -- */
 div.node-forum div.meta, div.comment div.meta {border-style:none;width:100px;float:left;height:auto;}
 div.node-forum div.content, div.comment div.content, div.comment ul.links {padding-left:115px;padding-top:3px;}
-div.node-forum div.picture, div.comment div.picture {width:30px;height:30px;overflow:hidden;}
+div.node-forum div.picture, div.comment div.picture {margin-left:10px;}
 form#comment-form div#edit-subject-wrapper {display:none;}
 div.comment h3.title {display:none;}
 div.comment {border-top:solid #CCC8BF 1px;text-align:justify;}
 div.forum-topic-navigation {display:none;}
 div.node-forum, div.comment {background-image:url('../images/forum_comment_bg.png');background-repeat:repeat-y;}
-div.node-forum div.content {clear:none;}
-body.node-type-forum h1 {float:none;margin:0px 0px 0px 115px;}
+div.node-forum div.content {clear:none;margin-right:10px;text-align:justify;}
+body.node-type-forum h1 {float:none;margin:10px 0px 10px 115px;}
 body.node-type-forum .box h2 {margin:0px;padding:8px 0px 0px 0px;border-top:solid #CCC8BF 1px;}
-div.node-forum .terms {float:right}
-div.node-forum ul.links {padding-left:15px;}
+div.node-forum .terms {float:right;position:relative;top:-20px;}
+div.node-forum ul.links {margin-left:115px;}
 body.node-type-forum div#content-column .inner {padding:0px;}
 
 /* Comment form */

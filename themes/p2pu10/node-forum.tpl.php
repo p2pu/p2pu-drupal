@@ -9,10 +9,15 @@
 <?php if ($submitted): ?>
 <?php
 
-//George: We want the forum post author information to match that of the comments author info
+  //George: We want the forum post author information to match that of the comments author info
   $puser = user_load($node -> uid);
 
   $imagecache_id = variable_get('user_picture_imagecache_profiles_default', FALSE);
+
+  //get the default picture if none exists
+  if (!($puser -> picture)) {
+    $puser -> picture =   variable_get('user_picture_default', '');
+  }
 
   if ($imagecache_id){
     $preset = imagecache_preset($imagecache_id);

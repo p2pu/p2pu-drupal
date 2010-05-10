@@ -217,6 +217,7 @@ body.node-type-forum .box h2 {margin:0px;padding:8px 0px 0px 0px;border-top:soli
 div.node-forum .terms {float:right;position:relative;top:-20px;}
 div.node-forum ul.links {margin-left:115px;}
 body.node-type-forum div#content-column .inner {padding:0px;}
+div#comments div.box {margin-left:10px;}
 
 /* Comment form */
 form#contact-mail-page table.cke_editor td#cke_contents_edit-message,

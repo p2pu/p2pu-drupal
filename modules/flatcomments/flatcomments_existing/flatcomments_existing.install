@@ -1,0 +1,14 @@
+<?php
+// $Id: flatcomments_existing.install,v 1.1.2.2 2009/05/18 02:55:05 dragonwize Exp $
+
+/**
+ * @file
+ *  (Un)Install, (dis)enable, and update functions.
+ */
+
+/**
+ * Implementation of hook_enable().
+ */
+function flatcomments_existing_enable() {
+  drupal_set_message(t('Flatcomments Existing successfully installed. Go to <a href="!url">admin/content/comment/flatten</a> to flatten existing comments.', array('!url' => url('admin/content/comment/flatten'))));
+}

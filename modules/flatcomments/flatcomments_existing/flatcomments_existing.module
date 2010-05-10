@@ -1,0 +1,40 @@
+<?php
+// $Id: flatcomments_existing.module,v 1.1.2.2 2009/05/18 02:55:05 dragonwize Exp $
+
+/**
+ * @file
+ *  Remove threading from existing comments by content type.
+ */
+
+/**
+ * Implementation of hook_help().
+ */
+function flatcomments_existing_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#flatcomments_existing':
+    case 'admin/content/comment/flatten':
+      return '<p>' . t('The Flatcomments Existing module allows you to remove threading information from comments already existing in the database. This is useful when the Flatcomments module gets installed to an already existing site, and/or if a content type is switched from threaded to flat commenting mode later, in order to apply the behavior to previously existing comments.') . '</p>';
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function flatcomments_existing_menu() {
+  $items = array();
+
+  $items['admin/content/comment/flatten'] = array(
+    'title' => 'Flatten comments',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flatcomments_existing_form'),
+    'access callback' => 'flatcomments_existing_flatten_access',
+    'file' => 'flatcomments_existing.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+function flatcomments_existing_flatten_access() {
+  return (user_access('administer comments') && user_access('administer nodes') && user_access('administer content types'));
+}

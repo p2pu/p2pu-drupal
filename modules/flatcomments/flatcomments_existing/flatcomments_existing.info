@@ -1,0 +1,12 @@
+; $Id: flatcomments_existing.info,v 1.1.2.1 2009/05/16 21:39:11 dragonwize Exp $
+name = Flat comments existing
+description = Remove threading on existing comments.
+dependencies[] = comment
+core = 6.x
+
+; Information added by drupal.org packaging script on 2009-06-14
+version = "6.x-2.0"
+core = "6.x"
+project = "flatcomments"
+datestamp = "1244997941"
+

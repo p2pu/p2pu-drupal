@@ -1,0 +1,17 @@
+<?php
+// $Id: flatcomments.install,v 1.1.2.5 2009/05/18 04:10:19 dragonwize Exp $
+
+/**
+ * Removes old flatcomments variables.
+ *
+ * Flatcomments now uses the core comment display mode.
+ */
+function flatcomments_update_6100() {
+  $ret = array();
+
+  // remove unused variables
+  $ret[] = update_sql("DELETE FROM {variable} WHERE name LIKE 'flatcomments_%'");
+  cache_clear_all('variables', 'cache');
+
+  return $ret;
+}

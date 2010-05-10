@@ -1,0 +1,13 @@
+; $Id: flatcomments.info,v 1.1.2.1.2.2 2009/03/07 05:26:59 dragonwize Exp $
+name = Flat comments
+description = Make all comments replies to the main post, regardless of the reply link used.
+dependencies[] = comment
+core = 6.x
+
+
+; Information added by drupal.org packaging script on 2009-06-14
+version = "6.x-2.0"
+core = "6.x"
+project = "flatcomments"
+datestamp = "1244997941"
+

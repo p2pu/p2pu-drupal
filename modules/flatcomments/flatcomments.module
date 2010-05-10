@@ -1,0 +1,108 @@
+<?php
+// $Id: flatcomments.module,v 1.5.4.1.2.11 2009/06/05 23:36:28 dragonwize Exp $
+
+/**
+ * @file
+ *  Make comments replies to the node, regardless of the reply link used.
+ */
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function flatcomments_form_alter(&$form, $form_state, $form_id) {
+  switch ($form['#id']) {
+    case 'comment-form':
+    case 'panels-comment-form':
+      array_unshift($form['#submit'], 'flatcomments_comment_form_submit');
+      break;
+
+    case 'node-type-form':
+      // Add note about flatcomments to comment display description.
+      $form['comment']['comment_default_mode']['#description'] .= t(' <strong>Flatcomments enabled:</strong> flat list options will force replies to be to the main post.');
+
+      // Add option to default display mode.
+      $form['comment']['comment_default_mode']['#options'][5] = t('Orderable flat list - expanded');
+
+      // Add submit handler to handle additional display mode.
+      array_unshift($form['#submit'], 'flatcomments_node_type_form_submit');
+
+      // If display mode is 2 and our variable is 5 then set default value to 5.
+      $display_mode = $form['comment']['comment_default_mode']['#default_value'];
+      $node_type    = $form['#node_type']->type;
+      $orderable    = variable_get('flatcomments_default_mode_' . $node_type, 0);
+      if ($display_mode == 4 && $orderable == 5 && !$form_state['submitted']) {
+        $form['comment']['comment_default_mode']['#default_value'] = 5;
+      }
+
+      // Add option to remove reply link from comments.
+      $form['comment']['flatcomments_remove_reply_link'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Links'),
+        '#default_value' => variable_get('flatcomments_remove_reply_link_' . $node_type, array()),
+        '#options' => array(
+          'reply' => t('Do not show a reply link on comments'),
+        ),
+      );
+      break;
+  }
+}
+
+/**
+ * Sets comment pid to null prior to comment save.
+ *
+ * @see flatcomments_form_alter()
+ */
+function flatcomments_comment_form_submit($form, &$form_state) {
+  $node = node_load($form_state['values']['nid']);
+  $display_mode = (int)variable_get('comment_default_mode_' . $node->type, 0);
+  $orderable    = (int)variable_get('flatcomments_default_mode_' . $node->type, 0);
+  // Only alter new comments.
+  if ((in_array($display_mode, array(1, 2)) || $orderable === 5) && !$form_state['values']['cid']) {
+    // Setting pid to NULL makes the comment a reply to the node.
+    $form_state['values']['pid'] = NULL;
+  }
+}
+
+/**
+ * Handles comment display mode save for our custom option.
+ *
+ * @see flatcomments_form_alter()
+ */
+function flatcomments_node_type_form_submit($form, &$form_state) {
+  // Change display mode 5 to 2 to have comments display correctly.
+  // Then save mode 5 in our variable for flatcomments use.
+  $node_type = trim($form_state['values']['type']);
+  if ($form_state['values']['comment_default_mode'] == 5) {
+    $form_state['values']['comment_default_mode'] = 4;
+    variable_set('flatcomments_default_mode_' . $node_type, 5);
+  } else {
+    variable_set('flatcomments_default_mode_' . $node_type, 0);
+  }
+}
+
+
+/**
+ * Implementation of hook_node_type().
+ */
+function flatcomments_node_type($op, $info) {
+  switch ($op) {
+    case 'delete':
+      variable_del('flatcomments_default_mode_' . $info->type);
+      break;
+  }
+}
+
+/**
+ * Process variables for comment.tpl.php.
+ *
+ * @see comment.tpl.php
+ * @see template_preprocess_comment()
+ */
+function flatcomments_preprocess_comment(&$vars) {
+  // Removing reply link if requested.
+  // hook_link_alter does not run for comment threads.
+  // Hopefully will be fixed in D7. http://drupal.org/node/374463
+  if (in_array('reply', variable_get('flatcomments_remove_reply_link_' . $vars['node']->type, array()))) {
+    $vars['links'] = preg_replace('(\<li.*\>' . t('reply') . '\</a\>\</li\>)', '', $vars['links']);
+  }
+}

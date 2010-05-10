@@ -607,6 +607,11 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
     //  $group = og_get_group_context();
     //  $form['#redirect'] = array('node/'.$group->nid.'/discussions');
     //}
+
+    //GEORGE: just doing some formatting changes
+    unset($form['_author']);
+    unset($form['mollom']['privacy']);
+    unset($form['comment_filter']['comment']['#title']);
   }
 
   //Modify the organic group subscribe form to ask for the submission requirement and save the application

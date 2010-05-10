@@ -254,6 +254,13 @@ function _title_to_id($title){
           );
 }
 
-
+//added by George Z to tidy up the comments information - removed text: Submitted By
+function p2pu10_comment_submitted($comment) {
+  return t('!username on @datetime.',
+    array(
+      '!username' => theme('username', $comment),
+      '@datetime' => format_date($comment->timestamp)
+    ));
+}
 
 // --------------------------------------------------------------- Views themeng

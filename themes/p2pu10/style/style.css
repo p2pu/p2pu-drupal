@@ -269,7 +269,6 @@ div.yellow-panel div.meta h2.title a{ color: #ee9900;}
 
 /* Fixes */
 body.page-home-page div.panel-flexible,
-body.page-community div.panel-flexible,
 body.page-about div.panel-flexible,
 body.page-faqs div.panel-flexible,
 body.page-advisors div.panel-flexible,
@@ -277,7 +276,6 @@ body.page-get-involved div.panel-flexible,
 body.page-team div.panel-flexible,
 body.page-contact-us div.panel-flexible{ margin: 0 auto; width: 100%;}
 body.page-home-page div.panels-flexible-column-1-10,
-body.page-community div.panels-flexible-column-1-10,
 body.page-about div.panels-flexible-column-28-1,
 body.page-faqs div.panels-flexible-column-30-1,
 body.page-advisors div.panels-flexible-column-29-1,
@@ -285,7 +283,6 @@ body.page-get-involved div.panels-flexible-column-36-1,
 body.page-team div.panels-flexible-column-31-1,
 body.page-contact-us div.panels-flexible-column-25-1 { float:left; width:33%;}
 body.page-home-page div.panels-flexible-column-1-1,
-body.page-community div.panels-flexible-column-1-1,
 body.page-about div.panels-flexible-column-28-main,
 body.page-advisors div.panels-flexible-column-29-main,
 body.page-get-involved div.panels-flexible-column-36-main,
@@ -293,7 +290,6 @@ body.page-faqs div.panels-flexible-column-30-main,
 body.page-team div.panels-flexible-column-31-main,
 body.page-contact-us div.panels-flexible-column-25-main { float:left; width:67%;}
 body.page-home-page div.panels-flexible-region-1-rightsidebar,
-body.page-community div.panels-flexible-region-1-rightsidebar,
 body.page-about div.panels-flexible-region-28-rightsidebar,
 body.page-faqs div.panels-flexible-region-30-rightsidebar,
 body.page-advisors div.panels-flexible-region-29-rightsidebar,
@@ -312,6 +308,9 @@ div.panel-pane div.bl{ background-position: left bottom;}
 div.panel-pane div.pane-inner{ padding: 10px 10px 20px 10px;}
 div.panel-pane h2{ margin-top: 0;}
 div.panel-pane ul{ padding-left: 10px;}
+
+/* Mini Panels */
+div.panel-pane.pane-panels-mini.pane-about-and-news-blocks div.pane-inner{padding: 0px 0px 20px 10px;}
 
 /* Grey */
 div.grey-panel{ background: url('../images/grey-back.png'); color: #eee;}

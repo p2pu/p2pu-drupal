@@ -310,7 +310,9 @@ div.panel-pane h2{ margin-top: 0;}
 div.panel-pane ul{ padding-left: 10px;}
 
 /* Mini Panels */
-div.panel-pane.pane-panels-mini.pane-about-and-news-blocks div.pane-inner{padding: 0px 0px 20px 10px;}
+div.panel-pane.pane-panels-mini.pane-about-and-news-blocks div.pane-inner{padding:0 0 20px 0;}
+div.panel-pane.pane-panels-mini.pane-about-and-news-blocks .grey-panel .pane-inner,
+div.panel-pane.pane-panels-mini.pane-about-and-news-blocks .yellow-panel .pane-inner {padding:10px;}
 
 /* Grey */
 div.grey-panel{ background: url('../images/grey-back.png'); color: #eee;}

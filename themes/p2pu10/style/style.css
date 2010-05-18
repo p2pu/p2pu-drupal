@@ -195,6 +195,11 @@ body.page-course div.view-course-list td.views-field-name .picture{ padding: 6px
 div.view-course-shouts h2.pane-title{ margin: 0;}
 div.view-course-events .view-header a{ font-family: georgia; font-size: 150%; text-decoration: none;}
 div.view-id-og_members_faces table td{ vertical-align: top;}
+div.view-feeds .views-field-title{font-size: 115%; font-family: Georgia;}
+div.view-feeds .views-field-timestamp{font-size: 85%; color: gray;}
+div.view-feeds.view-display-id-page_1 .views-field-timestamp{color: #4F4F4F;}
+.view-display-id-panel_pane_1 .views-row {padding-bottom: 7px;}
+
 /* Comments */
 div.comment{ background: #fff; margin: 0;}
 div.comment ul.links{ padding-bottom: 10px;}

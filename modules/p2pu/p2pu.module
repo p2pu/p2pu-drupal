@@ -352,7 +352,26 @@ function p2pu_menu() {
     'access arguments' => array(1),
     'type' => MENU_CALL_BACK,
   );
+
+  // IRC Channel
+  $items['node/%node/chat'] = array(
+    'title' => 'Chat',
+    'page callback' => 'p2pu_chat_page',
+    'page arguments' => array(1),
+    'access callback' => 'user_is_logged_in',
+    'type' => MENU_LOCAL_TASK,
+  );
+
   return $items;
+}
+
+//Creates a chat page based on the Course parameters
+function p2pu_chat_page($node) {
+  global $user;
+  $irc_channel = 'p2pu-' .$node -> path;
+  $nick = $user -> name;
+  return '<div id="chat_box" style="text-align:center;width:100%;"><iframe src="http://webchat.freenode.net?
+  channels=' .$irc_channel .'&nick=' .$nick .'&uio=d4&prompt=1" width="647" height="400"></iframe></div>';
 }
 
 function p2pu_keypage_redirect($node) {

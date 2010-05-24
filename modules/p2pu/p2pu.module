@@ -358,7 +358,7 @@ function p2pu_menu() {
     'title' => 'Chat',
     'page callback' => 'p2pu_chat_page',
     'page arguments' => array(1),
-    'access callback' => 'user_is_logged_in',
+    'access arguments' => array(1),
     'weight' => 20,
     'type' => MENU_LOCAL_TASK,
   );

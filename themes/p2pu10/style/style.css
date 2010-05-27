@@ -216,7 +216,7 @@ div.orange-panel div.node-forum div.meta{border-style:none;width:100px;float:lef
 div.node-forum div.content, div.comment div.content, div.comment ul.links {padding-left:115px;padding-top:3px; padding-right: 0px;}
 div.node-forum div.picture, div.comment div.picture {float:right;padding-right:10px;}
 div.node-forum div.meta img,
-div.comment div.meta img{display:block;}
+div.comment div.meta img{display:block; float:right;}
 div.node-forum .meta .submitted img {padding-left:52px;}
 form#comment-form div#edit-subject-wrapper {display:none;}
 div.comment h3.title {display:none;}

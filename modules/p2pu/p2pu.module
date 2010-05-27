@@ -46,115 +46,114 @@ function p2pu_init() {
 function p2pu_perm() {
   return array('administer p2pu settings','schedule courses');
 }
+
 /**
  * Implementation of hook_block().
  *
  */
 function p2pu_block($op = 'list', $delta = 0, $edit = array()) {
+  global $user;
   switch ($op) {
     case 'list':
+      $block = array();
       $blocks[0]['info'] = t('P2PU custom comment block');
-      $block[0]['cache'] = BLOCK_NO_CACHE;
+      $blocks[0]['cache'] = BLOCK_NO_CACHE;
+      $blocks[1]['info'] = t('P2PU custom OG forum block');
+      $blocks[1]['cache'] = BLOCK_NO_CACHE;
+      $blocks[2]['info'] = t('P2PU custom forum post node page with comments');
+      $blocks[2]['cache'] = BLOCK_NO_CACHE; 
+      $blocks[3]['info'] = t('P2PU custom forum RSS icon block');
       return $blocks;
     case 'view':
-      if (user_access('post comments')) {
-        // Confirm that we are displaying this on the course node, discussion variant (node/765/discussions/3082) OR
-        // On the assignment submission page (assignment-submission/rebeccas-assignment) OR
-        // On the document page (node/765/document/3082)
-        $subject = t('Add a comment');
-        $anchor = "<a id='add-comment-anchor'></a>\n";
-        if (arg(0) == 'node' && is_numeric(arg(1)) && (arg(2) == 'discussions' || arg(2) == 'document') && is_numeric(arg(3))) {
-          $block['subject'] = $subject;
-          // We want to put in an anchor here so that we can target the add comment
-          // form from the add comment link
-          $block['content'] = $anchor;
-          $block['content'] .= drupal_get_form('comment_form', array('nid' => arg(3)));
+   $block = array();
+
+    switch ($delta) {
+      case 0:
+        if (user_access('post comments')) {
+          // Confirm that we are displaying this on the course node, discussion variant (node/765/discussions/3082) OR
+          // On the assignment submission page (assignment-submission/rebeccas-assignment) OR
+          // On the document page (node/765/document/3082)
+          $subject = t('Add a comment');
+          $anchor = "<a id='add-comment-anchor'></a>\n";
+          if (arg(0) == 'node' && is_numeric(arg(1)) && (arg(2) == 'discussions' || arg(2) == 'document' || arg(2) == 'forums') && is_numeric(arg(3))) {
+            $block['subject'] = $subject;
+            // We want to put in an anchor here so that we can target the add comment
+            // form from the add comment link
+            $block['content'] = $anchor;
+            $block['content'] .= drupal_get_form('comment_form', array('nid' => arg(3)));
+          }
+          // Now for assignment submissions which is displayed with a slightly different path
+          $alias = drupal_get_path_alias($_GET['q']);
+          $alias_parts = explode('/', $alias);
+          if (arg(0) == 'node' && is_numeric(arg(1)) && $alias_parts[1] == 'assignment-submission') {
+            $block['subject'] = $subject;
+            $block['content'] = $anchor;
+            $block['content'] .= drupal_get_form('comment_form', array('nid' => arg(1)));
+          }        
         }
-        // Now for assignment submissions which is displayed with a slightly different path
-        $alias = drupal_get_path_alias($_GET['q']);
-        $alias_parts = explode('/', $alias);
-        if (arg(0) == 'node' && is_numeric(arg(1)) && $alias_parts[1] == 'assignment-submission') {
-          $block['subject'] = $subject;
-          $block['content'] = $anchor;
-          $block['content'] .= drupal_get_form('comment_form', array('nid' => arg(1)));
-        }        
-      }
-      return $block;
+        return $block;
+
+      case 1:
+        // Display the group 'general discussion' forum
+        // Don't display anything if it's displaying a forum topic
+        if (arg(0) == 'node' && is_numeric(arg(1)) && arg(2) == 'forums' && !(is_numeric(arg(3)))) {
+          // Load the general discussion forum taxonomy term id
+          $forum_tid = p2pu_get_discussion_forum_tid(arg(1));
+          if (og_forum_is_public($forum_tid) || (!empty($user->og_groups) && array_key_exists($arg, $user->og_groups)) || user_access('administer forums')){
+            require_once(drupal_get_path('module', 'forum').'/forum.pages.inc');
+            $block['subject'] = t('Discussion Forum');
+            $block['content'] = forum_page($forum_tid);
+          }
+          else
+            return FALSE;
+        } 
+        return $block;
+      case 2:
+        // This will display a full forum node for placing in a panel page where
+        // we don't have access to the node's context, as is the case when we're
+        // dispaying the forum post from the course panel override - if we load
+        // the node in the panel, it doesn't display the comments, as I think there's
+        // no context.
+        if (arg(0) == 'node' && is_numeric(arg(1)) && arg(2) == 'forums' && is_numeric(arg(3))) {
+          // Load the full forum post node
+          $node = node_load(array("nid" => arg(3)));
+          $block['subject'] = $node->title;
+          $block['content'] = node_page_view($node);
+        }
+        else
+          return FALSE;
+        return $block;
+      case 3:
+        // Display the forum rss feed icon in a block
+        if (arg(0) == 'node' && is_numeric(arg(1)) && arg(2) == 'forums' && !(is_numeric(arg(3)))) {
+          // Load the full forum post node
+          $forum_tid = p2pu_get_discussion_forum_tid(arg(1));
+          $feed_path = "taxonomy/term/$forum_tid/0/feed"; // is there a better way to do this?
+          $title_text = "Subscribe to this discussion forum's RSS feed";
+          $title = t($title_text);
+          $rss_link = l($title_text, $feed_path);
+          $node = node_load(array("nid" => arg(3)));
+          $block['subject'] = '';
+          $block['content'] = theme_feed_icon($feed_path, $title);
+          $block['content'] .= "<span id='discussion-feed-icon-text'>$rss_link</span>";
+        }
+        else
+          return FALSE;
+        return $block;
+    }      
   }
 }      
 /**
- * Implementation of hook_block().
- *
- * Displays the book table of contents in a block when the current page is a
- * single-node view of a book node.
+ * Gets the taxonomy term id of the group's general discussion forum.
  */
-//function p2pu_block($op = 'list', $delta = 0, $edit = array()) {
-//  $block = array();
-//  switch ($op) {
-//    case 'list':
-//      $block[0]['info'] = t('OG Book navigation');
-//      $block[0]['cache'] = BLOCK_CACHE_PER_PAGE | BLOCK_CACHE_PER_ROLE;
-//      return $block;
-//    case 'view':
-//      $current_bid = 0;
-//      if ($node = menu_get_object()) {
-//        $current_bid = empty($node->book['bid']) ? 0 : $node->book['bid'];
-//      }
-//      if (variable_get('og_book_block_mode', 'all pages') == 'all pages') {
-//        $block['subject'] = t('Book navigation');
-//        $book_menus = array();
-//        $pseudo_tree = array(0 => array('below' => FALSE));
-//        foreach (p2p_og_get_books() as $book_id => $book) {
-//          if ($book['bid'] == $current_bid) {
-//            // If the current page is a node associated with a book, the menu
-//            // needs to be retrieved.
-//            watchdog('debug', 'Retrieve menu');
-//            $book_menus[$book_id] = menu_tree_output(menu_tree_all_data($node->book['menu_name'], $node->book));
-//          }
-//          else {
-//            // Since we know we will only display a link to the top node, there
-//            // is no reason to run an additional menu tree query for each book.
-//            watchdog('debug', 'In pseudo tree');
-//            $book['in_active_trail'] = FALSE;
-//            $pseudo_tree[0]['link'] = $book;
-//            $book_menus[$book_id] = menu_tree_output($pseudo_tree);
-//          }
-//        }
-//
-//        $block['content'] = theme('book_all_books_block', $book_menus);
-//      }
-//      elseif ($current_bid) {
-//        // Only display this block when the user is browsing a book.
-//        $title = db_result(db_query(db_rewrite_sql('SELECT n.title FROM {node} n WHERE n.nid = %d'), $node->book['bid']));
-//        // Only show the block if the user has view access for the top-level node.
-//        if ($title) {
-//          $tree = menu_tree_all_data($node->book['menu_name'], $node->book);
-//          // There should only be one element at the top level.
-//          $data = array_shift($tree);
-//          $block['subject'] = theme('book_title_link', $data['link']);
-//          $block['content'] = ($data['below']) ? menu_tree_output($data['below']) : '';
-//        }
-//      }
-//      return $block;
-//    case 'configure':
-//        $options = array(
-//        'all pages' => t('Show block on all pages'),
-//        'book pages' => t('Show block only on book pages'),
-//      );
-//      $form['book_block_mode'] = array(
-//        '#type' => 'radios',
-//        '#title' => t('Book navigation block display'),
-//        '#options' => $options,
-//        '#default_value' => variable_get('og_book_block_mode', 'all pages'),
-//        '#description' => t("If <em>Show block on all pages</em> is selected, the block will contain the automatically generated menus for all of the site's books. If <em>Show block only on book pages</em> is selected, the block will contain only the one menu corresponding to the current page's book. In this case, if the current page is not in a book, no block will be displayed. The <em>Page specific visibility settings</em> or other visibility settings can be used in addition to selectively display this block."),
-//        );
-//      return $form;
-//    case 'save':
-//      variable_set('og_book_block_mode', $edit['book_block_mode']);
-//      break;
-//  }
-//}
-//
+function p2pu_get_discussion_forum_tid($gid) {
+    // Load the general discussion forum
+  $forum_tid  = og_forum_get_forum_container($gid);
+  $children = taxonomy_get_children($forum_tid);
+  $children_tids = array_keys($children);
+  // General discussion is the 1st item
+  return $children_tids[0];
+}
 ///**
 // * Returns an array of all books.
 // *
@@ -233,6 +232,14 @@ function p2pu_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
             $og_groups = array_values($node->og_groups);
             if (arg(2) != 'discussion' && arg(1) == $node->nid) {
               drupal_goto('node/'.$og_groups[0].'/discussions/'.$node->nid);
+            }
+          }
+        break;
+        case 'forum':
+          if (isset($node->og_groups)) {
+            $og_groups = array_values($node->og_groups);
+            if (arg(2) != 'forums' && arg(1) == $node->nid) {
+              drupal_goto('node/'.$og_groups[0].'/forums/'.$node->nid);
             }
           }
         break;
@@ -397,25 +404,27 @@ function p2pu_my_dashboard_redirect() {
  */
 
 function p2pu_menu_alter(&$items) {
+
   unset($items['user/%user/imce']);
   $items['user/register']['weight'] = 1;
   $items['user/password']['weight'] = 2;
-  // We want to redirect the course forum to the General Discussion forum immediately
-  $items['node/%og_forum_group_type/og/forum']['page callback'] = 'p2pu_og_forum_link_redirect';
-  unset($items['node/%og_forum_group_type/og/forum']['file']);
-  unset ($items['node/%og_forum_group_type/og/forum']['file path']);
+  // Hide the og forums menu item
+  //unset($items['node/%og_forum_group_type/og/forum']);
+  // For some reason the above didn't work, so unsent the type to hide the og forums menu item
+  unset($items['node/%og_forum_group_type/og/forum']['type']);
+
 }
 
 function p2pu_og_forum_link_redirect($ctid = 0) {
-      global $user;
-     $children = taxonomy_get_children($ctid);
-     $children_tids = array_keys($children);
-     $tid = $children_tids[0];
-     if (og_forum_is_public($tid) || (!empty($user->og_groups) && array_key_exists($arg, $user->og_groups)) || user_access('administer forums')){
-         drupal_goto('forum/'.$tid);
-     }
-     else
-       return FALSE;
+  global $user;
+  $children = taxonomy_get_children($ctid);
+  $children_tids = array_keys($children);
+  $tid = $children_tids[0];
+  if (og_forum_is_public($tid) || (!empty($user->og_groups) && array_key_exists($arg, $user->og_groups)) || user_access('administer forums')){
+    drupal_goto('forum/'.$tid);
+  }
+  else
+    return FALSE;
 }
 
 function p2pu_link_alter(&$links, $node) {
@@ -626,12 +635,13 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
     //  $group = og_get_group_context();
     //  $form['#redirect'] = array('node/'.$group->nid.'/discussions');
     //}
-
+  
     //GEORGE: just doing some formatting changes
     unset($form['_author']);
     unset($form['mollom']['privacy']);
     unset($form['comment_filter']['comment']['#title']);
-  }
+
+}
 
   //Modify the organic group subscribe form to ask for the submission requirement and save the application
   if ($form_id == 'og_confirm_subscribe') {

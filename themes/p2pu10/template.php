@@ -21,7 +21,53 @@ function p2pu10_preprocess_page($vars = array()) {
   return $vars;
 }
 
+/**
+ * Override or insert variables into the comment templates.
+ *
+ * @param $vars
+ *   An array of variables to pass to the theme template.
+ * @param $hook
+ *   The name of the template being rendered ("comment" in this case.)
+ */
+function p2pu10_preprocess_comment(&$vars, $hook) {
+  // Add an "unpublished" flag.
+  $vars['unpublished'] = ($vars['comment']->status == COMMENT_NOT_PUBLISHED);
 
+  // If comment subjects are disabled, don't display them.
+  if (variable_get('comment_subject_field_' . $vars['node']->type, 1) == 0) {
+    $vars['title'] = '';
+  }
+
+  // Special classes for comments.
+  $classes = array('comment');
+  if ($vars['comment']->new) {
+    $classes[] = 'comment-new';
+  }
+  $classes[] = $vars['status'];
+  $classes[] = $vars['zebra'];
+  if ($vars['id'] == 1) {
+    $classes[] = 'first';
+  }
+
+  if ($vars['id'] == $vars['node']->comment_count) {
+    $classes[] = 'last';
+  }
+  if ($vars['comment']->uid == 0) {
+    // Comment is by an anonymous user.
+    $classes[] = 'comment-by-anon';
+  }
+  else {
+    if ($vars['comment']->uid == $vars['node']->uid) {
+      // Comment is by the node author.
+      $classes[] = 'comment-by-author';
+    }
+    if ($vars['comment']->uid == $GLOBALS['user']->uid) {
+      // Comment was posted by current user.
+      $classes[] = 'comment-mine';
+    }
+  }
+  $vars['classes'] = implode(' ', $classes);
+}
 
 /**
  * Hooked to add node-type-teaser.tpl.php to suggested templates
@@ -51,7 +97,9 @@ function p2pu10_preprocess_node($vars = array()) {
     $vars['p2pu_forum_time'] = isset($vars['node']->created) ? format_interval(time() - $vars['node']->created) : '';
   
     $course_name = array_values($vars['og_groups_both']);
-    $vars['back_to_course_link'] = l(t('Go back to this course: ') . $course_name[0], 'node/' . $vars['og_forum_nid']);
+    $tid = p2pu_get_discussion_forum_tid($vars['og_forum_nid']);
+    $forum = taxonomy_get_term($tid);
+    $vars['back_to_forum_link'] = l(t('Go back to: ') . $forum->name, 'node/' . $vars['og_forum_nid'] . '/forums');
   }
   return $vars;
 }
@@ -256,11 +304,17 @@ function _title_to_id($title){
 
 //added by George Z to tidy up the comments information - removed text: Submitted By
 function p2pu10_comment_submitted($comment) {
-  return t('!username on @datetime.',
+  $submitted = t('!username',
     array(
-      '!username' => theme('username', $comment),
+      '!username' => theme('username', $comment)
+    ));
+  $submitted .= "<div id='comment-submitted-date'>\n";
+  $submitted .= t('@datetime.',
+    array(
       '@datetime' => format_date($comment->timestamp)
     ));
+  $submitted .= "</div>\n";
+  return $submitted;
 }
 
 // --------------------------------------------------------------- Views themeng

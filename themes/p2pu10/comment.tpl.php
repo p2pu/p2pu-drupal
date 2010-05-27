@@ -1,4 +1,4 @@
-<div class="comment<?php print ($comment->new) ? ' comment-new' : ''; print ($comment->status == COMMENT_NOT_PUBLISHED) ? ' comment-unpublished' : ''; ?> clear-block">
+<div class="<?php print $classes; ?> clear-block">
   
   <?php if ($title): ?>
     <h3 class="title">

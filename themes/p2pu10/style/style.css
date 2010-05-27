@@ -208,8 +208,8 @@ div.comment div.content{ padding: 0 10px;}
 html.js .resizable-textarea textarea { height: 70px;}
 
 /* -- Changes by George Z for Forum display, to be merged with rest of stylesheet on approval -- */
-div.node-forum div.meta, div.comment div.meta {border-style:none;width:100px;float:left;height:auto;}
-div.node-forum div.content, div.comment div.content, div.comment ul.links {padding-left:115px;padding-top:3px;}
+div.node-forum div.meta, div.comment div.meta {border-style:none;width:100px;float:left;height:auto; background-color: transparent; margin:5px 15px 0 0; font-size:0.9em;}
+div.node-forum div.content, div.comment div.content, div.comment ul.links {padding-left:115px;padding-top:3px; padding-right: 0px;}
 div.node-forum div.picture, div.comment div.picture {margin-left:10px;}
 form#comment-form div#edit-subject-wrapper {display:none;}
 div.comment h3.title {display:none;}
@@ -220,7 +220,7 @@ div.node-forum div.content {clear:none;margin-right:10px;text-align:justify;}
 body.node-type-forum h1 {float:none;margin:10px 0px 10px 115px;}
 body.node-type-forum .box h2 {margin:0px;padding:8px 0px 0px 0px;border-top:solid #CCC8BF 1px;}
 div.node-forum .terms {float:right;position:relative;top:-20px;}
-div.node-forum ul.links {margin-left:115px;}
+div.node-forum ul.links {display: block; padding-left: 115px;}
 body.node-type-forum div#content-column .inner {padding:0px;}
 div#comments div.box {margin-left:10px;}
 
@@ -358,6 +358,19 @@ div.button-panel div.pane-inner div.pane-content p{ margin: 0; padding: 0;}
 div.button-panel div.pane-inner div.pane-content{ margin: 0; padding: 0; text-align: center;}
 div.button-panel div.pane-inner a{ font-family: Georgia; color: #333; font-size: 150%; text-decoration: none;}
 
+/* White on Orange */
+div.white-on-orange-panel{ background: url('../images/white-on-orange-back.png'); color: #333;}
+div.white-on-orange-panel h2{ color: #333333;}
+div.white-on-orange-panel a{ color: #58CAC1; text-decoration: none;}
+div.white-on-orange-panel a:hover{ color: #58CAC1; text-decoration: underline;}
+div.white-on-orange-panel div.tl{ background-image: url('../images/white-on-orange-tl.png');}
+div.white-on-orange-panel div.tr{ background-image: url('../images/white-on-orange-tr.png');}
+div.white-on-orange-panel div.bl{ background-image: url('../images/white-on-orange-bl.png');}
+div.white-on-orange-panel div.br{ background-image: url('../images/white-on-orange-br.png');}
+div.white-on-orange-panel table *{ border-color: #fff;}
+div.white-on-orange-panel tr.even{ background: #eee;}
+div.white-on-orange-panel tr.odd{ background: #fff;}
+
 /* Shout panel */
 div#edit-shout-box-wrapper #edit-shout-box{ width: 263px;}
 #p2pu-shout-form .form-item{ margin-bottom: 0;}
@@ -368,3 +381,12 @@ div#edit-shout-box-wrapper #edit-shout-box{ width: 263px;}
 
 div#page-footer div.block{ float: left; margin-right: 10px;}
 div#page-footer div.block:last{ float: right;}
+
+/* -- Changes by Charles for the forum in a panel display -- */
+#mini-panel-forum_post_and_comments {}
+div#mini-panel-forum_post_and_comments div.node h2.title{background-color: #f48b08; font-family:georgia; font-size:150%;}
+#forum-listing-pane ul.links {display: none;}
+#forum-rss-icon-block img {
+	margin-right:4px;
+	vertical-align:sub;
+}

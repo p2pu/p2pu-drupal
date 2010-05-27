@@ -32,10 +32,8 @@
 <?php endif; ?>
 
   <div class="content">
-
-<?php if ($terms): ?>
-    <span class="terms"><?php print $terms ?></span>
-<?php endif; ?>
+    <!-- Removed the terms - just display the link to the forum -->
+    <span class="terms"><?php print $back_to_forum_link;?></span>
 
     <?php print $content ?>
   </div>

@@ -208,7 +208,9 @@ div.comment div.content{ padding: 0 10px;}
 html.js .resizable-textarea textarea { height: 70px;}
 
 /* -- Changes by George Z for Forum display, to be merged with rest of stylesheet on approval -- */
-div.node-forum div.meta, div.comment div.meta {border-style:none;width:100px;float:left;height:auto; background-color: transparent; margin:5px 15px 0 0; font-size:0.9em;}
+div.node-forum div.meta,
+div.comment div.meta,
+div.node-forum div.orange-panel div.meta{border-style:none;width:100px;float:left;height:auto; background-color: transparent; margin:5px 15px 0 0; font-size:0.9em;}
 div.node-forum div.content, div.comment div.content, div.comment ul.links {padding-left:115px;padding-top:3px; padding-right: 0px;}
 div.node-forum div.picture, div.comment div.picture {margin-left:10px;}
 form#comment-form div#edit-subject-wrapper {display:none;}

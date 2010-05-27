@@ -309,7 +309,7 @@ function p2pu10_comment_submitted($comment) {
       '!username' => theme('username', $comment)
     ));
   $submitted .= "<div id='comment-submitted-date'>\n";
-  $submitted .= t('@datetime.',
+  $submitted .= t('@datetime',
     array(
       '@datetime' => format_date($comment->timestamp)
     ));

@@ -217,7 +217,7 @@ div.node-forum div.content, div.comment div.content, div.comment ul.links {paddi
 div.node-forum div.picture, div.comment div.picture {float:right;padding-right:10px;}
 div.node-forum div.meta img,
 div.comment div.meta img{display:block; float:right;}
-div.node-forum .meta .submitted img {padding-left:52px;}
+div.node-forum .meta .submitted img {margin-right:2px;padding-left:46px;}
 form#comment-form div#edit-subject-wrapper {display:none;}
 div.comment h3.title {display:none;}
 div.comment {border-top:solid #CCC8BF 1px;text-align:justify;}

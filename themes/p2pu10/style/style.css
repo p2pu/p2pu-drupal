@@ -207,14 +207,18 @@ div.comment ul.links li{ padding: 0 10px 0 0;}
 div.comment div.content{ padding: 0 10px;}
 html.js .resizable-textarea textarea { height: 70px;}
 
-/* -- Changes by George Z for Forum display, to be merged with rest of stylesheet on approval -- */
+/* -- Forum display -- */
 div.node-forum div.meta,
 div.orange-panel div.node-forum div.meta,
 div.white-on-orange-panel div.comment div.meta,
 div.comment div.meta,
 div.orange-panel div.node-forum div.meta{border-style:none;width:100px;float:left;height:auto; background-color: transparent; margin:5px 15px 0 0; font-size:0.9em;}
 div.node-forum div.content, div.comment div.content, div.comment ul.links {padding-left:115px;padding-top:3px; padding-right: 0px;}
-div.node-forum div.picture, div.comment div.picture {margin-left:10px;}
+div.node-forum div.picture, div.comment div.picture {float:right;padding-right:10px;}
+div.node-forum div.meta img,
+div.comment div.meta img{display:block;}
+div.node-forum .meta .submitted img {padding-left:48px;}
+ {font-size: 0.8em;}
 form#comment-form div#edit-subject-wrapper {display:none;}
 div.comment h3.title {display:none;}
 div.comment {border-top:solid #CCC8BF 1px;text-align:justify;}
@@ -227,7 +231,18 @@ div.node-forum .terms {float:right;position:relative;top:-20px;}
 div.node-forum ul.links {display: block; padding-left: 115px;}
 body.node-type-forum div#content-column .inner {padding:0px;}
 div#comments div.box {margin-left:10px;}
+#mini-panel-forum_post_and_comments {}
+div#mini-panel-forum_post_and_comments div.node h2.title{background-color: #f48b08; font-family:georgia; font-size:150%;}
+#forum-listing-pane ul.links {display: none;}
+#forum-rss-icon-block img {
+	margin-right:4px;
+	vertical-align:sub;
+}
+#comment-submitted-date,
+div.node-forum .meta .submitted {font-size: 0.8em;}
+div.node-forum .meta .submitted a{font-size: 0.9em;}
 
+#comment-submitted-container {width: 80px;}
 /* Comment form */
 form#contact-mail-page table.cke_editor td#cke_contents_edit-message,
 form#comment-form table.cke_editor td#cke_contents_edit-comment { height: 100px;}
@@ -385,13 +400,3 @@ div#edit-shout-box-wrapper #edit-shout-box{ width: 263px;}
 
 div#page-footer div.block{ float: left; margin-right: 10px;}
 div#page-footer div.block:last{ float: right;}
-
-/* -- Changes by Charles for the forum in a panel display -- */
-#mini-panel-forum_post_and_comments {}
-div#mini-panel-forum_post_and_comments div.node h2.title{background-color: #f48b08; font-family:georgia; font-size:150%;}
-#forum-listing-pane ul.links {display: none;}
-#forum-rss-icon-block img {
-	margin-right:4px;
-	vertical-align:sub;
-}
-#comment-submitted-date {font-size: 0.8em;}

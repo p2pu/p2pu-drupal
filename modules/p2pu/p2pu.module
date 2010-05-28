@@ -195,8 +195,8 @@ function p2pu_signup_link_for_block () {
   $group = og_get_group_context();
   global $user;
   if ($user->uid == 0) {
-    $register = l('register', 'user/register', array('query' => 'distination=node/'.$group->nid));
-    $login = l('login', 'user/login', array('query' => 'distination=node/'.$group->nid));
+    $register = l('register', 'user/register', array('query' => 'destination=node/'.$group->nid));
+    $login = l('login', 'user/login', array('query' => 'destination=node/'.$group->nid));
     print ('You must '.$register.' or '.$login.' in order to post into this group.');
     return;  
   }
@@ -205,7 +205,7 @@ function p2pu_signup_link_for_block () {
     if ($group->og_selective == 0) {
       $label = 'Join';
     }
-    $link = l($label, 'og/subscribe/'.$group->nid, array('query' => 'distination=node/'.$group->nid));
+    $link = l($label, 'og/subscribe/'.$group->nid, array('query' => 'destination=node/'.$group->nid));
     print ($link);
     return;
   }

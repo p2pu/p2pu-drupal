@@ -31,3 +31,5 @@ features[] = favicon
 features[] = primary_links
 features[] = secondary_links
 features[] = breadcrumb
+
+scripts[] = scripts/js/flag.js

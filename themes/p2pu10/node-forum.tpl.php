@@ -37,7 +37,10 @@
 
     <?php print $content ?>
   </div>
-
+  <div class="node-flags">
+    <?php print flag_create_link('like_node', $node->nid); ?>
+    <span class="flagged-by-indication"><?php echo p2pu_get_item_flag_indication('like_node', $node->nid); ?></span>
+  </div>
 <?php
   if ($links) {
     print $links;

@@ -370,7 +370,36 @@ function p2pu_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  // Flags: Provide a way to get flag data to jQuery
+  $items['p2pu_flag/get'] = array(
+    'title' => 'Get node flag indication text',
+    'page callback' => 'p2pu_flag_get_item_text_ajax',
+    'access callback' => TRUE,
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
+}
+/*
+ * Flag related function to be used via ajax
+ * 
+ * Fetches some text to display an indication of who has flagged an item.
+ *
+ * @param $flag_name
+ *   The unique name of the flag 
+ * @param $item_id
+ *   The content ID who's flags we are checking (usually the node ID or comment ID).
+ *
+ * @return json array with 2 values: isText indicates whether there's a flag
+ *   and flagIndicationText, the actual text string
+ */
+function p2pu_flag_get_item_text_ajax($flag_name, $item_id) {
+  $is_text = 0;
+  if ($text = p2pu_get_item_flag_indication($flag_name, $item_id)) {
+    $is_text = 1;
+  }
+  drupal_json(array('isText' => $is_text, 'flagIndicationText' => $text));
 }
 
 //Creates a chat page based on the Course parameters
@@ -698,6 +727,49 @@ function p2pu_get_assignments_for_course($gid) {
   return $assignments;
 }
 
+/*
+ * Flag related function to get text returns a string indicating who has liked something.
+ * TODO: make the flagged_by_text more generic, or flexible so it works when
+ * using other flags.
+ *
+ * @param $flag_name
+ *   The unique name of the flag 
+ * @param $content_id
+ *   The content ID (usually the node ID or comment ID).
+ *
+ * @return $flagged_by_text
+ */
+function p2pu_get_item_flag_indication($flag_name, $content_id) {
+  global $user;
+  // Load the flag object so we can do more stuff with it
+  $flag = flag_get_flag($flag_name);
+  $content_type = $flag->content_type;
+  $flag_count = 0;
+  $flagged_by_text = '';
+  $flag_count_array = flag_get_counts($content_type, $content_id);
+  $flag_count = $flag_count_array[$flag_name];
+  if ($flag_count) {
+    // Check if the current user has flagged the item
+    $user_flags = flag_get_user_flags($content_type, $content_id, $user->uid);
+    // If the current user has flagged the item
+    if ($user_flags) {
+      if ($user_flags && ($flag_count > 1)) {
+        // If the current user and at least 1 other has also liked the item
+        $other_count = $flag_count - 1;
+        $flagged_by_text = 'You and ' . $other_count . ' other ' . ($other_count > 1 ? 'people ' : 'person ');
+      }
+      else {
+        // The current user is the only person who has liked the item
+        $flagged_by_text = 'You ';
+      }
+    }
+    else {
+      $flagged_by_text = $flag_count . ($flag_count > 1 ? ' people ' : ' person ');
+    }
+    $flagged_by_text .= 'liked this';
+  }
+  return $flagged_by_text;
+}
 /**
  * Settings page
  */

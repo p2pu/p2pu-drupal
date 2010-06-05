@@ -43,6 +43,7 @@ function p2pu10_preprocess_comment(&$vars, $hook) {
   if ($vars['comment']->new) {
     $classes[] = 'comment-new';
   }
+  $classes[] = 'comment-' . $vars['comment']->cid;
   $classes[] = $vars['status'];
   $classes[] = $vars['zebra'];
   if ($vars['id'] == 1) {
@@ -316,5 +317,15 @@ function p2pu10_comment_submitted($comment) {
   $submitted .= "</div>\n";
   return $submitted;
 }
-
-// --------------------------------------------------------------- Views themeng
+/*
+ * Use this function to add variables to use with the flag module
+ */ 
+function phptemplate_preprocess_flag(&$vars) {
+  //dprint_r($vars);
+  $image_file = path_to_theme() . '/images/icons/flags/flag-' . $vars['flag']->name . '-' . ($vars['action'] == 'flag' ? 'off' : 'on') . '.png';
+  // Uncomment the following line when debugging.
+  //drupal_set_message("Flag is looking for '$image_file'...");
+  if (file_exists($image_file)) {
+    $vars['link_text'] = '<img src="' . base_path() . $image_file . '" />';
+  }
+}

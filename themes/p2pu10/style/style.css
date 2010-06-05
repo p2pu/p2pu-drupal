@@ -399,3 +399,8 @@ div#edit-shout-box-wrapper #edit-shout-box{ width: 263px;}
 
 div#page-footer div.block{ float: left; margin-right: 10px;}
 div#page-footer div.block:last{ float: right;}
+
+/* Flags */
+.node-forum .node-flags,
+#mini-panel-forum_post_and_comments .comment-flags{ display:block; margin-bottom:5px;	margin-left:110px;}
+.flagged-by-indication {font-size:0.9em;}

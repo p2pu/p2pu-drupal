@@ -343,6 +343,7 @@ div.grey-panel div.bl{ background-image: url('../images/grey-bl.png');}
 div.grey-panel div.br{ background-image: url('../images/grey-br.png');}
 div.grey-panel div.pane-content div.item-list ul{ margin: 0; padding: 0;}
 div.grey-panel div.pane-content div.item-list ul li{ border-top: 1px solid #777; list-style-type: none; list-style-image: none; margin: 0; padding: 5px 0 5px 20px;}
+div.grey-panel h3 {color: white;}
 
 /* Orange */
 div.orange-panel{ background: url('../images/orange-back.png'); color: #333;}

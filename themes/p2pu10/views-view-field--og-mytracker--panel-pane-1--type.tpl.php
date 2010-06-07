@@ -28,7 +28,7 @@
 		
  */
  $type_string = '';
- $created_text = t('created a new');
+ $created_text = t('edited');
   switch($row->node_type) {
 		case 'discussion':
 			$node_type_string = t('discussion topic');
@@ -38,7 +38,7 @@
 			break;	
 		case 'submission':
 			$node_type_string = t('assignment');
-			$created_text = t('submitted an');
+			//$created_text = t('submitted an');
 			break;
 		default:
 			$node_type_string = $output;

@@ -407,7 +407,7 @@ function p2pu_chat_page($node) {
   global $user;
   $irc_channel = 'p2pu-' .$node -> path;
   $nick = $user -> name;
-  return '<div id="chat_box" style="text-align:center;width:100%;"><iframe src="http://webchat.freenode.net?channels=' .$irc_channel .'&nick=' .$nick .'&uio=MTA9dHJ1ZQ49&prompt=1" width="860" height="400"></iframe></div>';
+  return '<div id="chat_box" style="text-align:center;width:100%;"><iframe src="http://webchat.freenode.net?channels=' .$irc_channel .'&nick=' .$nick .'&uio=MT1mYWxzZSYzPWZhbHNlJjk9dHJ1ZSYxMD10cnVl32&prompt=1" width="860" height="400"></iframe></div>';
 }
 
 function p2pu_keypage_redirect($node) {

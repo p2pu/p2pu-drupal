@@ -379,8 +379,54 @@ function p2pu_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  //Export Node tracker results in CSV format
+  $items['tracker_export/%node'] = array(
+    'title' => 'Data export',
+    'page callback' => 'p2pu_node_tracker',
+    'page arguments' => array(1),
+    'access callback' => 'user_access',
+    'access arguments' => array('access statistics'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 20,    
+  );
+
   return $items;
 }
+
+
+//Returns access statistics for node
+function p2pu_node_tracker() {  
+  //based on the statistics_node_tracker function in statistics.pages.inc (Statistcs Module)    
+  if ($node = node_load(arg(1))) {
+
+    $filename = $node -> path ."_" .date("d-m-Y") .".csv";
+    $header = array('Log ID','Time', 'Page Title', 'Path','Referrer','User ID', 'User Name');
+
+    $result = db_query("SELECT a.aid, from_unixtime(a.timestamp), a.title, a.path, a.url, a.uid, u.name FROM {accesslog} a LEFT JOIN {users} u ON a.uid = u.uid WHERE a.path = 'node/%d' OR a.path LIKE 'node/%d/%%' ORDER BY timestamp DESC LIMIT 2000", $node->nid, $node->nid);
+    p2pu_export_csv($header,$result, $filename);    
+    exit;
+  }
+  else {
+    drupal_not_found();
+  }
+}
+
+//Export a result set as a CSV file
+function p2pu_export_csv($header, $result,  $filename = 'tracker.csv'){
+  drupal_set_header('Content-Type: text/csv');
+  drupal_set_header('Content-Disposition: attachment; filename=' . $filename);
+    
+  print implode(',', $header) ."\r\n";
+
+  while($row = db_fetch_array($result)){
+    foreach($row as $value){
+      $values[] = '"' . str_replace('"', '""', decode_entities(strip_tags($value))) . '"';
+    }
+    print implode(',', $values) ."\r\n";
+    unset($values);
+  }
+}
+
 /*
  * Flag related function to be used via ajax
  * 

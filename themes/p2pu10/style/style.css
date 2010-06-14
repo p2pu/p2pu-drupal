@@ -173,8 +173,22 @@ div.node-teaser ul.links{ padding: 0 10px;}
 div.view-profile-info label{ display: block; float: left; width: 40%;}
 div.view-profile-info label.views-label-field-profile-url-url{ float: none; padding: 20px 0 10px 0;}
 div#content-column .view-og-mytracker .views-row{ background: #f4af59;}
+div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row a,
+div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row a{
+color: white;
+}
+div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row a:hover,
+div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row a:hover{
+color: #222;
+}
 div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row,
-div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row{ background: #f4af59; clear: both; clear:both; margin:6px 0; min-height:30px; border-style: solid none; border-width:1px; border-color:#FFD8A4;}
+div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row{	background: #f4af59; border-style: solid none; border-color:#F48B08;	border-style:none none solid;	border-width:1px;	clear:both;	min-height:35px; padding:7px 5px;}
+div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row-even,
+div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row-even{background: #f4a33d;}
+
+div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row-odd,
+div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row-odd{background: #d77a07;}
+	
 div#content-column .view-course-shouts table td { border-color: #f3f130; }
 div.views-table caption { font-family: georgia; font-size: 16px; }
 div.view-course-discussions div.views-row{ background: #F9F898;}

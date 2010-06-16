@@ -1,0 +1,49 @@
+--- messaging_phpmailer_original.module	2010-06-16 18:56:01.071701000 +0200
++++ messaging_phpmailer.module	2010-06-16 19:00:49.259201000 +0200
+@@ -72,6 +72,19 @@ function messaging_phpmailer_settings_fo
+     '#default_value' => variable_get('messaging_phpmailer_smtp_password', ''),
+     '#description'   => t('SMTP password.'),
+   );
++  $form['messaging_phpmailer_auth']['messaging_phpmailer_smtp_secure'] = array(
++    '#type'          => 'radios',
++    '#title'         => t('SMTP Security'),
++    '#options'       => array('' => t('None'), 'tls' => t('TLS'), 'ssl' => t('SSL')),
++    '#default_value' => variable_get('messaging_phpmailer_smtp_secure', ''),
++    '#description'   => t('What security, if any, to use for this SMTP connection.'),
++  );
++  $form['messaging_phpmailer_auth']['messaging_phpmailer_smtp_port'] = array(
++    '#type'          => 'textfield',
++    '#title'         => t('SMTP Port'),
++    '#default_value' => variable_get('messaging_phpmailer_smtp_port', 25),
++    '#description'   => t('What port to use for the connection.'),
++  );  
+   $form['messaging_phpmailer_attach'] = array(
+       '#title' => t('Include attachments'),
+       '#type' => 'checkbox',
+@@ -155,8 +168,11 @@ function messaging_phpmailer_drupal_mail
+   $mail->IsSMTP(); // telling the class to use SMTP
+   $mail->CharSet = 'utf-8';
+   $mail->ContentType = 'text/html';
+-  
+-    // Set the authentication settings.
++  if (variable_get('messaging_phpmailer_smtp_secure', '') != '') {
++    $mail->SMTPSecure = variable_get('messaging_phpmailer_smtp_secure', '');
++  }
++  $mail->Port = variable_get('messaging_phpmailer_smtp_port', 25);  
++  // Set the authentication settings.
+   $username = variable_get('messaging_phpmailer_smtp_username', '');
+   $password = variable_get('messaging_phpmailer_smtp_password', '');
+ 
+@@ -225,7 +241,11 @@ function messaging_phpmailer_drupal_mail
+     watchdog('messaging', 'PHPMailer debug message: '. $mail->Send() . ' - ' . $mail->ErrorInfo);    
+   }
+   else {
+-    return $mail->Send();
++    $result = $mail->Send();
++    if (!$result) {
++    watchdog('messaging', 'PHPMailer exception: !details', array('!details' => $mail->ErrorInfo), WATCHDOG_ERROR);
++    }
++    return $result;
+   }
+ }
+ 

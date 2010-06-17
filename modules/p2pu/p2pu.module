@@ -63,6 +63,7 @@ function p2pu_block($op = 'list', $delta = 0, $edit = array()) {
       $blocks[2]['info'] = t('P2PU custom forum post node page with comments');
       $blocks[2]['cache'] = BLOCK_NO_CACHE; 
       $blocks[3]['info'] = t('P2PU custom forum RSS icon block');
+      $blocks[4]['info'] = t('P2PU custom course admin signups toggle block');
       return $blocks;
     case 'view':
    $block = array();
@@ -137,6 +138,22 @@ function p2pu_block($op = 'list', $delta = 0, $edit = array()) {
           $block['content'] = theme_feed_icon($feed_path, $title);
           $block['content'] .= "<span id='discussion-feed-icon-text'>$rss_link</span>";
         }
+        else
+          return FALSE;
+        return $block;
+      case 4:
+      // Display the course open/close signups link to course admins
+        $group = og_get_group_context();
+        if ($group->type == 'course' && og_is_group_admin($group)) {
+          if ($group->og_selective != OG_CLOSED) {
+            $text = 'Close Applications';
+          } else {
+            $text = 'Re-open Applications';
+          }
+          $link = l($text, "toggle-signup/".$group->nid);
+          $block['subject'] = '';
+          $block['content'] = $link;
+        }          
         else
           return FALSE;
         return $block;

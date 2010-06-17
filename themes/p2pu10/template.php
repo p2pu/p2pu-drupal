@@ -156,54 +156,53 @@ function p2pu10_form_element($element, $value) {
 
 // ---------------------------------------------------------- Graphical themeing
 
-
-
 function p2pu10_logo(){
   $url = theme_get_setting('logo');
   $title = t('Home');
-  return module_exists('page_elements')
-    ? theme('graphical_logo', $url, $title)
-    : '<a href="/" title="'.$title.'">'.
-        '<img src="'.$url.'" alt="'.$title.'"/>'.
-      '</a>';
+  return '<a href="/" title="'.$title.'"><img src="'.$url.'" alt="'.$title.'"/></a>';
 }
 
 function p2pu10_primary_links(){
   $primary_links = menu_primary_links();
-  return module_exists('page_elements')
-    ? theme('graphical_main_navigation', $primary_links, 'primary')
-    : theme_links($primary_links);
+  return theme_links($primary_links);
 }
 
 function p2pu10_secondary_links(){
   $secondary_links = menu_secondary_links();
-  return module_exists('page_elements')
-    ? theme('graphical_main_navigation', $secondary_links, 'secondary')
-    : theme_links($secondary_links);
+  return theme_links($secondary_links);
 }
 
 function p2pu10_page_title($title){
-  return module_exists('page_elements')
-    ? theme('graphical_page_title', $title)
-    : '<h1 class="title">'.$title.'</h1>';
+  return '<h1 class="title">'.$title.'</h1>';
 }
 
 function p2pu10_block_title($title){
-  return module_exists('page_elements')
-    ? theme('graphical_block_title', $title)
-    : '<h2 class="title">'.$title.'</h2>';
-}
-
-function p2pu10_menu_local_tasks(){
-  return module_exists('page_elements')
-    ? theme('graphical_menu_local_tasks')
-    : theme_menu_local_tasks();
+  return '<h2 class="title">'.$title.'</h2>';
 }
 
 function p2pu10_button($element){
-  return module_exists('page_elements')
-    ? theme('graphical_button', $element)
-    : theme_button($element);
+  return theme_button($element);
+}
+/**
+ * Implementation of hook_menu_local_tasks
+ * 
+ */
+function p2pu10_menu_local_tasks(){
+  // We change the node "View" link title to "Course Home" for all course nodes
+  $output = '';
+  if ($primary = menu_primary_local_tasks()) {
+    if (arg(0) == 'node' && is_numeric(arg(1))) {
+      $node = node_load(arg(1));
+      if ($node->type == 'course') {
+        $primary = str_replace(t('View'), t('Course Home'), $primary);
+      }
+    }    
+    $output .= "<ul class=\"tabs primary\">\n". $primary ."</ul>\n";
+  }
+  if ($secondary = menu_secondary_local_tasks()) {
+    $output .= "<ul class=\"tabs secondary\">\n". $secondary ."</ul>\n";
+  }
+  return $output;
 }
 
 function p2pu10_menu_item_link($link) {

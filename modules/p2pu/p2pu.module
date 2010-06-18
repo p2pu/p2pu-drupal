@@ -419,7 +419,7 @@ function p2pu_node_tracker() {
     $filename = $node -> path ."_" .date("d-m-Y") .".csv";
     $header = array('Log ID','Time', 'Page Title', 'Path','Referrer','User ID', 'User Name');
 
-    $result = db_query("SELECT a.aid, from_unixtime(a.timestamp), a.title, a.path, a.url, a.uid, u.name FROM {accesslog} a LEFT JOIN {users} u ON a.uid = u.uid WHERE a.path = 'node/%d' OR a.path LIKE 'node/%d/%%' ORDER BY timestamp DESC LIMIT 2000", $node->nid, $node->nid);
+    $result = db_query("SELECT a.aid, from_unixtime(a.timestamp), a.title, a.path, a.url, a.uid, u.name FROM {accesslog} a LEFT JOIN {users} u ON a.uid = u.uid WHERE a.path = 'node/%d' OR a.path LIKE 'node/%d/%%' ORDER BY timestamp DESC LIMIT 50000", $node->nid, $node->nid);
     p2pu_export_csv($header,$result, $filename);    
     exit;
   }

@@ -173,19 +173,25 @@ div.node-teaser ul.links{ padding: 0 10px;}
 div.view-profile-info label{ display: block; float: left; width: 40%;}
 div.view-profile-info label.views-label-field-profile-url-url{ float: none; padding: 20px 0 10px 0;}
 div#content-column .view-og-mytracker .views-row{ background: #f4af59;}
+div#content-column .view-activity-atrium.view-display-id-panel_pane_2 .views-row a,
+div#content-column .view-activity-atrium.view-display-id-panel_pane_1 .views-row a,
 div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row a,
 div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row a{
 color: white;
 }
+div#content-column .view-activity-atrium.view-display-id-panel_pane_2 .views-row a:hover,
+div#content-column .view-activity-atrium.view-display-id-panel_pane_1 .views-row a:hover,
 div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row a:hover,
 div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row a:hover{
 color: #222;
 }
+div#content-column .view-activity-atrium .views-row,
 div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row,
 div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row{	background: #f4af59; border-style: solid none; border-color:#F48B08;	border-style:none none solid;	border-width:1px;	clear:both;	min-height:35px; padding:7px 5px;}
 div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row-even,
 div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row-even{background: #f4a33d;}
 
+div#content-column .view-activity-atrium .views-row-odd,
 div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row-odd,
 div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row-odd{background: #d77a07;}
 	
@@ -419,3 +425,9 @@ div#page-footer div.block:last{ float: right;}
 .node-forum .node-flags,
 #mini-panel-forum_post_and_comments .comment-flags{ display:block; margin-bottom:5px;	margin-left:110px;}
 .flagged-by-indication {font-size:0.9em;}
+
+/* Creative Commons */
+#creative-commons {text-align: center; width: 100%; margin-top: 10px;}
+#cc-text {font-size: 0.9em; margin-top:3px;}
+#creative-commons a{color: #000; text-decoration: underline;}
+#creative-commons a:hover{ color: #FFF;}

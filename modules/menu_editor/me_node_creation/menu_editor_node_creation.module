@@ -1,0 +1,160 @@
+<?php
+
+
+function menu_editor_node_creation_perm() {
+  return array('see menu_editor placeholder pages');
+}
+
+function menu_editor_node_creation_menu() {
+  $items = array();
+  $items['node/add/%menu_editor_node_type/mlid/%menu_editor_mlid'] = array(
+    'title' => 'Create a node',
+    'page callback' => 'menu_editor_node_creation_create_node',
+    'page arguments' => array(2, 4),
+    'file' => 'menu_editor_node_creation.inc',
+    'access callback' => 'menu_editor_node_creation_create_node_access',
+    'access arguments' => array(2),
+  );
+  $items['mlid/%menu_editor_menu_link/under-construction'] = array(
+    'load arguments' => array('%map', '%index'),
+    'title' => 'Under Construction',
+    'title callback' => 'menu_editor_under_construction_title',
+    'title arguments' => array(1),
+    'page callback' => 'menu_editor_under_construction',
+    'page arguments' => array(1),
+    'file' => 'menu_editor_node_creation.inc',
+    'access arguments' => array('see menu_editor placeholder pages'),
+    'weight' => 0,
+  );
+  
+  return $items;
+}
+
+
+/**
+ * Title callback for menu links or tabs.
+ * The page title can be different!
+ * 
+ * @param $item
+ */
+function menu_editor_under_construction_title($item) {
+  // _menu_link_translate($item);
+  return $item['link_title'];
+}
+
+
+function menu_editor_under_construction($item) {
+  drupal_set_title("$item[link_title] - Under Construction");
+  $html = '';
+  foreach (node_get_types() as $type_name => $type_info) {
+    if (menu_editor_node_creation_create_node_access($type_name)) {
+      $link_html = l($type_info->name, "node/add/$type_name/mlid/$item[mlid]");
+      $html .= "<li>$link_html</li>";
+    }
+  }
+  // TODO: Provide themeable output, or find another solution.
+  $txt = t('We are working on it.');
+  if ($html) {
+    $txt_admin = t("Replace this placeholder link with real content:");
+    return <<<EOT
+      <p>$txt</p>
+      <p>$txt_admin</p>
+      <ul>$html</ul>
+EOT;
+  } else {
+    return <<<EOT
+      <p>$txt</p>
+EOT;
+  }
+}
+
+
+/**
+ * Title for menu links or tabs.
+ * The page title can be different!
+ * 
+ * @param $type
+ * @param $item
+ */
+function menu_editor_node_creation_title($type_arg, $item) {
+  foreach (node_get_types() as $type_name => $type_object) {
+    if ($type_name == $type_arg) {
+      return "New $type_object->name";
+    }
+  }
+  return $type->name;
+}
+
+
+function menu_editor_node_type_load($type_arg) {
+  $type_arg = strtr($type_arg, array('-' => '_'));
+  foreach (node_get_types() as $type_name => $type_object) {
+    if ($type_name == $type_arg) {
+      return $type_name;
+    }
+  }
+  return false;
+}
+
+
+function menu_editor_menu_link_load($mlid, $map, $index) {
+  if (!is_numeric($mlid) || $mlid <= 0) {
+    return false;
+  }
+  $sql = "
+    SELECT m.*, ml.*
+    FROM {menu_links} ml
+    LEFT JOIN {menu_router} m ON m.path = ml.router_path
+    WHERE ml.mlid = %d
+  ";
+  if ($q = db_query($sql, $mlid)) {
+    $item = db_fetch_array($q);
+    $item_path_prefix = implode('/', explode('/', $item['link_path'], $index+1));
+    $path_prefix = implode('/', array_slice($map, 0, $index+1));
+    if ($item_path_prefix != $path_prefix) {
+      // we have to allow this, because otherwise saving doesn't work!!
+      // return false;
+    }
+    // _menu_link_translate($item);
+    return $item;
+  }
+  return false;
+}
+
+
+function menu_editor_mlid_load($mlid) {
+  if ($type_arg == 'auto') {
+    return 1;
+  } 
+  if ((int)$mlid == $mlid && $mlid > 0) {
+    return $mlid;
+  }
+  return false;
+}
+
+
+function menu_editor_node_creation_create_node_access($type) {
+  return node_access('create', $type);
+}
+
+
+function menu_editor_node_creation_menu_editor_placeholders() {
+  $placeholders = array(
+    '<new>' => 'mlid/%mlid/under-construction',
+    '<new page>' => NULL
+  );
+  foreach (node_get_types() as $type_name => $type_info) {
+    $placeholders["<new $type_name>"] = "node/add/$type_name/mlid/%mlid";
+  }
+  // we want that <new page> is first, if this content type exists.
+  // if not, we remove this placeholder.
+  if (!isset($placeholders['<new page>'])) {
+    unset($placeholders['<new page>']);
+  }
+  return $placeholders;
+}
+
+
+
+require_once drupal_get_path('module', 'menu_editor_node_creation') . '/menu_editor_node_creation.inc';
+

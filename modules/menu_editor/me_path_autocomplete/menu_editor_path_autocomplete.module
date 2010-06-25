@@ -1,0 +1,82 @@
+<?php
+
+/**
+ * @file
+ * Find node paths on menu item creation via autocomplete.
+ * 
+ * This is a shameless clone of
+ * http://drupal.org/project/mpac
+ * by stBorchert
+ */
+
+/**
+ * Implement hook_menu().
+ *
+ * @return An array of menu items.
+ */
+function menu_editor_path_autocomplete_menu() {
+  $items = array();
+
+  $items['mepac/autocomplete'] = array(
+    'title' => 'Menu path autocomplete',
+    'description' => 'Autocomplete callback for menu path autocomplete',
+    'page callback' => 'menu_editor_path_autocomplete',
+    'access callback' => 'user_access',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Find nodes and URL aliases based on title.
+ * @param $string
+ *   Title of element to find.
+ * @return
+ *   List of elements with path as key.
+ */
+function menu_editor_path_autocomplete($string) {
+  $string = strtolower($string);
+  $title = filter_xss_admin($string);
+  $matches = array($string => $string);
+
+  foreach (module_invoke_all('menu_editor_placeholders') as $placeholder_code => $placeholder_path) {
+    if (!strlen($string) || count(explode($string, $placeholder_code)) > 1) {
+      $matches[$placeholder_code] = htmlentities($placeholder_code);
+    }
+  }
+  
+  // Get a list of all nodes where the title matches the given string.
+  $query = db_query("SELECT * FROM {node} n WHERE n.title LIKE '%%%s%%'", $title);
+  while ($node = db_fetch_object($query)) {
+    // Add node path and title to list.
+    if (node_access('view', $node) && $node->status) {
+      $matches['node/'. $node->nid] = check_plain($node->title);
+    }
+  }
+  
+  if (module_exists('path')) {
+    // Get a list of all URL aliases where the destination matches the given
+    // string.
+    $query = db_query("SELECT * FROM {url_alias} WHERE dst LIKE '%%%s%%'", $title);
+    while ($alias = db_fetch_object($query)) {
+      // Add alias source and destination to list (and add a special marker to
+      // the item).
+      $matches[$alias->src] = check_plain($alias->dst) . t('*');
+    }
+  }
+  drupal_json($matches);
+}
+
+/**
+ * Implement hook_form_FORM_ID_alter().
+ *
+ * Change path field to autocomplete field.
+ */
+function menu_editor_path_autocomplete_form_menu_editor_overview_form_alter(&$form, &$form_state) {
+  foreach (element_children($form) as $element_key) {
+    $form[$element_key]['link_path']['#autocomplete_path'] = 'mepac/autocomplete';
+  }
+}
+

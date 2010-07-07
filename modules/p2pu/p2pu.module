@@ -1261,3 +1261,15 @@ function p2pu_delete_incorrect_report_cards() {
     node_delete($row['nid']);
   }
 }
+
+/* COPY OF the ATRIUM ACTIVITY VIEWS STUFF */
+/**
+ * Implementation of hook_views_api().
+ * This is required for our module to have its include files loaded
+ */
+function p2pu_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'p2pu') .'/includes',
+  );
+}

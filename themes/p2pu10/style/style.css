@@ -205,6 +205,7 @@ div.view-course-list .views-field-subscribe a{ text-decoration: none; font-weigh
 body.page-course div.view-course-list .views-field-subscribe a{ color: #333; text-decoration: none;font-style: italic;}
 div.view-course-list .views-field-subscribe a:hover{ color: #333;}
 div.view-og-mytracker p{ margin: 5px 0;}
+.views-field-p2pu-activity .picture,
 div.view-og-mytracker.view-display-id-panel_pane_1 .picture,
 div.view-dashboard-mytracker.view-display-id-page_1 .picture {float:left; padding-right: 2px;}
 body.page-course div.view-course-list a{ color: #fff; text-decoration: underline;}

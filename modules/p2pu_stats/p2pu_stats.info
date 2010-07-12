@@ -1,0 +1,5 @@
+; $Id$
+name = "P2PU Stats"
+description = "P2P University module, contains functionality to extend the statistics capturing"
+core = 6.x
+package = P2PU

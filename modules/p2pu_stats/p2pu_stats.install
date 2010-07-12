@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * @file
+ *   Install file for P2PU statistics module
+ *
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function p2pu_stats_install() {
+  variable_set('p2pu_stats_last_run', 0);
+  drupal_install_schema('p2pu_stats');
+  drupal_set_message(t('P2PU statistics module installed',array()));
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function p2pu_stats_uninstall() {
+  variable_del('p2pu_stats_last_run');
+  drupal_uninstall_schema('p2pu_stats');
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function p2pu_stats_schema() {
+  
+  $schema['p2pu_stats_accesslog'] = array(
+    'description' => 'Stores site access information for statistics.',
+    'fields' => array(
+      'rid' => array('type' => 'serial','not null' => TRUE,),
+      'aid' => array('type' => 'int','not null' => TRUE,),
+      'sid' => array('type' => 'varchar','length' => 64,'not null' => TRUE,'default' => '','description' => 'Browser session ID of user that visited page.',),
+      'title' => array('type' => 'varchar','length' => 255,'not null' => FALSE,'description' => 'Title of page visited.',),
+      'path' => array('type' => 'varchar','length' => 255,'not null' => FALSE,'description' => 'Internal path to page visited (relative to Drupal root.)',),
+      'url' => array('type' => 'varchar','length' => 255,'not null' => FALSE,'description' => 'Referrer URI.',),
+      'hostname' => array('type' => 'varchar','length' => 128,'not null' => FALSE,'description' => 'Hostname of user that visited the page.',),
+      'uid' => array('type' => 'int','unsigned' => TRUE,'not null' => FALSE,'default' => 0,'description' => 'User {users}.uid that visited the page.',),
+      'timer' => array('type' => 'int','unsigned' => TRUE,'not null' => TRUE,'default' => 0,'description' => 'Time in milliseconds that the page took to load.',),
+      'timestamp' => array('type' => 'int','unsigned' => TRUE,'not null' => TRUE,'default' => 0,'description' => 'Timestamp of when the page was visited.',),
+      'action' => array('type' => 'varchar','length' => 255,'not null' => TRUE,'default' => '','description' => 'Action performed by user.',),
+      'course_id' => array('type' => 'int','not null' => FALSE,'description' => 'The course related to this entry',),            
+    ),
+    'indexes' => array(
+      'timestamp' => array('timestamp'),
+      'course_id' => array('course_id'),
+    ),
+    'primary key' => array('rid'),
+  );
+
+  return $schema;
+}
+
+
+
+
+
+

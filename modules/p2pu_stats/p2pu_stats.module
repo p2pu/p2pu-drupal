@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * Implementation of hook_cron().
+ */
+function p2pu_stats_cron() {
+  
+  //This function creates another version of the accesslog table
+  //which can be manipulated to add other information
+  
+  $reports_update_interval = 1800; //update the stats once every 30 minutes
+  
+  $last_run = variable_get('p2pu_stats_last_run', 0);
+  //$last_run = 0; //used to force the report to update from the beginning
+  if ((time() - $last_run) > $reports_update_interval){
+    
+    //we need to update our custom access log table with the recent access log entries  
+    //first, get the latest date
+    $last_time = db_result(db_query("SELECT MAX(timestamp) FROM {p2pu_stats_accesslog}"));
+    
+    if (!$last_time  > 0) {$last_time  = 0;}
+    
+    //currently the only anonymizing done is to remove the first 4 characters from the IP address
+    //this may be extended later
+    $sql = "INSERT INTO {p2pu_stats_accesslog} (aid, sid, title, path, url, hostname, uid, timer, timestamp) ";
+    $sql .= " SELECT aid, sid, title, path, url, SUBSTRING(hostname,4), uid, timer, timestamp FROM {accesslog} WHERE timestamp > %d ";
+    $sql .= " AND NOT(path LIKE 'admin%') ";
+    $sql .= "ORDER BY timestamp ASC";
+    db_query($sql,$last_time);  
+  
+    // we always store last run
+    variable_set('p2pu_stats_last_run', mktime());
+    watchdog('p2pu_stats', 'Archive accesslog table updated');
+  }
+  
+}

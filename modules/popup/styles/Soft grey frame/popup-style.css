@@ -1,0 +1,81 @@
+@charset "UTF-8";
+
+
+
+/* ---- Title ---- */
+
+a.popup-title{ color: #aaa; background: url('images/title-back.png') repeat-x left top; display: inline-block; height: 18px; margin: 0 8px; white-space: nowrap;}
+a.popup-title span.wrapper{ background: url('images/title-left.png') no-repeat left top; display: inline-block; height: 18px; margin: 0 -8px; padding-left: 8px;}
+a.popup-title span.wrapper span{ background: url('images/title-right.png') no-repeat right top; display: inline-block; height: 18px; padding-right: 20px;}
+
+a.popup-title:hover{ color: #000; background-position: left -20px;}
+a.popup-title:hover span.wrapper{ background-position: left -20px;}
+a.popup-title:hover span.wrapper span{ background-position: right -20px;}
+
+div.popup-title-container a.popped-up-title{ color: #000; background-position: left -40px}
+div.popup-title-container a.popped-up-title span.wrapper{ background-position: left -40px;}
+div.popup-title-container a.popped-up-title span.wrapper span{ background-position: right -40px;}
+
+/* ---- Body ---- */
+
+div.popup-body div.popup-body-t{ background: url('images/body-top.png') repeat-x top; height: 8px; line-height: 0; font-size: 0; margin: 0 8px;}
+div.popup-body div.popup-body-tl{ background: url('images/body-tl.png') no-repeat left top;}
+div.popup-body div.popup-body-tr{ background: url('images/body-tr.png') no-repeat right top;}
+div.popup-body div.popup-body-l{ background: url('images/body-left.png') repeat-y left;}
+div.popup-body div.popup-body-r{ background: url('images/body-right.png') repeat-y right;}
+div.popup-body div.popup-body-b{ background: url('images/body-bottom.png') repeat-x bottom; height: 8px; line-height: 0; font-size: 0; margin: 0 8px;}
+div.popup-body div.popup-body-bl{ background: url('images/body-bl.png') no-repeat left bottom;}
+div.popup-body div.popup-body-br{ background: url('images/body-br.png') no-repeat right bottom;}
+div.popup-body div.popup-body-inner{ color: #ddd; background: url('images/body-back.png'); margin: 0px 8px; padding: 0 4px; white-space: nowrap;}
+
+/* ---- Menu ---- */
+
+a.popup-menu-title{ color: #aaa;}
+a.popup-menu-title:hover{ color: #fff;}
+div.popup-menu-element div.popup-title-container a.popped-up-title{ color: #fff;}
+
+div.popup-menu-block-element{ display: block; float: left; clear: right;}
+a.popup-menu-block-title{ background-position: left -180px; }
+a.popup-menu-block-title span.wrapper{ background-position: left -180px; }
+a.popup-menu-block-title span.wrapper span{ background-position: right -180px; }
+a.popup-menu-block-title:hover{ background-position: left -200px; }
+a.popup-menu-block-title:hover span.wrapper{ background-position: left -200px; }
+a.popup-menu-block-title:hover span.wrapper span{ background-position: right -200px; }
+div.popup-menu-block-title-container a.popped-up-title{ background-position: left -220px; }
+div.popup-menu-block-title-container a.popped-up-title span.wrapper{ background-position: left -220px; }
+div.popup-menu-block-title-container a.popped-up-title span.wrapper span{ background-position: right -220px; }
+
+/* -- Inline -- */
+
+div.popup-menu-inline-element,
+div.popup-menu-inline-title-container{ display: inline;}
+div.popup-menu-inline-origin{ bottom: 0; left: 0; right: auto; top: auto;}
+a.popup-menu-inline-title{ background-position: left -60px; }
+a.popup-menu-inline-title span.wrapper { background-position: left -60px; }
+a.popup-menu-inline-title span.wrapper span{ background-position: right -60px; }
+a.popup-menu-inline-title:hover{ background-position: left -80px; }
+a.popup-menu-inline-title:hover span.wrapper{ background-position: left -80px; }
+a.popup-menu-inline-title:hover span.wrapper span{ background-position: right -80px; }
+div.popup-menu-inline-title-container a.popped-up-title{ background-position: left -100px; }
+div.popup-menu-inline-title-container a.popped-up-title span.wrapper{ background-position: left -100px; }
+div.popup-menu-inline-title-container a.popped-up-title span.wrapper span{ background-position: right -100px; }
+
+/* -- Flat --*/
+
+div.popup-menu-flat-element{ display: inline-block;}
+
+div.popup-menu-body a.popup-title{ background: none;}
+div.popup-menu-body a.popup-title span.wrapper{ background: none;}
+div.popup-menu-body a.popup-menu-leaf-title span.wrapper span{ background: none;}
+div.popup-menu-body a.popup-menu-parent-title span.wrapper span{ background-position: right -240px;}
+
+div.popup-menu-body a.popup-menu-parent-title:hover span.wrapper span{ background-position: right -260px;}
+div.popup-menu-body div.popup-menu-parent-title-container a.popped-up-title span.wrapper span{ background-position: right -280px;}
+
+div.popup-menu-flat-body div.popup-body-tl{ background: url('images/top-body-tl.png') no-repeat left top;}
+
+/* -- Inline flat -- */
+
+div.popup-menu-flat-body-wrapper div.popup-menu-inline-title-container a span.wrapper span{ background-position: right -120px;}
+div.popup-menu-flat-body-wrapper div.popup-menu-inline-title-container a:hover span.wrapper span{ background-position: right -140px;}
+div.popup-menu-flat-body-wrapper div.popup-menu-inline-title-container a.popped-up-title span.wrapper span{ background-position: right -160px;}

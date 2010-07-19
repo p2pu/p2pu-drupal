@@ -1,0 +1,150 @@
+<?php
+// $Id:
+
+
+
+/* ---- Hook implementation ---- */
+
+
+
+/**
+ * Implementation of hook_block
+ */
+function popup_menu_block($op = 'list', $delta = 0, $edit = array()){
+
+  switch($op){
+
+    case 'list': return popup_menu_list();
+
+    case 'configure': return popup_menu_block_form($delta);
+
+    case 'save': popup_menu_block_form_save($delta, $edit); break;
+
+    case 'view': return popup_menu_view($delta);
+
+  }
+
+}
+
+
+
+/* ---- List & View ---- */
+
+
+
+function popup_menu_list(){
+
+  $menus = menu_get_menus();
+  $menu_blocks = array();
+
+  foreach($menus as $id => $menu){
+    $menu_blocks[$id]['info'] = 'Popup menu: '.$menu;
+  }
+  return $menu_blocks;
+}
+
+
+
+function popup_menu_view($delta){
+
+  module_load_include('inc', 'popup', 'processing');
+
+  $settings = _popup_menu_settings();
+  $settings = $settings[$delta]
+    ? $settings[$delta]
+    : _popup_menu_default_settings();
+
+  $formats = _popup_ui_formatter_settings();
+  $attributes = $settings['display-format'] != 'Default'
+    ? $formats[$settings['display-format']]
+    : array();
+
+  $attributes['menu'] = $delta;
+
+  return array(
+    'content' => _popup_menu($attributes)
+  );
+}
+
+
+
+/* ---- Forms ---- */
+
+
+
+function popup_menu_block_form($delta){
+
+  $settings = _popup_menu_settings();
+
+  $settings = $settings[$delta]
+    ? $settings[$delta]
+    : _popup_menu_default_settings();
+
+  $format_options = array_keys(_popup_ui_formatter_settings());
+  array_unshift($format_options, 'Default');
+  $display_format_options = array_combine($format_options, $format_options);
+
+  return array(
+
+    'display-format' => array(
+      '#default_value' => $settings['display-format'],
+      '#title' => 'Display format',
+      '#type' => 'select',
+      '#options' => $display_format_options,
+      '#description' => t('Select the format in which to display popups. You may manage popup formats !here.', array('!here' => l('here', 'admin/settings/popup/formats'))),
+      '#weight' => -2,
+    ),
+
+  );
+
+}
+
+
+
+function popup_menu_block_form_save($delta, $edit){
+
+  $settings = _popup_menu_settings();
+
+  $settings[$delta] = array(
+    'display-format' => $edit['display-format'],
+  );
+
+  _popup_menu_settings($settings);
+
+}
+
+
+
+/* ---- Settings ---- */
+
+
+
+function _popup_menu_settings($new_settings = FALSE){
+
+  static $settings = FALSE;
+  if ($new_settings){
+    $settings = $new_settings;
+    variable_set('popup-menu-settings', $settings);
+  }
+
+  if (!$settings){
+    $settings =  variable_get('popup-menu-settings', array());
+  }
+
+  return $settings;
+}
+
+
+
+function _popup_menu_default_settings(){
+
+  $format_options = _popup_ui_formatter_settings();
+
+  return array(
+    'display-format' => $format_options['Popup menu'] ? 'Popup menu' : 'Default',
+  );
+
+}
+
+
+

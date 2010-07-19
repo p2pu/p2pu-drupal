@@ -1,0 +1,12 @@
+name = Popup Filter
+description = Embed popup text, nodes, views, menus and php generated content within filterable content
+package = User interface
+version = "6.x-3.1"
+core = 6.x
+dependencies[] = popup
+; Information added by drupal.org packaging script on 2010-06-30
+version = "6.x-3.1"
+core = "6.x"
+project = "popup"
+datestamp = "1277928019"
+

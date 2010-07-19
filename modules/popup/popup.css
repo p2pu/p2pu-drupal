@@ -1,0 +1,61 @@
+@charset "UTF-8";
+
+
+
+/* ---- All ---- */
+
+/* Element */
+
+div.popup-element{ display: inline-block; position: relative;}
+
+/* Title container */
+
+div.title-container{ display: inline;}
+
+/* Title */
+
+a.popup-title{ cursor: default;}
+a.popup-link-title{ cursor: pointer;}
+a.popup-title,
+a.popup-title:hover{ text-decoration: none; width: auto;}
+
+/* Origin */
+
+div.popup-origin{ clear: both; position: absolute; width: 0;}
+div.popup-top-left-origin{ left: 0; top: 0;}
+div.popup-top-right-origin{ right: 0; top: 0;}
+div.popup-bottom-left-origin{ left: 0; bottom: 0;}
+div.popup-bottom-right-origin{ right: 0; bottom: 0;}
+
+/* Expand */
+
+div.popup-expand{ position: absolute;}
+div.popup-top-left-expand{ bottom: 0; right: 0;}
+div.popup-top-right-expand{ bottom: 0; left: 0;}
+div.popup-bottom-right-expand{ top: 0; left: 0;}
+div.popup-bottom-left-expand{ top: 0; right: 0;}
+
+/* Body */
+
+div.popup-body{ display: none;}
+div.popup-menu-flat-body{ display: block;}
+a.popup-generated-close-button{ font-size: 70%; position: absolute; right: 2px; top: 2px;}
+a.popup-generated-close-button span{ padding-right: 5px;}
+a.popup-generated-close-button:hover{ text-decoration: none;}
+
+/* ---- Menu ---- */
+
+/* Element */
+
+div.popup-menu-element{ display: block;}
+div.popup-menu-element-inline{ display: inline;}
+div.popup-menu-flat-container div.popup-menu-element-inline{ float: left;}
+
+/* Title */
+
+a.popup-menu-leaf-title{ cursor: pointer;}
+a.popup-menu-leaf-title span{ background: none;}
+
+/* Origin */
+
+div.popup-origin-inline{ bottom: 0; left: 0; right: auto; top: auto;}

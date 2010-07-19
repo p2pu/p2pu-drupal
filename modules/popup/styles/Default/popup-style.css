@@ -1,0 +1,43 @@
+@charset "UTF-8";
+
+
+
+/* ---- Title ---- */
+
+a.popup-title span{ background: url('images/popup-icon.png') no-repeat right 2px; padding-right: 12px;}
+
+/* -- Block Menu -- */
+
+a.popup-menu-title{ background: none; border: 1px #999; border-style: none solid; display: block; height: 20px;}
+a.popup-menu-title:hover{ background-color: #999;}
+a.popup-menu-title span{ background: none; padding: 1px 5px; display: block; margin: 0; padding: 0 5px;}
+a.popup-menu-first-title{ border-top: 1px solid #999;}
+a.popup-menu-last-title{ border-bottom: 1px solid #999;}
+a.popup-menu-parent-title{ padding-right: 5px;}
+a.popup-menu-parent-title span{ background: url('images/popup-menu-parent.png') no-repeat 150px 5px; display: block;}
+a.popup-menu-parent-title:hover span{ background-position: 150px -14px;}
+
+/* -- Inline Menu -- */
+
+a.popup-menu-inline-title{ float: left; border-style: solid none;}
+div.popup-menu-inline-title-container{ float: left;}
+div.popup-menu-inline-title-container a.popup-menu-first-title{ border-left: 1px solid #999;}
+div.popup-menu-inline-title-container a.popup-menu-last-title{ border-right: 1px solid #999;}
+div.popup-menu-inline-title-container a.popup-menu-parent-title span{ background-image: url('images/popup-menu-inline-parent.png'); background-position: right 5px; padding-right: 12px;}
+div.popup-menu-inline-title-container a.popup-menu-parent-title:hover span{ background-position: right -14px;}
+
+/* ---- Origin ---- */
+
+div.popup-menu-inline-origin{ bottom: 0; left: 0; right: auto; top: auto;}
+
+/* ---- Body ---- */
+
+div.popup-body{ background: #fff; border: 1px solid #999; padding: 5px 10px;}
+div.popup-menu-body{ border: 0; padding: 0;}
+
+/* ---- Element ---- */
+
+body div.popup-menu-element{ display: block; width: 165px;}
+body div.popup-menu-inline-element{ float: left; width: auto;}
+
+

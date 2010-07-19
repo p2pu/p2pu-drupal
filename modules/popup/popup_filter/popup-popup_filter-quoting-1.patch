@@ -1,0 +1,20 @@
+--- popup_filter/popup_filter.install	2010-05-31 03:28:03.000000000 -0700
++++ popup_filter/popup_filter.install	(working copy)
+@@ -5,7 +5,7 @@ function popup_filter_install() {
+ 
+   db_query("INSERT INTO {filter_formats}(name) VALUES('Popup filter')");
+   $filter = db_result(db_query("SELECT format FROM {filter_formats} WHERE name='Popup filter'"));
+-  db_query('INSERT INTO {filters}(format, module) VALUES(%d, "popup_filter")', $filter);
++  db_query("INSERT INTO {filters}(format, module) VALUES(%d, 'popup_filter')", $filter);
+ 
+ }
+ 
+@@ -13,5 +13,5 @@ function popup_filter_install() {
+ 
+ function popup_filter_uninstall() {
+   db_query("DELETE FROM {filter_formats} WHERE name='Popup filter'");
+-  db_query('DELETE FROM {filters} WHERE module="popup_filter"', $filter);
+-}
+\ No newline at end of file
++  db_query("DELETE FROM {filters} WHERE module='popup_filter'", $filter);
++}

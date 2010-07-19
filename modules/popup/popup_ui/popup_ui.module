@@ -1,0 +1,613 @@
+<?php
+// $Id:
+
+
+
+/* ----- Hook implementation ---- */
+
+
+
+/**
+ * Implementation of hook_enable
+ */
+function popup_ui_enable(){
+  _popup_ui_flush_all();
+}
+
+
+
+/**
+ * Implementation of hook_menu
+ */
+function popup_ui_menu(){
+
+  return array(
+   
+    'admin/settings/popup/settings' => array(
+      'access arguments' => array('administer popup elements'),
+      'title' => 'Settings',
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'weight' => -1,
+    ),
+
+    'admin/settings/popup/formats' => array(
+      'access arguments' => array('administer popup elements'),
+      'description' => 'Manage popup formats available to Views and CCK',
+      'page arguments' => array('popup_ui_form_formatters'),
+      'page callback' => 'drupal_get_form',
+      'title' => 'Popup formats',
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 1,
+    ),
+
+    'admin/settings/popup/formats/delete' => array(
+      'page callback' => 'popup_ui_delete_format',
+      'access arguments' => array('administer popup elements'),
+      'type' => MENU_CALLBACK,
+    ),
+
+    'admin/settings/popup/formats/reset' => array(
+      'page callback' => 'popup_ui_reset',
+      'access arguments' => array('administer popup elements'),
+      'type' => MENU_CALLBACK,
+    ),
+
+  );
+
+}
+
+
+
+/**
+ * Implementation of hook_field_formatter_info
+ */
+function popup_ui_field_formatter_info() {
+
+  $formatter_info = array();
+  $formatters = _popup_ui_formatter_settings();
+
+  foreach($formatters as $label => $formatter){
+
+    $formatter_info[str_replace(' ', '_', $label)] = array(
+      'label' => $label,
+      'field types' => array('nodereference',),
+    );
+
+  }
+  
+  return $formatter_info;
+}
+
+
+
+/* ---- Themeing hooks ---- */
+
+
+
+/**
+ * Implementation of hook_theme
+ */
+function popup_ui_theme() {
+
+  $formatters = _popup_ui_formatter_settings();
+  $theme = array();
+
+  foreach($formatters as $label => $formatter){
+
+    $theme['popup_ui_formatter_'.str_replace(' ', '_', $label)] = array(
+      'function' => 'theme_popup_field',
+      'arguments' => array('element' => NULL),
+    );
+    
+  }
+
+  $theme['popup_ui_form_formatters'] = array(
+    'arguments' => array('form' => array()),
+  );
+  
+  $theme['table'] = array(
+    'arguments' => array('header' => array(), 'rows' => array(), 'attributes' => array(), 'caption' => NULL),
+    'function' => 'popup_ui_table',
+  );
+
+  return $theme;
+}
+
+
+
+function theme_popup_field($element = NULL){
+
+  $formatters = _popup_ui_formatter_settings();
+
+  module_load_include('inc', 'popup', 'processing');
+
+  $attributes = $formatters[str_replace('_', ' ', $element['#formatter'])];
+
+  if ($element['#item']['nid']){
+    $attributes['node'] = $element['#item']['nid'];
+    $popup = _popup_node($attributes);
+  }
+
+  return $popup;
+}
+
+
+
+/**
+ * Implementation of theme_table
+ * Wraps tables to provide horisontal scrolling if needed
+ */
+function popup_ui_table($header, $rows, $attributes = array(), $caption = NULL){
+  return
+    '<div class="table-wrapper">'.
+    theme_table($header, $rows, $attributes, $caption).
+    '</div>';
+}
+
+
+
+/* ---- Forms ---- */
+
+
+
+function popup_ui_form_formatters(){
+
+  drupal_add_css(drupal_get_path('module', 'popup_ui').'/popup-ui.css');
+
+  $formatters = _popup_ui_formatter_settings();
+
+  $form = array(
+    '#tree' => TRUE,
+  );
+  $form['rows'] = array();
+
+  $options = array(
+    'position' => array('top-left' => t('Top left'), 'top-right' => t('Top right'), 'bottom-right' => t('Bottom right'), 'bottom-left' => t('Bottom left'),),
+    'effect' => array('none' => t('None'), 'slide' => t('Slide'), 'fade' => t('Fade'), 'slide-fade' => t('Slide and Fade'),),
+    'opacity' => array('1.0' => '1.0', '0.9' => 0.9, '0.8' => 0.8, '0.7' => 0.7, '0.6' => 0.6, '0.5' => 0.5, '0.4' => 0.4, '0.3' => 0.3, '0.2' => 0.2, '0.1' => 0.1,),
+  );
+
+  foreach ($formatters as $label => $formatter){
+    $form['rows'][$label] = _popup_ui_form_formatters_row(
+      $label,
+      $formatter,
+      $options
+    );
+  }
+
+  $form['rows']['new'] = _popup_ui_form_formatters_row(
+    'new',
+    array(
+      'origin' => 'bottom-left',
+      'expand' => 'bottom-right',
+      'effect' => 'none',
+      'activate' => 'hover',
+      'teaser' => 0,
+      'links' => 0,
+    ),
+    $options
+  );
+
+//  $form[] = array(
+//    '#collapsed' => TRUE,
+//    '#collapsible' => TRUE,
+//    '#title' => t('Export settings'),
+//    '#type' => 'fieldset',
+//    '#weight' => TRUE,
+//
+//    array(
+//      '#rows' => 30,
+//      '#type' => 'textarea',
+//      '#value' => var_export($formatters, TRUE),
+//    ),
+//  );  
+//
+//  $form[] = array(
+//    '#collapsed' => TRUE,
+//    '#collapsible' => TRUE,
+//    '#title' => t('Import settings'),
+//    '#type' => 'fieldset',
+//    '#weight' => 1,
+//  
+//    'import' => array(
+//      '#rows' => 30,
+//      '#title' => t('Paste settings code here'),
+//      '#type' => 'textarea',
+//    ),
+//  );  
+
+  $form['buttons']= array(
+
+    array('#value' => '<div class="form-item form-buttons">'),
+
+    'submit' => array(
+      '#type'=>'submit',
+      '#value'=>t('Save'),
+    ),
+
+    array('#value' => popup_ui_confirm('Reset to defaults', 'Are you sure you want to reset to defaults?<br /> This action cannot be undone!', 'admin/settings/popup/formats/reset')),
+
+    array('#value' => '</div>'),
+
+    '#weight' => 2,
+  );
+
+  return $form;
+}
+
+
+
+function _popup_ui_form_formatters_row($key, $values, $options){
+
+  $row = array(
+  
+    'label' => array(
+      '#default_value' => $values['label'],
+      '#size' => 20,
+      '#type' => 'textfield',
+    ),
+
+    'origin' => array(
+      '#default_value' => $values['origin'],
+      '#type' => 'select',
+      '#options' => $options['position'],
+    ),
+    
+    'expand' => array(
+      '#default_value' => $values['expand'],
+      '#type' => 'select',
+      '#options' => $options['position'],
+    ),
+  
+    'effect' => array(
+      '#default_value' => $values['effect'],
+      '#type' => 'select',
+      '#options' => $options['effect'],
+    ),
+
+    'opacity' => array(
+      '#default_value' => $values['opacity'],
+      '#type' => 'select',
+      '#options' => $options['opacity'],
+    ),
+
+    'activate' => array(
+      '#default_value' => $values['activate'],
+      '#type' => 'select',
+      '#options' => array('hover' => t('Hover'), 'click' => t('Click')),
+    ),
+  
+    'close-button' => array(
+      '#default_value' => $values['close-button'],
+      '#type' => 'checkbox',
+    ),
+  
+    'teaser' => array(
+      '#default_value' => $values['teaser'],
+      '#type' => 'checkbox',
+    ),
+
+    'page' => array(
+      '#default_value' => $values['page'],
+      '#type' => 'checkbox',
+    ),
+
+    'links' => array(
+      '#default_value' => $values['links'],
+      '#type' => 'checkbox',
+    ),
+
+    'inline' => array(
+      '#default_value' => $values['inline'],
+      '#type' => 'checkbox',
+    ),
+
+    'flat' => array(
+      '#default_value' => $values['flat'],
+      '#type' => 'checkbox',
+    ),
+
+    'ops' => array(
+      '#value' => (
+        $key == 'new' 
+          ? '&nbsp;'
+          : popup_ui_confirm('Delete', 'Are you sure you want to delete this popup format? It cannot be undone!', 'admin/settings/popup/formats/delete/'.$key)
+      ),
+    ),
+
+  );
+
+  return $row;
+}
+
+
+
+function theme_popup_ui_form_formatters($form){
+
+  $rows = array();
+  $header = array(
+    t('Administrative label'),
+    array(
+      'data' => '<div>'.t('Display').'</div>'.t('Origin at'),
+      'class' => 'section',
+    ),
+    t('Expand to'),
+    t('Effect'),
+    t('Opacity'),
+    array(
+      'data' => '<div>'.t('Control').'</div>'.t('Activate'),
+      'class' => 'section',
+    ),
+    t('Close'),
+    array(
+      'data' => '<div>'.t('Node').'</div>'.t('Teaser'),
+      'class' => 'section',
+    ),
+    t('Page'),
+    t('Links'),
+    array(
+      'data' => '<div>'.t('Menu').'</div>'.t('Inline'),
+      'class' => 'section',
+    ),
+    t('Flat'),
+    array(
+      'data' => '',
+      'class' => 'section',
+    ),
+  );
+
+  foreach($form['rows'] as $row_id => $row){
+
+    if (substr($row_id, 0 , 1) != '#'){
+    
+      foreach($row as $field_id => $field){
+        if (substr($field_id, 0 , 1) != '#'){
+
+          if ($field_id == 'origin' || $field_id == 'teaser' || $field_id == 'activate' || $field_id == 'inline' || $field_id == 'ops'){
+            $table_rows[$row_id]['data'][] = array(
+              'data' => drupal_render($form['rows'][$row_id][$field_id]),
+              'class' => 'section',
+            );
+          } else {
+            $table_rows[$row_id]['data'][] = drupal_render($form['rows'][$row_id][$field_id]);
+          }
+        }
+      }
+    }
+  }
+
+  $form['table'] = array(
+    '#value' => '<div class="form-item"><label>'.t('Popup formats').':</label>'.theme('table', $header, $table_rows, array('id' => 'format-table', 'class' => "popup-settings-table")).'</div>'
+  );
+
+  $output .= drupal_render($form);
+
+  return $output;
+}
+
+
+
+function popup_ui_form_formatters_validate(&$form, &$form_state){
+
+  $values = $form_state['values'];
+  $formatters = _popup_ui_formatter_settings();
+
+  foreach($values['rows'] as $label=>$row){
+
+    if (!preg_match('/^[A-Za-z0-9\ ]*$/', $row['label'])){
+      form_set_error('rows]['.$label.'][label', t('Labels may only contain letters, numbers and spaces.'));
+    }
+
+    if (!$row['label'] && $label!='new'){
+      form_set_error('rows]['.$label.'][label', t('Please provide a label.'));
+    }
+
+  }
+}
+
+
+function popup_ui_form_formatters_submit(&$form, &$form_state){
+
+  $values = $form_state['values'];
+  $formatters = array();
+
+  foreach($form_state['values']['rows'] as $label=>$row){
+    if ($row['label']){
+      $formatters[$row['label']] = $row;
+    }
+  }
+
+  _popup_ui_formatter_settings($formatters);
+  _popup_ui_flush_all();
+
+  drupal_set_message(t('The popup filters have been saved.'));
+
+  $form['#redirect'] = array('admin/settings/popup/formats');
+}
+
+
+
+/* ---- Actions ---- */
+
+
+
+function popup_ui_delete_format($format){
+
+  $settings = _popup_ui_formatter_settings();
+
+  unset($settings[$format]);
+
+  _popup_ui_formatter_settings($settings);
+  _popup_ui_flush_all();
+
+  drupal_set_message(t('The "%format" filter format has been deleted.', array('%format' => $format)));
+  drupal_goto('admin/settings/popup/formats');
+}
+
+
+
+function popup_ui_reset(){
+
+  _popup_ui_formatter_settings(_popup_ui_formatter_defaults());
+  _popup_ui_flush_all();
+
+  drupal_set_message(t('Default settings has been restored.'));
+  drupal_goto('admin/settings/popup/formats');
+}
+
+
+
+/* ---- Settings ---- */
+
+
+
+function _popup_ui_formatter_defaults(){
+  return array (
+
+    'Default hover' => array (
+      'label' => 'Default hover',
+      'origin' => 'bottom-left',
+      'expand' => 'bottom-right',
+      'effect' => 'none',
+      'opacity' => '1.0',
+      'activate' => 'hover',
+      'close-button' => 0,
+      'teaser' => 0,
+      'page' => 0,
+      'links' => 0,
+      'inline' => 0,
+      'flat' => 0,
+    ),
+  
+    'Default click' => array (
+      'label' => 'Default click',
+      'origin' => 'bottom-left',
+      'expand' => 'bottom-right',
+      'effect' => 'none',
+      'opacity' => '1.0',
+      'activate' => 'click',
+      'close-button' => 1,
+      'teaser' => 0,
+      'page' => 0,
+      'links' => 0,
+      'inline' => 0,
+      'flat' => 0,
+    ),
+  
+    'Default node' => array (
+      'label' => 'Default node',
+      'origin' => 'bottom-left',
+      'expand' => 'bottom-right',
+      'effect' => 'none',
+      'opacity' => '1.0',
+      'activate' => 'hover',
+      'close-button' => 0,
+      'teaser' => 1,
+      'page' => 0,
+      'links' => 1,
+      'inline' => 0,
+      'flat' => 0,
+    ),
+  
+    'Left block' => array (
+      'label' => 'Left block',
+      'origin' => 'top-right',
+      'expand' => 'bottom-right',
+      'effect' => 'none',
+      'opacity' => '1.0',
+      'activate' => 'hover',
+      'close-button' => 0,
+      'teaser' => 0,
+      'page' => 0,
+      'links' => 0,
+      'inline' => 0,
+      'flat' => 0,
+    ),
+  
+    'Right block' => array (
+      'label' => 'Right block',
+      'origin' => 'top-left',
+      'expand' => 'bottom-left',
+      'effect' => 'none',
+      'opacity' => '1.0',
+      'activate' => 'hover',
+      'close-button' => 0,
+      'teaser' => 0,
+      'page' => 0,
+      'links' => 0,
+      'inline' => 0,
+      'flat' => 0,
+    ),
+  
+    'Popup menu' => array (
+      'label' => 'Popup menu',
+      'origin' => 'top-right',
+      'expand' => 'bottom-right',
+      'effect' => 'none',
+      'opacity' => '1.0',
+      'activate' => 'hover',
+      'close-button' => 0,
+      'teaser' => 0,
+      'page' => 0,
+      'links' => 0,
+      'inline' => 1,
+      'flat' => 0,
+    ),
+  );
+}
+
+
+
+function _popup_ui_formatter_settings($new_formatters = FALSE){
+
+  static $formatters = FALSE;
+  if ($new_formatters){
+    $formatters = $new_formatters;
+    variable_set('popup-formatters', $formatters);
+  }
+
+  if (!$formatters){
+    $formatters = variable_get('popup-formatters', _popup_ui_formatter_defaults());
+  }
+
+  return $formatters;
+}
+
+
+
+/* ---- Utility functions ---- */
+
+
+
+function _popup_ui_flush_all(){
+  $core = array('cache', 'cache_block', 'cache_filter', 'cache_page');
+  $cache_tables = array_merge(module_invoke_all('flush_caches'), $core);
+  foreach ($cache_tables as $table) {
+    cache_clear_all('*', $table, TRUE);
+  }
+}
+
+
+
+function popup_ui_confirm($title, $message, $confirm_path, $confirm_title = 'Yes', $confirm_cancel = "No"){
+
+  module_load_include('inc', 'popup', 'processing');
+
+  $body = 
+    '<div class="popup-message">'.$message.'</div>'.
+    '<div class="popup-buttons">'.
+    l($confirm_title, $confirm_path, array('class' => 'popup-confirm')).
+    ($confirm_cancel ? '<a href="#" class="popup-close-button">'.$confirm_cancel.'</a>' : '').
+    '</div>';  
+
+  return _popup_text(
+    array(
+      'title' => $title,
+      'text' => $body,
+      'activate' => 'click',
+      'class' => 'popup-confirm',
+    )
+  );
+}
+
+

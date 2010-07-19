@@ -1,0 +1,483 @@
+<?php
+// $Id:
+
+
+
+/* ----- Hook implementation ---- */
+
+
+
+/**
+ * Implementation of hook_menu
+ */
+function popup_filter_menu(){
+
+  return array(
+
+    'ajax/popup-filter/getnode' => array(
+      'page callback' => 'popup_filter_ajax_getnode',
+      'access arguments' => array(TRUE),
+      'type' => MENU_CALLBACK,
+    ),
+
+    'ajax/popup-filter/getdeltas' => array(
+      'page callback' => 'popup_filter_ajax_getdeltas',
+      'access arguments' => array(TRUE),
+      'type' => MENU_CALLBACK,
+    ),
+
+    'ajax/popup-filter/getdisplays' => array(
+      'page callback' => 'popup_filter_ajax_getdisplays',
+      'access arguments' => array(TRUE),
+      'type' => MENU_CALLBACK,
+    ),
+
+  );
+
+}
+
+
+
+/**
+ * Implementation of hook_filter
+ */
+function popup_filter_filter($op, $delta =  0, $format = -1, $text = ''){
+
+  switch($op) {
+    case 'list':
+      return array(t('Popup content filter'));
+
+    case 'description':
+      return t('Replaces [popup] tags with popup content');
+
+    case 'settings':
+      break;
+
+    case 'no cache':
+      return TRUE;
+
+    case 'prepare':
+      return $text;
+
+    case 'process':
+      return popup_filter_process_text($text);
+
+    default:
+      return $text;
+  }
+
+}
+
+
+
+/**
+ * Implementation of hook_form_alter
+ *
+ * Hooked to ad popup filter form to the bottom of filtered inputs
+ *
+ * @param $form
+ * @param $form_state
+ * @param $form_id
+ */
+function popup_filter_form_alter(&$form, &$form_state, $form_id){
+
+  if ($form['#id'] == 'node-form' || $form['#id']== 'block-add-block-form' || $form['#id']== 'block-admin-configure'){
+
+    module_load_include('inc', 'popup', 'processing');
+
+    $attributes = array(
+      'origin' => 'top-left',
+      'expand' => 'top-right',
+      'activate' => 'click',
+      'close-button' => TRUE,
+      'class' => 'popup-filter-admin-form',
+      'opacity' => '0.9',
+      'effect' => 'slide-fade',
+    );
+
+    $popup_form = _popup_element(
+      t('Insert popup element'),
+      drupal_get_form('popup_filter_insert_form'),
+      $attributes,
+      _classes($attributes)
+    );
+
+    if ($form['#id'] == 'node-form') {
+      $form['body_field']['body']['#suffix'] =
+        $popup_form .
+        $form['body_field']['body']['#suffix'];
+    } else {
+      $form['block_settings']['body_field']['body']['#suffix'] =
+        $popup_form .
+        $form['block_settings']['body_field']['body']['#suffix'];
+    }
+
+  }
+
+}
+
+
+
+/* ---- Forms ---- */
+
+
+
+function popup_filter_insert_form(){
+
+  drupal_add_css(drupal_get_path('module', 'popup_filter').'/popup-filter-admin.css');
+  drupal_add_js(drupal_get_path('module', 'popup_filter').'/popup-filter-admin.js');
+
+  $position = array(
+    'top-left' => 'Top left',
+    'top-right' => 'Top right',
+    'bottom-left' => 'Bottom left',
+    'bottom-right' => 'Bottom right',
+  );
+
+  $modules = module_implements('block', TRUE);
+  $modules = array_combine($modules, $modules);
+
+  $form_ids = variable_get('form-registry', array());
+  $form_ids = array_combine($form_ids, $form_ids);
+
+  $views = views_get_all_views();
+  $views_options = array();
+  foreach($views as $view){
+    $views_options[$view->name] = $view->name;
+  }
+
+  $form = array(
+
+    'popup_id' => array(
+      '#prefix' => '<div class="popup-attributes">',
+      '#title' => 'CSS ID',
+      '#type' => 'textfield',
+    ),
+
+    'popup_class' => array(
+      '#title' => 'CSS class',
+      '#type' => 'textfield',
+    ),
+
+    'popup_title' => array(
+      '#title' => 'Title',
+      '#type' => 'textfield',
+    ),
+
+    'popup_link' => array(
+      '#title' => 'Title link',
+      '#type' => 'textfield',
+    ),
+
+    'popup_origin' => array(
+      '#options' => $position,
+      '#title' => 'Origin',
+      '#type' => 'select',
+    ),
+
+    'popup_expand' => array(
+      '#options' => $position,
+      '#title' => 'Epand to',
+      '#type' => 'select',
+    ),
+
+    'popup_effect' => array(
+      '#options' => array(
+        'None',
+        'slide' => 'Slide',
+        'fade' => 'Fade',
+        'slide-fade' => 'Slide and fade',
+      ),
+      '#title' => 'Effect',
+      '#type' => 'select',
+    ),
+
+    'popup_activate' => array(
+      '#options' => array(
+        'hover' => t('Hover'),
+        'click' => t('Click'),
+      ),
+      '#suffix' => '</div>',
+      '#title' => 'Activate',
+      '#type' => 'select',
+    ),
+
+    array(
+      '#value' => '<div class="popup-content">',
+    ),
+
+    'popup_type' => array(
+      '#options' =>  array(
+        'block' => 'Block',
+        'form' => 'Form',
+        'menu' => 'Menu',
+        'node' => 'Node',
+        'php' => 'PHP',
+        'text' => 'Text',
+      ),
+      '#title' => t('Type'),
+      '#type' => 'select',
+    ),
+
+    'popup_content_text' => array(
+      '#prefix' => '<div class="popup-content-text popup-content-section">',
+      '#suffix' => '</div>',
+
+      'popup_content_text_text' => array(
+        '#title' => 'Text',
+        '#type' => 'textarea',
+      ),
+
+    ),
+
+    'popup_content_node' => array(
+      '#prefix' => '<div class="popup-content-node popup-content-section">',
+      '#suffix' => '</div>',
+
+      'popup_content_node_id' => array(
+        '#title' => 'Node id',
+        '#type' => 'textfield',
+        '#suffix' => '<div>OR</div>',
+      ),
+
+      'popup_content_node_title' => array(
+        '#title' => 'Node title',
+        '#type' => 'textfield',
+        '#autocomplete_path' => 'ajax/popup-filter/getnode',
+      ),
+
+      'popup_content_node_options' => array(
+        '#type' => 'checkboxes',
+        '#options' => array(
+          'teaser' => t('Display as a teaser'),
+          'page' => t('Use page display'),
+          'links' => t('Show links'),
+        ),
+      ),
+    ),
+
+    'popup_content_block' => array(
+      '#prefix' => '<div class="popup-content-block popup-content-section">',
+      '#suffix' => '</div>',
+
+      'popup_content_block_module' => array(
+        '#title' => 'Module',
+        '#type' => 'select',
+        '#options' => $modules,
+      ),
+
+      'popup_content_block_delta' => array(
+        '#title' => 'Delta',
+        '#type' => 'select',
+        '#options' => array(),
+      ),
+
+    ),
+
+    'popup_content_form' => array(
+      '#prefix' => '<div class="popup-content-form popup-content-section">',
+      '#suffix' => '</div>',
+
+      'popup_content_form_id' => array(
+        '#description' => t('<strong>Note</strong>: Only forms that have been displayed since the Popup module has been enabled are listed here. If a form that you want to popup is not listed here, navigate to a page that displays that form before returning here.'),
+        '#title' => 'Form ID',
+        '#type' => 'select',
+        '#options' => $form_ids,
+      ),
+
+    ),
+
+    'popup_content_menu' => array(
+      '#prefix' => '<div class="popup-content-menu popup-content-section">',
+      '#suffix' => '</div>',
+
+      'popup_content_menu' => array(
+        '#title' => 'Menu',
+        '#type' => 'select',
+        '#options' => menu_get_menus(),
+      ),
+
+      'popup_content_menu_flat' => array(
+        '#description' => t('Select this option if you don\'t want the menu title to display'),
+        '#title' => t('Flat'),
+        '#type' => 'checkbox',
+      ),
+
+    ),
+
+    'popup_content_view' => array(
+      '#prefix' => '<div class="popup-content-view popup-content-section">',
+      '#suffix' => '</div>',
+
+      'popup_content_view' => array(
+        '#title' => 'View',
+        '#type' => 'select',
+        '#options' => $views_options,
+      ),
+
+      'popup_content_view_display' => array(
+        '#title' => 'Display',
+        '#type' => 'select',
+        '#options' => array(),
+      ),
+
+      'popup_content_view_args' => array(
+        '#description' => t('Comma seperated argument list eg. "1,3"'),
+        '#title' => 'Argumens',
+        '#type' => 'textfield',
+      ),
+
+    ),
+
+    'popup_content_php' => array(
+      '#prefix' => '<div class="popup-content-php popup-content-section">',
+      '#suffix' => '</div>',
+
+      'popup_content_php_php' => array(
+        '#description' => t('PHP that returns text to popup eg. return my_text_function();'),
+        '#title' => 'PHP',
+        '#type' => 'textarea',
+      ),
+
+    ),
+
+    array(
+      '#value' => '</div>',
+    ),
+
+    'popup_insert' => array(
+      '#prefix' => '<div class="popup-insert">',
+      '#suffix' => '</div>',
+      '#value' => '<p class="description">'.t('Please ensure that the input format is set to "Popup filter", or that the current input format includes a popup filter.') . '</p><input type="button" value="' . t('Insert') . '" />',
+    ),
+
+  );
+
+  if (module_exists('views')){
+    $form['popup_type']['#options']['view'] = 'View';
+  }
+
+  return $form;
+
+}
+
+
+
+/* ---- Callbacks ---- */
+
+
+
+function popup_filter_ajax_getnode($part){
+
+  $result = db_query('SELECT title, nid FROM {node} where title like "%s%";', $part);
+  $nodes = array();
+
+  while ($row = db_fetch_array($result)){
+    $nodes[$row['title'] . ' [' . $row['nid'] . ']'] = $row['title'];
+  }
+
+  print drupal_to_js(
+    $nodes
+  );
+
+}
+
+
+
+function popup_filter_ajax_getdeltas($module){
+
+  $options = '';
+  $blocks = module_invoke($module, 'block', 'list');
+  if (is_array($blocks)){
+    foreach($blocks as $delta=>$data){
+      $options .= '<option value="' . $delta . '">' . $data['info'] . '</option>';
+    }
+  }
+
+  print $options;
+
+  exit;
+}
+
+
+
+function popup_filter_ajax_getdisplays($view_name){
+
+  $view = views_get_view($view_name);
+  if (is_array($view->display)){
+    foreach($view->display as $id=>$display){
+      $options .= '<option value="' . $id . '">' . $display->display_title . '</option>';
+    }
+  }
+
+  print $options;
+
+  exit;
+}
+
+
+
+/* ---- Processing ---- */
+
+
+
+/**
+ * Implementation of hook_filter_tips
+ */
+function popup_filter_filter_tips($delta, $format, $long = FALSE) {
+  return '[popup] tags are converted into popup content';
+}
+
+
+
+/**
+ * Replaces all [popup] tags with suitable html
+ */
+function popup_filter_process_text($text){
+
+  $tagPattern = '/\[popup[^\[]+\]/';
+  $found = array();
+  preg_match_all($tagPattern, $text, $found);
+
+  // Replace each found tag with its generated HTML
+  foreach($found[0] as $tag){
+    $text = str_replace($tag, popup_filter_process_tag($tag), $text);
+  }
+
+  return $text;
+}
+
+
+
+/**
+ * Processes a popup tag
+ */
+function popup_filter_process_tag($tag){
+
+  module_load_include('inc', 'popup', 'processing');
+
+  $attributes = _popup_tag_attributes($tag);
+
+  // Do not show unsupported click-activated popups
+  if (variable_get('popup-css-only', FALSE)){
+    $attributes['activate'] == 'hover';
+    watchdog('Warning', 'Click-activated popup changed to hover:<p>'.$tag.'</p><em>Popup module is in CSS-only mode</em>');
+    return '';
+  }
+
+  // Call the correct content loader for each popup type
+  switch(TRUE){
+    case $attributes['text']: return _popup_text($attributes);
+    case $attributes['node']: return _popup_node($attributes);
+    case $attributes['block']: return _popup_block($attributes);
+    case $attributes['form']: return _popup_form($attributes);
+    case $attributes['php']: return _popup_php($attributes);
+    case $attributes['menu']: return _popup_menu($attributes);
+    case $attributes['view']: return _popup_view($attributes);
+  }
+}
+
+
+
+
+

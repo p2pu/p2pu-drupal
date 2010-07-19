@@ -1,0 +1,27 @@
+@charset "UTF-8";
+
+
+
+div.popup-filter-admin-form div.popup-body{ font-size: 80%; width: 400px;}
+
+div.popup-filter-admin-form div.popup-attributes{ float: right; padding-left: 10px; width: 45%;}
+div.popup-filter-admin-form div.popup-content{ float: left; width: 50%;}
+
+div.popup-filter-admin-form div.popup-body:after{ clear: both; content: '.'; display: block; visibility: hidden;}
+
+#edit-popup-origin-wrapper label,
+#edit-popup-expand-wrapper label,
+#edit-popup-effect-wrapper label,
+#edit-popup-activate-wrapper label{ float: left;}
+
+#edit-popup-origin-wrapper select,
+#edit-popup-expand-wrapper select,
+#edit-popup-effect-wrapper select,
+#edit-popup-activate-wrapper select{ float: right;}
+
+div.popup-filter-admin-form select{ width: 65%;}
+
+div.popup-filter-admin-form input.form-text,
+#edit-popup-content-block-delta{ width: 100%;}
+
+div.popup-filter-admin-form div.popup-insert{ clear: both; padding: 10px 0 0; width: 100%;}

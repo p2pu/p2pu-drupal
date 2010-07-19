@@ -1,0 +1,23 @@
+@charset "UTF-8";
+
+
+table.popup-settings-table .section{ border-left: 1px solid #ccc;}
+
+table.popup-settings-table div.popup-element div.popup-origin{ bottom: auto; left: 0; top: 0; right: auto;}
+table.popup-settings-table div.popup-element div.popup-expand{ bottom: auto; left: auto; top: -10px; right: 0;}
+table.popup-settings-table div.popup-element div.popup-message{ width: 455px;}
+
+div.form-buttons div.popup-element div.popup-origin{ bottom: auto; left: 0; top: 0; right: auto;}
+div.form-buttons div.popup-element div.popup-expand{ bottom: 0; left: 0; top: auto; right: auto;}
+div.form-buttons div.popup-element div.popup-message{ width: 300px;}
+
+div.popup-element div.popup-buttons a{ padding-right: 10px;}
+
+table.popup-settings-table th{ font-size: 90%; vertical-align: bottom; white-space: nowrap;}
+table.popup-settings-table td{ white-space: nowrap;}
+table.popup-settings-table th div{ font-size: 120%; padding-bottom: 20px;}
+
+table.popup-settings-table td div.form-item{ float: left;}
+table.popup-settings-table td div.form-checkboxes{ margin: 0; padding: 0;}
+
+div.table-wrapper{ overflow: auto; width: 100%;}

@@ -95,6 +95,7 @@ div#page-sub-header #my-groups-navigation div.popup-title-container a.popped-up-
 div#page-sub-header #my-groups-navigation div.popup-title-container a.popped-up-title span.wrapper{ background-position: left -100px; }
 div#page-sub-header #my-groups-navigation div.popup-title-container a.popped-up-title span.wrapper span{ background-position: right -100px; }
 #my-groups-navigation-body h3{ font-size: 13px;}
+#my-groups-navigation-body .view-display-id-block_2 .view-footer {display:none; visibility: hidden;}
 
 div#page-sub-header a.popup-title span.wrapper span {	background-position: right -60px;}
 div#page-sub-header div.popup-title-container a.popped-up-title span.wrapper span{ background-position: right -100px; }

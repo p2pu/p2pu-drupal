@@ -46,7 +46,7 @@ function popup_preprocess(){
   $path = drupal_get_path('module', 'popup');
   $style_path = variable_get('popup-style', drupal_get_path('module', 'popup').'/styles/Default');
 
-  drupal_add_css($path.'/popup.css');
+  drupal_add_css($path.'/popup.css', 'module', 'screen', variable_get('popup-preprocess', FALSE));
 
   static $script_added = FALSE;
 
@@ -55,13 +55,13 @@ function popup_preprocess(){
       'popup' => array(
         'hoverLinger' => variable_get('popup-hover-linger', 250)
       )
-    ), 'setting');
-    drupal_add_js($path.'/popup.js');
+    ), 'setting', 'header', FALSE, FALSE, variable_get('popup-preprocess', FALSE));
+    drupal_add_js($path.'/popup.js', 'module', 'header', FALSE, FALSE, variable_get('popup-preprocess', FALSE));
     $script_added = true;
   }
 
 	if ($style_path){
-	  drupal_add_css($style_path.'/popup-style.css');
+	  drupal_add_css($style_path.'/popup-style.css', 'module', 'screen', variable_get('popup-preprocess', FALSE));
 	}
 }
 
@@ -176,6 +176,13 @@ function popup_admin_settings(){
     '#options' => array(250 => 250, 500 => 500, 750 => 750, 1000 => 1000, 1250 => 1250, 1500 =>1500, 1750 => 1750, 2000 => 2000),
     '#title' => 'Hover linger',
     '#type' => 'select',
+  );
+
+  $form['popup-preprocess'] = array(
+    '#default_value' => variable_get('popup-preprocess', FALSE),
+    '#description' => 'Allow performance optimization to be performed on the popup CSS and Javascript. Disable this option if popup styles are not working.',
+    '#title' => 'Optimize',
+    '#type' => 'checkbox',
   );
 
   return system_settings_form($form);

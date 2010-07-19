@@ -1,5 +1,0 @@
-name = Popup
-description = Enable popus of embedded content
-package = User interface
-version = "6.x-3.0"
-core = 6.x

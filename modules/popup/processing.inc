@@ -99,7 +99,9 @@ function _popup_view($attributes){
       $view->set_display($display);
 //      $view->pager['items_per_page'] = 0;
       $body = $view->execute_display();
-
+      if (is_array($body)){
+             $body = $body['content'];
+           }
       $computed_title = $view->get_title();
       $title = $attributes['title']
         ? $attributes['title']

@@ -94,14 +94,22 @@ div#page-sub-header #my-groups-navigation a.popup-title:hover span.wrapper span{
 div#page-sub-header #my-groups-navigation div.popup-title-container a.popped-up-title{ background-position: left -100px; }
 div#page-sub-header #my-groups-navigation div.popup-title-container a.popped-up-title span.wrapper{ background-position: left -100px; }
 div#page-sub-header #my-groups-navigation div.popup-title-container a.popped-up-title span.wrapper span{ background-position: right -100px; }
-#my-groups-navigation-body h3{ font-size: 13px;}
-#my-groups-navigation-body .view-display-id-block_2 .view-footer {display:none; visibility: hidden;}
 
 div#page-sub-header a.popup-title span.wrapper span {	background-position: right -60px;}
 div#page-sub-header div.popup-title-container a.popped-up-title span.wrapper span{ background-position: right -100px; }
 div#page-sub-header div.popup-title-container a.popped-up-title { background-position: right -100px; }
 
 /* -- Popups -- */
+
+#my-groups-navigation-body h3{ color: #fff; margin: 0; padding: 0 0 5px 0; font-weight: bold;}
+#my-groups-navigation-body ul {margin:0; padding:0;}
+#my-groups-navigation-body li {margin:0; padding:0;}
+
+#my-groups-navigation-body a {background:none repeat scroll 0 0 transparent;}
+#my-groups-navigation-body a {color:#AAAAAA;}
+#my-groups-navigation-body a {color:#AAAAAA; display:inline-block; height:18px;	margin:0 8px;	white-space:nowrap;}
+#my-groups-navigation-body a {cursor:pointer;}
+#my-groups-navigation-body a, a:hover {text-decoration:none; width:auto;}
 
 /* Title */
 div#page-sub-header a.popup-title span.wrapper span { padding-top: 2px;}

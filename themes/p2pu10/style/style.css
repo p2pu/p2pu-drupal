@@ -101,15 +101,14 @@ div#page-sub-header div.popup-title-container a.popped-up-title { background-pos
 
 /* -- Popups -- */
 
-#my-groups-navigation-body h3{ color: #fff; margin: 0; padding: 0 0 5px 0; font-weight: bold;}
-#my-groups-navigation-body ul {margin:0; padding:0;}
-#my-groups-navigation-body li {margin:0; padding:0;}
+#my-groups-navigation-body h3{ color: #fff; margin: 0; padding: 0 0 5px 0; font-weight: normal;font-family:TahomaGeneva,sans-serif; font-size: 13px;}#my-groups-navigation-body ul {margin:0; padding:0;}
+#my-groups-navigation-body ul, #my-groups-navigation-body li {margin:0; padding:0;}
 
-#my-groups-navigation-body a {background:none repeat scroll 0 0 transparent;}
-#my-groups-navigation-body a {color:#AAAAAA;}
+#my-groups-navigation-body a {background:none repeat scroll 0 0 transparent;text-decoration:none;cursor:pointer;}
 #my-groups-navigation-body a {color:#AAAAAA; display:inline-block; height:18px;	margin:0 8px;	white-space:nowrap;}
-#my-groups-navigation-body a {cursor:pointer;}
-#my-groups-navigation-body a, a:hover {text-decoration:none; width:auto;}
+#my-groups-navigation-body a:hover {text-decoration:none; width:auto; color: #fff}
+#my-groups-navigation-body .view-footer{margin:0;padding:0}
+#my-groups-navigation-body .view-footer p {margin:0; padding:0}
 
 /* Title */
 div#page-sub-header a.popup-title span.wrapper span { padding-top: 2px;}

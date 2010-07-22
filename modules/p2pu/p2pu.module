@@ -171,6 +171,40 @@ function p2pu_get_discussion_forum_tid($gid) {
   // General discussion is the 1st item
   return $children_tids[0];
 }
+
+/**
+ * This function is called when a course status is closed('30_complete'),
+ * see hook_nodeapi, node type 'course' & op is 'update' 
+ */
+function p2pu_close_course($nid){
+  //set comments for this node to be readonly
+  $comment_query = db_query("UPDATE {node} SET comment = 1 WHERE nid = %d",$nid);
+  //set comments for this node's material to be readonly
+  $sub_nodes_query = db_query("SELECT nid FROM {og_ancestry} o where group_nid =%d",$nid);
+  if(db_affected_rows()>0){    
+    while($sub_nodes= db_fetch_object($sub_nodes_query)){      
+      $comment_sub_items_query = db_query("UPDATE {node} SET comment = 1 WHERE nid = %d",$sub_nodes->nid);
+    }
+  }
+ 
+  
+}
+/**
+ * This function is called when a course status is running/open,
+ * see hook_nodeapi, node type 'course' & op is 'update' 
+ */
+function p2pu_open_course($nid){
+  //set comments for this node to be read/write
+  $comment_query = db_query("UPDATE {node} SET comment = 2 WHERE nid = %d",$nid);
+  //set comments for this node's material to be read/write
+  $sub_nodes_query = db_query("SELECT nid FROM {og_ancestry} o where group_nid =%d",$nid);
+  if(db_affected_rows()>0){    
+    while($sub_nodes= db_fetch_object($sub_nodes_query)){      
+      $comment_sub_items_query = db_query("UPDATE {node} SET comment = 2 WHERE nid = %d",$sub_nodes->nid);
+    }
+  }
+  
+}
 ///**
 // * Returns an array of all books.
 // *
@@ -302,6 +336,13 @@ function p2pu_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
           $node->og_groups = array( $group_node->nid);
           og_save_ancestry($node);
           
+        break;
+        case 'course':
+          if($node->field_course_status[0]['value'] =='30_complete'){
+            p2pu_close_course($node->nid); //sets the comments to be read only
+          }else{
+            p2pu_open_course($node->nid); //sets the comments to be read/write
+          }          
         break;
       }
       //adw: this is a hack to fix og_access setting nodes to private. Everything should be public

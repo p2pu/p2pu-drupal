@@ -1314,3 +1314,26 @@ function p2pu_views_api() {
     'path' => drupal_get_path('module', 'p2pu') .'/includes',
   );
 }
+// Removing the details of this visit for pages used in monitoring
+function p2pu_exit() {
+  global $user;
+  
+  //if this is the civic hacking course that is used as part of monitoring
+  //remove this entry from the statistics
+  if ((arg(0) == 'node') && (arg(1) == 716)) {
+    // A node has been viewed (and logged by the statistics module),
+    // so decrement what statistics.module incremented
+    db_query('UPDATE {node_counter} SET daycount = daycount - 1, totalcount = totalcount - 1 WHERE nid = %d', arg(1));
+ 
+    $referrer = referer_uri();
+    $hostname = ip_address(); // http://drupal.org/node/114774#ip-address
+    
+    //now remove the visit from the regular access log
+    $sql = "DELETE FROM {accesslog} ";
+    $sql .= "WHERE title='%s' AND path='%s' AND url='%s' AND hostname='%s' AND uid=%d";
+    db_query($sql,drupal_get_title(), $_GET['q'], $referrer, $hostname, $user->uid);
+    
+    //finally, don't save the users session        
+    session_save_session(false);
+  }
+}

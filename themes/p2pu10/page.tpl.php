@@ -35,6 +35,7 @@
   
           <div id="content-column">
             <div class="inner">
+              <?php if ($content_above_title): ?><div id="content-above-title"><?php print $content_above_title; ?></div><?php endif; ?>              
               <?php print $title; ?>
               <?php if ($content_top): ?><div id="content-top"><?php print $content_top; ?></div><?php endif; ?>
               <?php if ($mission): ?><div id="mission"><?php print $mission; ?></div><?php endif; ?>

@@ -432,6 +432,8 @@ div#edit-shout-box-wrapper #edit-shout-box{ width: 263px;}
 
 div#page-footer div.block{ float: left; margin-right: 10px;}
 div#page-footer div.block:last{ float: right;}
+#block-p2pu-5 {padding-bottom: 0;}
+#block-p2pu-5 h2{color: #222222;}
 
 /* Flags */
 .node-forum .node-flags,

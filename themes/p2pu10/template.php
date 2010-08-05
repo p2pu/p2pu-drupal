@@ -189,6 +189,9 @@ function p2pu10_button($element){
  */
 function p2pu10_menu_local_tasks(){
   // We change the node "View" link title to "Course Home" for all course nodes
+  // NOTE: we duplicate this in our block (p2pu.module) which displays the course local task tabs
+  // when editing nodes in a course - TODO: See if we can do this in only 1 place as
+  // this solution is a bit messy :-(
   $output = '';
   if ($primary = menu_primary_local_tasks()) {
     if (arg(0) == 'node' && is_numeric(arg(1))) {

@@ -64,6 +64,7 @@ function p2pu_block($op = 'list', $delta = 0, $edit = array()) {
       $blocks[2]['cache'] = BLOCK_NO_CACHE; 
       $blocks[3]['info'] = t('P2PU custom forum RSS icon block');
       $blocks[4]['info'] = t('P2PU custom course admin signups toggle block');
+      $blocks[5]['info'] = t('P2PU custom course navigation for nodes within a course');
       return $blocks;
     case 'view':
    $block = array();
@@ -153,6 +154,81 @@ function p2pu_block($op = 'list', $delta = 0, $edit = array()) {
           $link = l($text, "toggle-signup/".$group->nid);
           $block['subject'] = '';
           $block['content'] = $link;
+        }          
+        else
+          return FALSE;
+        return $block;
+      case 5:
+      /* When viewing a node that is part of a course, we want to display the
+        course menu so this navigation remains consistent throughout.
+        So we get the course the node belongs to, load and output the course
+        primary local tasks menu.
+        We don't want to display on the course node itself, only on nodes that
+        are part of the course. May have to improve how we do this.
+        
+        Conditions - Show on the following pages:
+          When adding a node that is part of a course
+          When editing a node that is part of a course
+      */
+        // When adding a node, the context is given in the query string
+        //if (isset($_GET['gid']) && $_GET['gid']) {
+        //  $group_node = node_load($_GET['gid']);
+        //  og_set_group_context($group_node);
+        //}
+        $group = og_get_group_context();
+        // Work through our conditions
+        if ($group->type == 'course') {
+          if (arg(0) == 'node' && is_numeric(arg(1))) {
+            // Don't display on group nodes, e.g. the course node itself
+            $node = node_load(arg(1));
+            $content_type = $node->type;
+            $usage = variable_get('og_content_type_usage_'. $content_type, 'omitted');
+            if ($usage == 'group') {
+              return FALSE;
+            }
+          }
+          elseif (arg(0) == 'node' && arg(1) == 'add') {
+            // We're adding a node so we get the content type from the url
+            $content_type = arg(2);
+          }
+          elseif (arg(0) == 'comment' && arg(1) == 'reply' && is_numeric(arg(2))) {
+            // For replies to comments in group posts or the group itself
+            // If the comment is a reply to the group itself, we leave the active
+            // tab to be the course home page (so content type 'course' is ignored)
+            $node = node_load(arg(2));
+            $content_type = $node->type;         
+          }
+          // TODO: perhaps move this into the else of the if ($usage) loop, depending
+          // on where we want this displayed.
+          // Also need to append the node type and node id to the url so that 
+          // the correct active link can be specified. There is some duplication
+          // here with the p2pu_nodeapi function
+
+          $fake_path = 'node/' . $group->nid;
+          switch ($content_type) {
+            case 'document':
+              $fake_path .= '/document/' . $node->nid;
+              break;
+            case 'forum':
+              $fake_path .= '/forums/' . $node->nid;
+              break;
+            case 'event':
+              $fake_path .= '/calendar';
+              break;
+          }
+          $tabs = p2pu_custom_menu_local_tasks($fake_path);
+          if (!empty($tabs)) {
+            // Remove any active tab classes
+            //$tabs = str_replace('active', '', $tabs);
+            $tabs = str_replace(t('View'), t('Course Home'), $tabs);
+            $block['subject'] = $group->title;
+            $block['content'] = "<div class='tabs float-container'>\n";
+            $block['content'] .= "<ul class=\"tabs primary\">\n". $tabs ."</ul>\n";
+            $block['content'] .= "</div>\n";            
+          }
+          else
+            return FALSE;
+
         }          
         else
           return FALSE;
@@ -1314,6 +1390,148 @@ function p2pu_views_api() {
     'path' => drupal_get_path('module', 'p2pu') .'/includes',
   );
 }
+
+
+ /**
+ * Custom menu_local_tasks function.
+ *
+ * Will return the local tasks (tabs) for a given path.
+ *
+ * @param $node_path
+ *  The path of the node for which we are generating the local tasks - e.g. 'node/3435'
+ *  This will be the course path - normally with extra query string items at the
+ *  end to indicate that we're viewing a document within that course etc. as setup
+ *  in the panel page overrides for the course nodes.
+ * @param $level
+ *   The level of tasks you ask for. Primary tasks are 0, secondary are 1.
+ * @param $return_root
+ *   Whether to return the root path for the current page.
+ * @return
+ *   Themed output corresponding to the tabs of the requested level, or
+ *   router path if $return_root == TRUE. This router path corresponds to
+ *   a parent tab, if the current page is a default local task.
+ * @see menu_local_tasks
+ */
+
+function p2pu_custom_menu_local_tasks($node_path, $level = 0, $return_root = FALSE) { 
+  static $tabs;
+  static $root_path;
+
+  if (!isset($tabs)) {
+
+    $tabs = array();
+    $router_item = menu_get_item($node_path);
+    if (!$router_item || !$router_item['access']) {
+      return '';
+    }
+    // Get all tabs and the root page.
+    $result = db_query("SELECT * FROM {menu_router} WHERE tab_root = '%s' ORDER BY weight, title", $router_item['tab_root']);
+    //$map = arg();
+    // We provide our own path
+    $map = explode('/', $node_path);
+    $children = array();
+    $tasks = array();
+    $root_path = $router_item['path'];
+
+    while ($item = db_fetch_array($result)) {
+      _menu_translate($item, $map, TRUE);
+      if ($item['tab_parent']) {
+        // All tabs, but not the root page.
+        $children[$item['tab_parent']][$item['path']] = $item;
+      }
+      // Store the translated item for later use.
+      $tasks[$item['path']] = $item;
+    }
+    // Find all tabs below the current path.
+    $path = $router_item['path'];
+    // Tab parenting may skip levels, so the number of parts in the path may not
+    // equal the depth. Thus we use the $depth counter (offset by 1000 for ksort).
+    $depth = 1001;
+    while (isset($children[$path])) {
+      $tabs_current = '';
+      $next_path = '';
+      $count = 0;
+      foreach ($children[$path] as $item) {
+        if ($item['access']) {
+          $count++;
+          // The default task is always active.
+          if ($item['type'] == MENU_DEFAULT_LOCAL_TASK) {
+            // Find the first parent which is not a default local task.
+            for ($p = $item['tab_parent']; $tasks[$p]['type'] == MENU_DEFAULT_LOCAL_TASK; $p = $tasks[$p]['tab_parent']);
+            $link = theme('menu_item_link', array('href' => $tasks[$p]['href']) + $item);
+            $tabs_current .= theme('menu_local_task', $link, TRUE);
+            $next_path = $item['path'];
+          }
+          else {
+            $link = theme('menu_item_link', $item);
+            $tabs_current .= theme('menu_local_task', $link);
+          }
+        }
+      }
+      $path = $next_path;
+      $tabs[$depth]['count'] = $count;
+      $tabs[$depth]['output'] = $tabs_current;
+      $depth++;
+    }
+
+    // Find all tabs at the same level or above the current one.
+    $parent = $router_item['tab_parent'];
+    $path = $router_item['path'];
+    $current = $router_item;
+    $depth = 1000;
+    while (isset($children[$parent])) {
+      $tabs_current = '';
+      $next_path = '';
+      $next_parent = '';
+      $count = 0;
+      foreach ($children[$parent] as $item) {
+        if ($item['access']) {
+          $count++;
+          if ($item['type'] == MENU_DEFAULT_LOCAL_TASK) {
+            // Find the first parent which is not a default local task.
+            for ($p = $item['tab_parent']; $tasks[$p]['type'] == MENU_DEFAULT_LOCAL_TASK; $p = $tasks[$p]['tab_parent']);
+            $link = theme('menu_item_link', array('href' => $tasks[$p]['href']) + $item);
+            if ($item['path'] == $router_item['path']) {
+              $root_path = $tasks[$p]['path'];
+            }
+          }
+          else {
+            $link = theme('menu_item_link', $item);
+          }
+          // We check for the active tab.
+          if ($item['path'] == $path) {
+            $tabs_current .= theme('menu_local_task', $link, TRUE);
+            $next_path = $item['tab_parent'];
+            if (isset($tasks[$next_path])) {
+              $next_parent = $tasks[$next_path]['tab_parent'];
+            }
+          }
+          else {
+            $tabs_current .= theme('menu_local_task', $link);
+          }
+        }
+      }
+      $path = $next_path;
+      $parent = $next_parent;
+      $tabs[$depth]['count'] = $count;
+      $tabs[$depth]['output'] = $tabs_current;
+      $depth--;
+    }
+    // Sort by depth.
+    ksort($tabs);
+    // Remove the depth, we are interested only in their relative placement.
+    $tabs = array_values($tabs);
+  }
+  
+  if ($return_root) {
+    return $root_path;
+  }
+  else {
+    // We do not display single tabs.
+    return (isset($tabs[$level]) && $tabs[$level]['count'] > 1) ? $tabs[$level]['output'] : '';
+  }
+}
+
 // Removing the details of this visit for pages used in monitoring
 function p2pu_exit() {
   global $user;

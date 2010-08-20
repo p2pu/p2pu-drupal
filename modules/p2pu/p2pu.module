@@ -677,6 +677,15 @@ function p2pu_link($type, $object, $teaser = FALSE) {
   return $links;
 }
 
+/*
+Validate the terms and conditions checkbox field, used on registration and course join.
+*/
+function p2pu_terms_and_cond_validate($element, &$form_state){ 
+  if($form_state['values']['terms_and_cond'] !=1){
+     form_error($element, t('You must agree to the P2PU terms and conditions to continue.'));
+  } 
+}
+
 /**
  * Implementation of hook_form_alter
  */
@@ -690,6 +699,26 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
 //  exit;
 
 //  watchdog('debug', $form_id.'<br>'.var_export($form, TRUE));
+
+  //Adding a link back to the thread on the comment form
+  if ($form['#id'] == 'comment-form') {
+    $form['comment_link'] = array(
+       '#prefix' => '<div style="position:relative;width:100%;"><div class="comment_link">',
+       '#value' => l(t('Go back to thread'), 'node/' .$form['nid']['#value']),
+       '#suffix' => '</div></div>',
+       '#weight' => -100,
+    );
+  }
+
+  //Adding a checkbox in the user_register form.
+  if($form_id =="user_register"){     
+      $form['terms_and_cond'] = array(
+      '#type' => 'checkbox',     
+      '#title' => t("By creating an account on p2pu.org, you accept our !privacy , !license and !terms. By default all content you create and conversations you have with other users on this site are publicly viewable.", array('!privacy' => l(t("privacy guidelines"),"privacy"), '!license'=>l(t("license provisions"),"license"), '!terms'=>l(t("terms of use"),"terms-of-use") )),
+      '#weight'=>10,
+      '#element_validate' => array('p2pu_terms_and_cond_validate'),
+    );      
+  }
 
   //Extra validation on the admin settings form
   if ($form_id == 'p2pu_settings_form') {
@@ -854,6 +883,16 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
 
   //Modify the organic group subscribe form to ask for the submission requirement and save the application
   if ($form_id == 'og_confirm_subscribe') {
+    //Adding a checkbox in the og_confirm_subscribe form.
+    $form['terms_and_cond'] = array(
+    '#type' => 'checkbox',      
+    '#title' =>t("Before you sign up for the course, we'd like to remind you of our !license and !privacy.
+                 By default all content you create and conversations you have with other users on this site are publicly viewable.",
+                 array('!license'=>l(t("license provisions"),"license"),'!privacy' => l(t("privacy guidelines"),"privacy"))),
+    '#weight'=>0,
+    '#element_validate' => array('p2pu_terms_and_cond_validate'),
+    );
+    
     $group = og_get_group_context();
     if ($group->type != 'course_template') {
 

@@ -1,0 +1,3 @@
+<?php
+
+include_once('p2pu_courses.features.inc');

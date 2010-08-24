@@ -65,6 +65,7 @@ function p2pu_block($op = 'list', $delta = 0, $edit = array()) {
       $blocks[3]['info'] = t('P2PU custom forum RSS icon block');
       $blocks[4]['info'] = t('P2PU custom course admin signups toggle block');
       $blocks[5]['info'] = t('P2PU custom course navigation for nodes within a course');
+      $blocks[6]['info'] = t('P2PU custom tweetable course text plus tweet button');
       return $blocks;
     case 'view':
    $block = array();
@@ -233,6 +234,24 @@ function p2pu_block($op = 'list', $delta = 0, $edit = array()) {
         else
           return FALSE;
         return $block;
+      case 6:
+      // Display a tweet this button which includes the course short description text in the tweet
+        $group = og_get_group_context();
+        if ($group->type == 'course' && !empty($group->field_course_short_desc[0]['value'])) {
+          $tweet_text = content_format('field_course_short_desc', $group->field_course_short_desc[0], 'default');
+          $block_html = "<div id='tweet-text-and-button'>\n";
+          $block_html .= "<div class='field-field-course-short-desc'>$tweet_text</div>\n";
+          $related_account = 'p2pu:P2P University, learning for everyone, by everyone, about almost anything.';
+          $button = '<div id="tweet-button"><a href="http://twitter.com/share" class="twitter-share-button" data-related="' . $related_account . '" data-text="' . $tweet_text . '" data-count="none">Tweet</a>';
+          $button .= '<script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></div>';
+          $block_html .= $button;
+          $block_html .= "</div>\n";
+          $block['subject'] = '';
+          $block['content'] = $block_html;
+        }
+        else
+          return FALSE;
+        return $block;
     }      
   }
 }      
@@ -342,7 +361,6 @@ function p2pu_signup_link_for_block () {
  * Implementation of hook_nodeapi
  */
 function p2pu_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
-
   switch ($op) {
     case 'view':
       switch($node->type) {
@@ -371,6 +389,13 @@ function p2pu_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
           }
         break;
       }
+      break;
+    case 'presave':
+      //dsm($node);
+      //dsm($op);
+      //dsm($a3);
+      //dsm($a4);
+      
       break;
     case 'insert':
       switch ($node->type) {
@@ -469,21 +494,7 @@ function p2pu_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_NORMAL_ITEM,
    );
-  // My dashboard
-  $items['user/me/dashboard'] = array(
-    'title' => 'My dashboard',
-    'page callback' => 'p2pu_my_dashboard_redirect',
-    'access callback' => TRUE,
-    'type' => MENU_CALL_BACK,
-  );
-  // Keypage redirect
-  $items['node/%node/keypage'] = array(
-    'title' => 'Node keypage redirect',
-    'page callback' => 'p2pu_keypage_redirect',
-    'page arguments' => array(1),
-    'access callback' => TRUE,
-    'type' => MENU_CALL_BACK,
-  );
+
   // Toggle signup type
   $items['toggle-signup/%node'] = array(
     'title' => 'Change Group Signup',
@@ -590,24 +601,6 @@ function p2pu_chat_page($node) {
   return '<div id="chat_box" style="text-align:center;width:100%;"><iframe src="http://webchat.freenode.net?channels=' .$irc_channel .'&nick=' .$nick .'&uio=MT1mYWxzZSYzPWZhbHNlJjk9dHJ1ZSYxMD10cnVl32&prompt=1" width="860" height="400"></iframe></div>';
 }
 
-function p2pu_keypage_redirect($node) {
-  if ($node->type == 'course') {
-    if (og_is_group_member($node->nid)) {
-      drupal_goto('node/'.$node->nid.'/dashboard');
-    } else {
-      drupal_goto('node/'.$node->nid);
-    }
-  } else {
-    drupal_goto('node/'.$node->nid);
-  }
-}
-
-// redirect to my dashboard 
-function p2pu_my_dashboard_redirect() {
-  global $user;
-  drupal_goto('user/'.$user->uid.'/dashboard');
-}
-
 /*
  * Implement hook_menu_alter(&$items)
  */
@@ -677,6 +670,31 @@ function p2pu_link($type, $object, $teaser = FALSE) {
   return $links;
 }
 
+function p2pu_filter_course_status_select($form) {
+  //control what appears in the dropdown, depending on context
+  
+  // the following course status' exist
+  // 00_draft|Draft
+  // 10_open|Open for registration
+  // 20_running|Running
+  // 30_complete|Complete
+  // 40_archived|Archived
+  
+  // we need to control the contents of the course status box, depending on the context
+  // the rules are as follows:
+  // 1. if the course is being created , create course with status = draft
+  
+  $current_default = $form['field_course_status']['#default_value'][0]['value'];
+  $full_list = $form['#field_info']['field_course_status']['allowed_values'];
+  // if the course is being created, restrict it to the draft view
+  if (empty($form['nid']['#value'])) {
+    return "00_draft|Draft";
+  }
+  
+  //otherwise return the full list
+  return $full_list;
+}
+
 /*
 Validate the terms and conditions checkbox field, used on registration and course join.
 */
@@ -692,13 +710,6 @@ function p2pu_terms_and_cond_validate($element, &$form_state){
 function p2pu_form_alter(&$form, $form_state, $form_id) {
 
   global $user;
-//  echo '<pre>';
-//  print ($form_id.'<br>');
-//  print_r($form);
-//  echo '</pre>';
-//  exit;
-
-//  watchdog('debug', $form_id.'<br>'.var_export($form, TRUE));
 
   //Adding a link back to the thread on the comment form
   if ($form['#id'] == 'comment-form') {
@@ -729,107 +740,54 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
   if (isset($form['book']) && $form['type']['#value'] != 'book') {
     $form['book']['#type'] = 'hidden';
   }  
+  if ($form_id == 'course_node_form') {
+    //dprint_r($form);
+    $form['#field_info']['field_course_status']['allowed_values'] = p2pu_filter_course_status_select($form);
+    $form['title']['#maxlength'] = 30;
+    if (in_array('webmaster', array_values($user->roles))) {
+      //expand the publishing fieldset
+      $form['options']['#collapsed'] = FALSE;
+    }    
+    // Hide from non admin users:
+    // syllabus node reference field; course dates field;
+    // And don't allow them to change the course status
+    if (!in_array('system', array_values($user->roles)) && !in_array('webmaster', array_values($user->roles))) {
+
+      //Hide all the og settings and give them specific default values
+
+      $form['og_language']['#type'] = 'hidden';
+      $form['og_language']['#value'] = 'p2pu';
+      $form['og_language']['#default_value'] = 'p2pu';
+      
+      $form['og_description']['#type'] = 'hidden';
+      $form['og_description']['#value'] = 'course';
+      $form['og_description']['#default_value'] = 'course';
+     
+      $form['og_selective']['#type'] = 'hidden';
+      $form['og_selective']['#value'] = 1; //TODO: review as this was set to 0 for course template
+      $form['og_selective']['#default_value'] = 1  ;
   
-  //Hide and set the defaults for og fields when creating a course or course template
-  if ($form_id == 'course_node_form' && $form['nid']['#value'] == '' && $user->uid != 1) {
-    //Hide all the og settings and give them specific default values
-
-    $form['og_language']['#type'] = 'hidden';
-    $form['og_language']['#value'] = 'p2pu';
-    $form['og_language']['#default_value'] = 'p2pu';
-    
-    $form['og_selective']['#type'] = 'hidden';
-    $form['og_selective']['#value'] = 1;
-    $form['og_selective']['#default_value'] = 1  ;
-
-    $form['og_register']['#type'] = 'hidden';
-    $form['og_register']['#value'] = 0;
-    $form['og_register']['#default_value'] = 0;
-
-    $form['og_directory']['#type'] = 'hidden';
-    $form['og_directory']['#value'] = 1;
-    $form['og_directory']['#default_value'] = 1;
-
-    $form['og_private']['#type'] = 'hidden';
-    $form['og_private']['#value'] = 0;
-    $form['og_private']['#default_value'] = 0;
-
-    $form['og_description']['#type'] = 'hidden';
-    $form['og_description']['#value'] = 'course';
-    $form['og_description']['#default_value'] = 'course';
-
-    $form['themes']['#type'] = 'hidden';
-
-  }
+      $form['og_register']['#type'] = 'hidden';
+      $form['og_register']['#value'] = 0;
+      $form['og_register']['#default_value'] = 0;
   
-  //Hide and set the defaults for og fields when creating course template
-  if ( $form_id == 'course_template_node_form' && $form['nid']['#value'] == '' && $user->uid != 1) {
-    //Hide all the og settings and give them specific default values
+      $form['og_directory']['#type'] = 'hidden';
+      $form['og_directory']['#value'] = 1;
+      $form['og_directory']['#default_value'] = 1;
+  
+      $form['og_private']['#type'] = 'hidden';
+      $form['og_private']['#value'] = 0;
+      $form['og_private']['#default_value'] = 0;
+  
+      $form['themes']['#type'] = 'hidden';
     
-//  echo '<pre>';
-//  print ($form_id.'<br>');
-//  print_r($form);
-//  echo '</pre>';
-//  exit;
-    
-    $form['og_language']['#type'] = 'hidden';
-    $form['og_language']['#value'] = 'p2pu';
-    $form['og_language']['#default_value'] = 'p2pu';
-    
-    $form['og_selective']['#type'] = 'hidden';
-    $form['og_selective']['#value'] = 0;
-    $form['og_selective']['#default_value'] = 0;
-
-    $form['og_register']['#type'] = 'hidden';
-    $form['og_register']['#value'] = 0;
-    $form['og_register']['#default_value'] = 0;
-
-    $form['og_directory']['#type'] = 'hidden';
-    $form['og_directory']['#value'] = 1;
-    $form['og_directory']['#default_value'] = 1;
-
-    $form['og_private']['#type'] = 'hidden';
-    $form['og_private']['#value'] = 0;
-    $form['og_private']['#default_value'] = 0;
-
-    $form['og_description']['#type'] = 'hidden';
-    $form['og_description']['#value'] = 'course_template';
-    $form['og_description']['#default_value'] = 'course_template';
-
-    $form['themes']['#type'] = 'hidden';
-
-    
-  }
-  // fix assignment list for filtering assignments for a course
-  // Exposed filters is not working for views in panels. We may still need some of this code if we make an "Assignment Finder" view later
-  //if ($form['#id'] == 'views-exposed-form-course-submissions-default') {
-    //print "<pre>";
-    //echo "Before";
-    //print_r($form);
-    //print_r($form['field_submission_assignment_nid']['#options']);
-    //print "</pre>";
-
-    //$group = og_get_group_context();
-    //firep( "group is ".$group->nid."<br/>\n");
-    //$form['field_submission_assignment_nid']['#options'] = array();
-    //foreach (p2pu_get_assignments_for_course($group->nid) as $nid => $title) {
-    //  $form['field_submission_assignment_nid']['#options'][$nid] = $title;
-   // }
-    //print "<pre>";
-    //echo "After";
-    //print_r($form['field_submission_assignment_nid']['#options']);
-    //print "</pre>";
-  //}
-
-
-  //Hide og fields when editing a course or course template
-  if ($form_id == 'course_node_form' || $form_id == 'course_template_node_form' && $user->uid != 1) {
-    //Hide all the og settings and give them specific default values
-    $form['og_selective']['#type'] = 'hidden';
-    $form['og_register']['#type'] = 'hidden';
-    $form['og_directory']['#type'] = 'hidden';
-    $form['og_private']['#type'] = 'hidden';
-    $form['themes']['#type'] = 'hidden';
+      $form['field_refers_to_syllabus']['#access'] = FALSE;
+      $form['field_course_dates']['#access'] = FALSE;
+      // The status field can't be modified here so we need to use an after_build function
+      // @see http://drupal.org/node/726282
+      // @see http://benbuckman.net/tech/10/07/customizing-drupal-date-field-hookformalter-and-afterbuild
+      $form['field_course_status']['#after_build'][] = 'p2pu_course_disable_status_field';
+    }
   }
 
   if (isset($form['og_nodeapi']) && $user->uid != 1) {
@@ -879,7 +837,7 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
     unset($form['mollom']['privacy']);
     unset($form['comment_filter']['comment']['#title']);
 
-}
+  }
 
   //Modify the organic group subscribe form to ask for the submission requirement and save the application
   if ($form_id == 'og_confirm_subscribe') {
@@ -931,11 +889,22 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
       //print "</pre>";
     }
   }
-}
+} // p2pu_form_alter
 
 /*
  * Custom functions
  */
+
+/*
+ * Make certain fields in the course form read only
+ *
+ */
+function p2pu_course_disable_status_field($form_element, &$form_state) {
+  //dpm($form_element);
+  $form_element['value']['#attributes'] = array('disabled' => 'disabled');
+  return $form_element;
+}
+
 // Finding the assignment nid/titles for a specific group for exposed filters
 function p2pu_get_assignments_for_course($gid) {
   $result = db_query("select n.nid,n.title from node n, og_ancestry oga where n.nid=oga.nid and oga.group_nid=%d and n.type='assignment'",$gid);
@@ -1594,3 +1563,64 @@ function p2pu_exit() {
     session_save_session(false);
   }
 }
+
+/**
+* Implementation of hook_action_info().
+*
+* Provide custom P2PU actions to be triggered by rules.
+* 
+*/
+function p2pu_action_info() {
+  return array(
+    'p2pu_create_course_syllabus_action' => array(
+      'description' => t('Create empty course syllabus document and link to course.'),
+      'type' => 'node',
+      'configurable' => FALSE,
+      'hooks' => array(
+        'nodeapi' => array('insert'),
+        ),
+      ),
+  );
+}
+
+/**
+* Implementation of a Drupal action.
+* Blocks the current user.
+*/
+function p2pu_create_course_syllabus_action(&$object, $context = array()) {
+  global $user;
+  $document = new StdClass();
+	$document->type = "document";
+	$document->status = 1;
+	$document->sticky = 1;
+	$document->uid = $user->uid;
+	$document->name = $user->name;
+	$document->title = "Syllabus for " . $object->title;
+	$body_text = t("This is the Syllabus for your Course. Any course participant is allowed to edit this page. Be the first to edit the page by clicking on 'Edit' next to the name of the page (in the Course Material block on the left).");
+  $document->field_document_body[0]['value'] = $body_text;
+  $document->body = $body_text;
+  $document->og_initial_groups[0][$object->nid];
+	$document->og_groups[0] = $object->nid;
+	$document->og_public = 1;
+	$document->og_groups_names[0] = $object->title;
+  $group_node = og_determine_context_get_group($object);
+  og_set_group_context($group_node);
+	if ($document = node_submit($document)) {
+	  node_save($document);
+    $document->og_groups = array($object->nid);
+    og_save_ancestry($document);        
+    $syllabus_url = l('course syllabus', 'node/' . $document->nid);
+    $message = t('Automatically created !syllabus for %course_name.', array('!syllabus' => $syllabus_url, '%course_name' => check_plain($object->title)));
+    
+    // Now add the nid of the document as a node reference
+    $object->field_refers_to_syllabus[0]['nid'] = $document->nid;
+    watchdog('action', $message);
+    drupal_set_message($message);
+  }
+  else {
+    $message = t('Could not creat course syllabus for %course_name.', array('%course_name' => check_plain($object->title)));
+    watchdog('action', $message);
+    drupal_set_message($message);
+  }
+}
+

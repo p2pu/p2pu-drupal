@@ -34,3 +34,7 @@ features[] = secondary_links
 features[] = breadcrumb
 
 scripts[] = scripts/js/flag.js
+
+; Plugins
+plugins[panels][styles] = plugins/panels/styles
+plugins[panels][layouts] = plugins/panels/layouts

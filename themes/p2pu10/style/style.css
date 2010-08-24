@@ -180,6 +180,8 @@ div.node-discussion div.content,
 div.node-teaser div.content,
 div.node-teaser ul.links{ padding: 0 10px;}
 
+.node-type-course .grey-panel .pane-content .node.node-unpublished.node-course {background-color:transparent;}
+
 /* Views */
 div.view-profile-info label{ display: block; float: left; width: 40%;}
 div.view-profile-info label.views-label-field-profile-url-url{ float: none; padding: 20px 0 10px 0;}
@@ -445,3 +447,19 @@ div#page-footer div.block:last{ float: right;}
 #cc-text {font-size: 0.9em; margin-top:3px;}
 #creative-commons a{color: #000; text-decoration: underline;}
 #creative-commons a:hover{ color: #FFF;}
+
+/* Add course form */
+.custom-help-text{font-size:0.85em;}
+#edit-field-course-short-desc-0-value {width: 95%;}
+
+/* Course home page */
+#mini-panel-course_general_info div.panel-pane div.pane-inner{padding:0;}
+.pane-course-general-info.grey-panel h2.pane-title{display:none;}
+.page-node.node-type-course .field-field-course-short-desc{font-weight: bold; font-size: 13px; float: left; width: 90%;}
+.page-node.node-type-course .field.field-field-course-facilitator-about .field-label-inline-first{display:inline; float:none; width:100%;} 
+.page-node.node-type-course div.panel-pane.pane-field-course-photo div.pane-inner{padding: 0;}
+
+/* Forms */
+.form-item .description {
+	font-size:0.98em;
+}

@@ -865,25 +865,26 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
       $form['message']['#weight'] = -10;
   
       $template = $form['#parameters'][3];
-      $form['request']['#title'] = 'Sign-up requirement: '.$template->field_course_sign_up_req[0]['value'];
-      $form['request']['#description'] = '';
+      $form['request']['#title'] = 'Sign-up requirement';
+      $form['request']['#description'] = $template->field_course_sign_up_req[0]['value'];
       $form['request']['#weight'] = -3;
       $form['request']['#required'] = true;
+      $form['request']['#rows'] = 10;
       $form['#submit'][] = 'p2pu_og_confirm_subscribe';
   
       //Background
-      $form['background']['#type'] = 'textarea';
+      $form['background']['#type'] = 'hidden';
       $form['background']['#title'] = 'Background';
       $form['background']['#weight'] = -2;
       $form['background']['#rows'] = 5;
-      $form['background']['#required'] = true;
+      $form['background']['#required'] = false;
   
       //Motivation field
-      $form['motivation']['#type'] = 'textarea';
+      $form['motivation']['#type'] = 'hidden';
       $form['motivation']['#title'] = 'Motivation';
       $form['motivation']['#weight'] = -1;
       $form['motivation']['#rows'] = 5;
-      $form['motivation']['#required'] = true;
+      $form['motivation']['#required'] = false;
       //print "<pre>";
       //print_r($form);
       //print "</pre>";

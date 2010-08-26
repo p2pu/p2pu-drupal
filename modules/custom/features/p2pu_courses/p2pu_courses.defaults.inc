@@ -2015,11 +2015,13 @@ function _p2pu_courses_imagecache_default_presets() {
       'actions' => array(
         '0' => array(
           'weight' => '-10',
-          'module' => 'imagecache',
-          'action' => 'imagecache_scale_and_crop',
+          'module' => 'imagecache_coloractions',
+          'action' => 'imagecache_alpha',
           'data' => array(
-            'width' => '292',
-            'height' => '150',
+            'RGB' => array(
+              'HEX' => 'ffffff',
+            ),
+            'flatten' => TRUE,
           ),
         ),
         '1' => array(
@@ -2027,7 +2029,7 @@ function _p2pu_courses_imagecache_default_presets() {
           'module' => 'imagecache_canvasactions',
           'action' => 'canvasactions_roundedcorners',
           'data' => array(
-            'radius' => '5',
+            'radius' => '20',
             'independent_corners_set' => array(
               'independent_corners' => 0,
               'radii' => array(
@@ -2041,10 +2043,12 @@ function _p2pu_courses_imagecache_default_presets() {
         ),
         '2' => array(
           'weight' => '-8',
-          'module' => 'imagecache_coloractions',
-          'action' => 'imagecache_convert',
+          'module' => 'imagecache',
+          'action' => 'imagecache_scale',
           'data' => array(
-            'format' => 'image/png',
+            'width' => '292',
+            'height' => '',
+            'upscale' => 0,
           ),
         ),
       ),
@@ -2595,7 +2599,20 @@ function _p2pu_courses_default_page_manager_handlers() {
     $pane->type = 'block';
     $pane->subtype = 'block-9';
     $pane->shown = TRUE;
-    $pane->access = array();
+    $pane->access = array(
+      'plugins' => array(
+        '0' => array(
+          'name' => 'php',
+          'settings' => array(
+            'description' => 'Show if course status is open for signup',
+            'php' => '$show_statuses = array(\'10_open\');
+if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value\'], $show_statuses)) {
+  return TRUE;
+}',
+          ),
+        ),
+      ),
+    );
     $pane->configuration = array(
       'override_title' => 0,
       'override_title_text' => '',
@@ -2739,22 +2756,9 @@ function _p2pu_courses_default_page_manager_handlers() {
     $pane->pid = 'new-7';
     $pane->panel = 'top_region';
     $pane->type = 'panels_mini';
-    $pane->subtype = 'prereq_and_signup_task';
+    $pane->subtype = 'course_summary_and_syllabus';
     $pane->shown = TRUE;
-    $pane->access = array(
-      'plugins' => array(
-        '0' => array(
-          'name' => 'php',
-          'settings' => array(
-            'description' => 'Show if course status is draft or open for signup',
-            'php' => '$show_statuses = array(\'00_draft\', \'10_open\');
-if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value\'], $show_statuses)) {
-  return TRUE;
-}',
-          ),
-        ),
-      ),
-    );
+    $pane->access = array();
     $pane->configuration = array(
       'context' => array(
         '0' => 'argument_nid_1',
@@ -2766,7 +2770,7 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
     $pane->style = array();
     $pane->css = array(
       'css_id' => '',
-      'css_class' => 'grey-panel',
+      'css_class' => 'yellow-panel',
     );
     $pane->extras = array();
     $pane->position = 1;
@@ -2797,9 +2801,22 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
     $pane->pid = 'new-9';
     $pane->panel = 'top_region';
     $pane->type = 'panels_mini';
-    $pane->subtype = 'course_summary_and_syllabus';
+    $pane->subtype = 'prereq_and_signup_task';
     $pane->shown = TRUE;
-    $pane->access = array();
+    $pane->access = array(
+      'plugins' => array(
+        '0' => array(
+          'name' => 'php',
+          'settings' => array(
+            'description' => 'Show if course status is draft or open for signup',
+            'php' => '$show_statuses = array(\'00_draft\', \'10_open\');
+if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value\'], $show_statuses)) {
+  return TRUE;
+}',
+          ),
+        ),
+      ),
+    );
     $pane->configuration = array(
       'context' => array(
         '0' => 'argument_nid_1',
@@ -2811,7 +2828,7 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
     $pane->style = array();
     $pane->css = array(
       'css_id' => '',
-      'css_class' => 'yellow-panel',
+      'css_class' => 'grey-panel',
     );
     $pane->extras = array();
     $pane->position = 3;
@@ -2822,7 +2839,7 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
     $pane->panel = 'top_region';
     $pane->type = 'node_comments';
     $pane->subtype = 'node_comments';
-    $pane->shown = FALSE;
+    $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(
       'mode' => '2',

@@ -4870,26 +4870,6 @@ If you are looking for a particular course that is currently running, change the
       'relationship' => 'none',
       'reduce_duplicates' => 0,
     ),
-    'status' => array(
-      'operator' => '=',
-      'value' => FALSE,
-      'group' => '0',
-      'exposed' => TRUE,
-      'expose' => array(
-        'operator' => '',
-        'identifier' => 'status',
-        'label' => 'Approved',
-        'optional' => 1,
-        'remember' => 1,
-      ),
-      'id' => 'status',
-      'table' => 'node',
-      'field' => 'status',
-      'override' => array(
-        'button' => 'Use default',
-      ),
-      'relationship' => 'none',
-    ),
   ));
   $handler->override_option('title', 'Administer Courses');
   $handler->override_option('header', '<?php
@@ -8452,7 +8432,7 @@ print "Next start date: <strong>".substr($start_date, 0, 10)."</strong><br/>";
     ),
   ));
   $handler->override_option('title', 'My items in this course');
-  $handler->override_option('empty', 'You haven\'t posted any items yet.');
+  $handler->override_option('empty', '');
   $handler->override_option('use_ajax', TRUE);
   $handler->override_option('items_per_page', 20);
   $handler->override_option('style_plugin', 'list');

@@ -865,7 +865,7 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
       $form['message']['#weight'] = -10;
   
       $template = $form['#parameters'][3];
-      $form['request']['#title'] = 'Sign-up requirement';
+      $form['request']['#title'] = 'Sign-up task';
       $form['request']['#description'] = $template->field_course_sign_up_req[0]['value'];
       $form['request']['#weight'] = -3;
       $form['request']['#required'] = true;

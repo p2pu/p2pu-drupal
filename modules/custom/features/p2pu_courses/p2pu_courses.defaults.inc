@@ -2859,6 +2859,25 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
     $pane->position = 4;
     $display->content['new-10'] = $pane;
     $display->panels['top_region'][4] = 'new-10';
+    $pane = new stdClass;
+    $pane->pid = 'new-11';
+    $pane->panel = 'top_region';
+    $pane->type = 'node_comment_form';
+    $pane->subtype = 'node_comment_form';
+    $pane->shown = TRUE;
+    $pane->access = array();
+    $pane->configuration = array(
+      'context' => 'argument_nid_1',
+      'override_title' => 0,
+      'override_title_text' => '',
+    );
+    $pane->cache = array();
+    $pane->style = array();
+    $pane->css = array();
+    $pane->extras = array();
+    $pane->position = 5;
+    $display->content['new-11'] = $pane;
+    $display->panels['top_region'][5] = 'new-11';
   $display->hide_title = PANELS_TITLE_PANE;
   $display->title_pane = 'new-3';
   $handler->conf['display'] = $display;
@@ -4443,15 +4462,7 @@ Panel page of courses list<br />
       'title' => '',
       'body' => '<?php
       global $user;
-    
-    // Load the general discussion forum taxonomy term id for this course
-    
-      $forum_tid  = og_forum_get_forum_container(arg(1));
-      $children = taxonomy_get_children($forum_tid);
-      $children_tids = array_keys($children);
-      // General discussion is the 1st item
-      $forum_tid = $children_tids[0];
-    
+       
       $group = og_get_group_context();
       if ($user->uid == 0) {
         $register = l(\'register\', \'user/register\', array(\'query\' => \'destination=node/\'.$group->nid.\'/forums\'));
@@ -4464,8 +4475,18 @@ Panel page of courses list<br />
         print ($link);
         return;
       }
-      $link = l(\'Start a discussion\', \'node/add/forum/\' . $forum_tid, array(\'query\' => \'gids[]=\'.$group->nid));
-      print ($link);
+      else {
+        // Only show to members of the course
+        // Load the general discussion forum taxonomy term id for this course
+        $forum_tid  = og_forum_get_forum_container(arg(1));
+        $children = taxonomy_get_children($forum_tid);
+        $children_tids = array_keys($children);
+        // General discussion is the 1st item
+        $forum_tid = $children_tids[0];        
+        $link = l(\'Start a discussion\', \'node/add/forum/\' . $forum_tid, array(\'query\' => \'gids[]=\'.$group->nid));
+        print ($link);        
+      }
+
     ?>',
       'format' => '3',
       'substitute' => 1,

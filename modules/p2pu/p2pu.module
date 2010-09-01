@@ -822,7 +822,8 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
   
   //Redirect comments
   if ($form_id == 'comment_form') {
-    $node = node_load($form['nid']['#value']);
+
+   // $node = node_load($form['nid']['#value']);
     //Discussions
     // CHARLES: I've removed Diricia's redirect, so that we redirect to the
     // course discussion which lists the comments - it was redirectint to the
@@ -834,6 +835,7 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
   
     // Don't display the subscriptions fieldset on the node comment form
     $form[0]['subscriptions']['#access'] = FALSE;  
+    $form['comment_link']['#access'] = FALSE;
   
     //GEORGE: just doing some formatting changes
     unset($form['_author']);

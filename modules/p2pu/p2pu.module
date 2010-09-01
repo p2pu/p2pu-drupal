@@ -714,7 +714,7 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
   //Adding a link back to the thread on the comment form
   if ($form['#id'] == 'comment-form') {
     $form['comment_link'] = array(
-       '#prefix' => '<div style="position:relative;width:100%;"><div class="comment_link">',
+       '#prefix' => '<div style="position:relative;width:100%;" id="p2pu-custom-comment-link"><div class="comment_link">',
        '#value' => l(t('Go back to thread'), 'node/' .$form['nid']['#value']),
        '#suffix' => '</div></div>',
        '#weight' => -100,
@@ -834,8 +834,7 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
     //}
   
     // Don't display the subscriptions fieldset on the node comment form
-    $form[0]['subscriptions']['#access'] = FALSE;  
-    $form['comment_link']['#access'] = FALSE;
+    $form[0]['subscriptions']['#access'] = FALSE;
   
     //GEORGE: just doing some formatting changes
     unset($form['_author']);
@@ -895,10 +894,20 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
       //print "</pre>";
     }
   }
-  // Change the filter form type from select to checkboxes
-  //if ($form_id == 'views_exposed_form' && $form['#id'] = 'views-exposed-form-course-list-page-1') {
-  //  $form['tid']['#type'] = 'checkboxes';
-  //}  
+  
+  if ($form_id == 'views_exposed_form' && $form['#id'] = 'views-exposed-form-course-list-page-1') {
+    //dpm($form_state);
+    // Temporary way to filter this view using a url
+    // @TODO must remove this when we start to use PURL and create the webcraft department
+    if (empty($form_state['view']->exposed_input['tid']) && arg(2) == 'webcraft')  {
+      $webcraft_tid = 445;
+      $form_state['input']['tid'] = array($webcraft_tid => $webcraft_tid);
+    }
+    
+    // There was talk of using checkboxes - can remove this if they're happy with the select   
+    //$form['tid']['#type'] = 'checkboxes';
+    //$form['status']['#type'] = 'checkboxes';
+  }
 } // p2pu_form_alter
 
 /*

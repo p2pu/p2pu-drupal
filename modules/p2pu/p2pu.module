@@ -900,7 +900,7 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
     // Temporary way to filter this view using a url
     // @TODO must remove this when we start to use PURL and create the webcraft department
     if (empty($form_state['view']->exposed_input['tid']) && arg(2) == 'webcraft')  {
-      $webcraft_tid = 445;
+      $webcraft_tid = 307;
       $form_state['input']['tid'] = array($webcraft_tid => $webcraft_tid);
     }
     

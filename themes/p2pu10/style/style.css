@@ -458,6 +458,7 @@ div#page-footer div.block:last{ float: right;}
 .page-node.node-type-course .field-field-course-short-desc{font-weight: bold; font-size: 13px; float: left; width: 90%;}
 .page-node.node-type-course .field.field-field-course-facilitator-about .field-label-inline-first{display:inline; float:none; width:100%;} 
 .page-node.node-type-course div.panel-pane.pane-field-course-photo div.pane-inner{padding: 0;}
+.page-node.node-type-course #p2pu-custom-comment-link{display:none; visibility: hidden;}
 
 /* Forms */
 .form-item .description {

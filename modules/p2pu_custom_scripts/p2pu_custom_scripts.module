@@ -79,3 +79,44 @@ function p2pu_custom_scripts_set_og_forums_public() {
 	db_query("UPDATE {og_term} SET public = %d", PUBLIC_BY_GROUP_OWNER);
 	drupal_set_message(t('OG forum permissions set to PUBLIC.'));
 }
+
+/**
+ * Adds a course node thread subscription for each member of that course 
+ *
+ * @param $nids Array of the group node ids we want to subscribe the users to
+ *
+ */
+function p2pu_custom_scripts_subscribe_members_to_course_thread($nids = array()) {
+	
+	// For each couse on the site that is open or running
+	$result = db_query("SELECT n.nid FROM {node} n, {content_type_course} c WHERE
+										 n.nid = c.nid AND
+										 c.field_course_status_value IN ('10_open', '20_running')");
+	while ($node_obj = db_fetch_object($result)) {
+		$courses[] = node_load($node_obj->nid);
+	}
+	foreach ($courses as $course) {
+		//dpm($course);
+		// Load all members of the course
+		$result = db_query(og_list_users_sql(0, 0, NULL), $course->nid);
+		$cntpending = $cntall = 0;
+		$subscription = '';
+		while ($user = db_fetch_object($result)) {
+			if ($user->is_active) {
+				// Only subscribe users who have been approved, to the thread
+				$type = 'thread';
+				$event_type = 'node';
+				$field = 'nid';
+				$value = $course->nid;
+				$subscription = array(
+						'uid' => $user->uid,
+						'type' => $type,
+						'event_type' => $event_type,
+						'fields' => array($field => $value),
+					);
+				notifications_save_subscription($subscription); // This function handles duplicate subscriptions
+				drupal_set_message(t('User @uid was subscribed to course @course home page comments.', array('@uid' => $user->uid, '@course' => $course->title)));						
+			}
+		}				
+	}
+}

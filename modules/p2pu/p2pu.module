@@ -832,6 +832,9 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
     //  $form['#redirect'] = array('node/'.$group->nid.'/discussions');
     //}
   
+    // Don't display the subscriptions fieldset on the node comment form
+    $form[0]['subscriptions']['#access'] = FALSE;  
+  
     //GEORGE: just doing some formatting changes
     unset($form['_author']);
     unset($form['mollom']['privacy']);
@@ -890,6 +893,10 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
       //print "</pre>";
     }
   }
+  // Change the filter form type from select to checkboxes
+  //if ($form_id == 'views_exposed_form' && $form['#id'] = 'views-exposed-form-course-list-page-1') {
+  //  $form['tid']['#type'] = 'checkboxes';
+  //}  
 } // p2pu_form_alter
 
 /*
@@ -1562,66 +1569,6 @@ function p2pu_exit() {
     
     //finally, don't save the users session        
     session_save_session(false);
-  }
-}
-
-/**
-* Implementation of hook_action_info().
-*
-* Provide custom P2PU actions to be triggered by rules.
-* 
-*/
-function p2pu_action_info() {
-  return array(
-    'p2pu_create_course_syllabus_action' => array(
-      'description' => t('Create empty course syllabus document and link to course.'),
-      'type' => 'node',
-      'configurable' => FALSE,
-      'hooks' => array(
-        'nodeapi' => array('insert'),
-        ),
-      ),
-  );
-}
-
-/**
-* Implementation of a Drupal action.
-* Blocks the current user.
-*/
-function p2pu_create_course_syllabus_action(&$object, $context = array()) {
-  global $user;
-  $document = new StdClass();
-	$document->type = "document";
-	$document->status = 1;
-	$document->sticky = 1;
-	$document->uid = $user->uid;
-	$document->name = $user->name;
-	$document->title = "Syllabus for " . $object->title;
-	$body_text = t("This is the Syllabus for your Course. Any course participant is allowed to edit this page. Be the first to edit the page by clicking on 'Edit' next to the name of the page (in the Course Material block on the left).");
-  $document->field_document_body[0]['value'] = $body_text;
-  $document->body = $body_text;
-  $document->og_initial_groups[0][$object->nid];
-	$document->og_groups[0] = $object->nid;
-	$document->og_public = 1;
-	$document->og_groups_names[0] = $object->title;
-  $group_node = og_determine_context_get_group($object);
-  og_set_group_context($group_node);
-	if ($document = node_submit($document)) {
-	  node_save($document);
-    $document->og_groups = array($object->nid);
-    og_save_ancestry($document);        
-    $syllabus_url = l('course syllabus', 'node/' . $document->nid);
-    $message = t('Automatically created !syllabus for %course_name.', array('!syllabus' => $syllabus_url, '%course_name' => check_plain($object->title)));
-    
-    // Now add the nid of the document as a node reference
-    $object->field_refers_to_syllabus[0]['nid'] = $document->nid;
-    watchdog('action', $message);
-    drupal_set_message($message);
-  }
-  else {
-    $message = t('Could not creat course syllabus for %course_name.', array('%course_name' => check_plain($object->title)));
-    watchdog('action', $message);
-    drupal_set_message($message);
   }
 }
 

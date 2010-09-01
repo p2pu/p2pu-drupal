@@ -4353,6 +4353,8 @@ Panel page of courses list<br />
       ),
     ),
     'logic' => 'and',
+    'type' => 'none',
+    'settings' => NULL,
   );
   $page->menu = array(
     'type' => 'tab',
@@ -5260,6 +5262,90 @@ Please review this at [node:site-url]/node/[node:nid]
               'configurable' => FALSE,
             ),
             '#weight' => 0,
+          ),
+        ),
+        '#version' => 6003,
+      ),
+      'p2pu_courses_3' => array(
+        '#type' => 'rule',
+        '#set' => 'event_og_user_delete',
+        '#label' => 'User removed from course: Delete course node comment notification subscription',
+        '#active' => 1,
+        '#weight' => '0',
+        '#categories' => array(
+          '0' => 'p2pu_courses',
+          'p2pu_courses' => 'p2pu_courses',
+        ),
+        '#status' => 'default',
+        '#conditions' => array(),
+        '#actions' => array(
+          '0' => array(
+            '#type' => 'action',
+            '#settings' => array(
+              '#argument map' => array(
+                'user' => 'account',
+                'group' => 'group',
+              ),
+            ),
+            '#name' => 'p2pu_rules_action_unsubscribe_user_from_course_comments',
+            '#info' => array(
+              'label' => 'Unsubscribe a user from a course node comments notifications.',
+              'arguments' => array(
+                'user' => array(
+                  'type' => 'user',
+                  'label' => 'User who will be subscribed',
+                ),
+                'group' => array(
+                  'type' => 'node',
+                  'label' => 'Group node that user will be unsubscribed from',
+                ),
+              ),
+              'configurable' => FALSE,
+              'module' => 'P2PU',
+            ),
+            '#weight' => 0,
+          ),
+        ),
+        '#version' => 6003,
+      ),
+      'p2pu_courses_4' => array(
+        '#type' => 'rule',
+        '#set' => 'event_og_user_approved',
+        '#label' => 'User accepted to join a course: Subscribe them to the course node comment notifications',
+        '#active' => 1,
+        '#weight' => '0',
+        '#categories' => array(
+          '0' => 'p2pu_courses',
+          'p2pu_courses' => 'p2pu_courses',
+        ),
+        '#status' => 'default',
+        '#conditions' => array(),
+        '#actions' => array(
+          '0' => array(
+            '#weight' => 0,
+            '#info' => array(
+              'label' => 'Subscribe a user to notifications on course node comments.',
+              'arguments' => array(
+                'user' => array(
+                  'type' => 'user',
+                  'label' => 'User who will be subscribed',
+                ),
+                'group' => array(
+                  'type' => 'node',
+                  'label' => 'Group node that user will be subscribed to notifications of',
+                ),
+              ),
+              'configurable' => FALSE,
+              'module' => 'P2PU',
+            ),
+            '#name' => 'p2pu_rules_action_subscribe_user_to_course_comments',
+            '#settings' => array(
+              '#argument map' => array(
+                'user' => 'account',
+                'group' => 'group',
+              ),
+            ),
+            '#type' => 'action',
           ),
         ),
         '#version' => 6003,

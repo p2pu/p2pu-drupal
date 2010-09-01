@@ -731,7 +731,7 @@ function _p2pu_courses_content_default_fields() {
     ),
     'widget_active' => '1',
     'type' => 'date',
-    'required' => '1',
+    'required' => '0',
     'multiple' => '0',
     'module' => 'date',
     'active' => '1',
@@ -2864,7 +2864,7 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
     $pane->panel = 'top_region';
     $pane->type = 'node_comment_form';
     $pane->subtype = 'node_comment_form';
-    $pane->shown = TRUE;
+    $pane->shown = FALSE;
     $pane->access = array();
     $pane->configuration = array(
       'context' => 'argument_nid_1',
@@ -3092,6 +3092,8 @@ function _p2pu_courses_default_page_manager_pages() {
       ),
     ),
     'logic' => 'or',
+    'type' => 'none',
+    'settings' => NULL,
   );
   $page->menu = array(
     'type' => 'tab',
@@ -3762,6 +3764,8 @@ print ($link);
       ),
     ),
     'logic' => 'and',
+    'type' => 'none',
+    'settings' => NULL,
   );
   $page->menu = array(
     'type' => 'none',
@@ -4246,7 +4250,10 @@ else return FALSE;',
 Panel page of courses list<br />
 ';
   $page->path = 'course/list';
-  $page->access = array();
+  $page->access = array(
+    'type' => 'none',
+    'settings' => NULL,
+  );
   $page->menu = array(
     'type' => 'normal',
     'title' => 'Courses',

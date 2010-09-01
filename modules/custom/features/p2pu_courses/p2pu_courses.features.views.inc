@@ -3984,12 +3984,13 @@ return date(\'Y-m\');',
         'max_length' => '',
         'word_boundary' => 1,
         'ellipsis' => 1,
-        'strip_tags' => 0,
         'html' => 0,
+        'strip_tags' => 0,
       ),
       'empty' => '',
       'hide_empty' => 0,
       'empty_zero' => 0,
+      'imagecache_preset' => 'user_image_default',
       'exclude' => 0,
       'id' => 'picture',
       'table' => 'users',
@@ -4082,8 +4083,6 @@ return date(\'Y-m\');',
       'operator' => 'or',
       'value' => array(
         '10_open' => '10_open',
-        '20_running' => '20_running',
-        '30_complete' => '30_complete',
       ),
       'group' => '0',
       'exposed' => TRUE,
@@ -4102,6 +4101,9 @@ return date(\'Y-m\');',
       'field' => 'field_course_status_value_many_to_one',
       'relationship' => 'none',
       'reduce_duplicates' => 0,
+      'override' => array(
+        'button' => 'Override',
+      ),
     ),
     'type_groups' => array(
       'operator' => 'in',
@@ -4313,18 +4315,19 @@ return date(\'Y-m\');',
         'max_length' => '',
         'word_boundary' => 1,
         'ellipsis' => 1,
-        'strip_tags' => 0,
         'html' => 0,
+        'strip_tags' => 0,
       ),
       'empty' => '',
       'hide_empty' => 0,
       'empty_zero' => 0,
+      'imagecache_preset' => 'user_image_default',
       'exclude' => 0,
       'id' => 'picture',
       'table' => 'users',
       'field' => 'picture',
       'override' => array(
-        'button' => 'Override',
+        'button' => 'Use default',
       ),
       'relationship' => 'none',
     ),
@@ -4403,14 +4406,6 @@ return date(\'Y-m\');',
     ),
   ));
   $handler->override_option('sorts', array(
-    'field_course_dates_value' => array(
-      'order' => 'ASC',
-      'delta' => -1,
-      'id' => 'field_course_dates_value',
-      'table' => 'node_data_field_course_dates',
-      'field' => 'field_course_dates_value',
-      'relationship' => 'none',
-    ),
     'title' => array(
       'order' => 'ASC',
       'id' => 'title',
@@ -4442,7 +4437,6 @@ return date(\'Y-m\');',
       'value' => array(
         '10_open' => '10_open',
         '20_running' => '20_running',
-        '30_complete' => '30_complete',
       ),
       'group' => '0',
       'exposed' => TRUE,
@@ -4525,6 +4519,34 @@ return date(\'Y-m\');',
       ),
       'relationship' => 'none',
     ),
+    'tid' => array(
+      'operator' => 'or',
+      'value' => array(),
+      'group' => '0',
+      'exposed' => TRUE,
+      'expose' => array(
+        'use_operator' => 0,
+        'operator' => 'tid_op',
+        'identifier' => 'tid',
+        'label' => 'Department',
+        'optional' => 1,
+        'single' => 0,
+        'remember' => 0,
+        'reduce' => 0,
+      ),
+      'type' => 'select',
+      'limit' => TRUE,
+      'vid' => '6',
+      'id' => 'tid',
+      'table' => 'term_node',
+      'field' => 'tid',
+      'hierarchy' => 0,
+      'override' => array(
+        'button' => 'Use default',
+      ),
+      'relationship' => 'none',
+      'reduce_duplicates' => 0,
+    ),
   ));
   $handler->override_option('header', 'This page lists all of P2PU\'s courses. By default you see the courses that are open for sign-up. Click the course title to see more information about the course, including the course materials and assignments. You can also apply to join a course by clicking the "request membership" link. 
 
@@ -4532,7 +4554,7 @@ If you are looking for a particular course that is currently running, change the
   $handler->override_option('header_format', '1');
   $handler->override_option('header_empty', 0);
   $handler->override_option('empty', 'There are currently no courses ... ');
-  $handler->override_option('items_per_page', 20);
+  $handler->override_option('items_per_page', 50);
   $handler->override_option('use_pager', 'mini');
   $handler->override_option('style_options', array(
     'grouping' => '',
@@ -5302,10 +5324,76 @@ print "Next start date: <strong>".substr($start_date, 0, 10)."</strong><br/>";
       'field' => 'title',
     ),
   ));
-  $handler->override_option('cache', array(
-    'type' => 'time',
-    'results_lifespan' => '21600',
-    'output_lifespan' => '21600',
+  $handler->override_option('filters', array(
+    'status' => array(
+      'operator' => '=',
+      'value' => '1',
+      'group' => '0',
+      'exposed' => FALSE,
+      'expose' => array(
+        'operator' => FALSE,
+        'label' => '',
+      ),
+      'id' => 'status',
+      'table' => 'node',
+      'field' => 'status',
+      'relationship' => 'none',
+    ),
+    'type' => array(
+      'operator' => 'in',
+      'value' => array(
+        'course' => 'course',
+      ),
+      'group' => '0',
+      'exposed' => FALSE,
+      'expose' => array(
+        'operator' => FALSE,
+        'label' => '',
+      ),
+      'id' => 'type',
+      'table' => 'node',
+      'field' => 'type',
+      'relationship' => 'none',
+    ),
+    'type_groups' => array(
+      'operator' => 'in',
+      'value' => array(
+        'course' => 'course',
+      ),
+      'group' => '0',
+      'exposed' => FALSE,
+      'expose' => array(
+        'operator' => FALSE,
+        'label' => '',
+      ),
+      'id' => 'type_groups',
+      'table' => 'og',
+      'field' => 'type_groups',
+      'override' => array(
+        'button' => 'Override',
+      ),
+      'relationship' => 'none',
+    ),
+    'field_course_status_value_many_to_one_1' => array(
+      'operator' => 'or',
+      'value' => array(
+        '10_open' => '10_open',
+      ),
+      'group' => '0',
+      'exposed' => FALSE,
+      'expose' => array(
+        'operator' => FALSE,
+        'label' => '',
+      ),
+      'id' => 'field_course_status_value_many_to_one_1',
+      'table' => 'node_data_field_course_status',
+      'field' => 'field_course_status_value_many_to_one',
+      'relationship' => 'none',
+      'reduce_duplicates' => 0,
+      'override' => array(
+        'button' => 'Use default',
+      ),
+    ),
   ));
   $handler->override_option('title', 'Recent Courses ');
   $handler->override_option('footer', 'View all <a href="/course/list">Open Courses</a>');

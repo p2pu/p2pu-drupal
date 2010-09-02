@@ -1073,6 +1073,10 @@ function p2pu_og_confirm_subscribe($form, &$form_state) {
   if ($application = node_submit($application)) {
     node_save($application);
   }
+  else {
+    drupal_set_message(t("Couldn't save application for user with uid @uid and for course id @cid.", array('@uid' => $user->uid, '@cid' => $course->nid)));
+    watchdog('p2pu', t("Couldn't save application for user with uid @uid and for course id @cid.", array('@uid' => $user->uid, '@cid' => $course->nid)));
+  }
 
   $application->og_groups = array( $form['gid']['#value']);
   og_save_ancestry($application);

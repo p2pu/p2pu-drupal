@@ -614,7 +614,75 @@ function p2pu_menu_alter(&$items) {
   //unset($items['node/%og_forum_group_type/og/forum']);
   // For some reason the above didn't work, so unsent the type to hide the og forums menu item
   unset($items['node/%og_forum_group_type/og/forum']['type']);
+  // Allow course organisers to delete comments in their course(s)
+  $items['comment/delete']['access callback'] = 'p2pu_comment_delete_access';
+ 
+}
 
+/**
+ * Determine whether the user can delete comments.
+ *
+ * @param $string
+ *   The permission, such as "administer nodes", being checked for.
+ * @param $account
+ *   (optional) The account to check, if not given use currently logged in user.
+ * @param $reset
+ *   (optional) Resets the user's permissions cache, which will result in a
+ *   recalculation of the user's permissions. This is necessary to support
+ *   dynamically added user roles.
+ *
+ * @return
+ *   Boolean TRUE if the current user has the requested permission.
+ *
+ * Based on the user_access function, we add in a check which allows group admins
+ * to delete comments. We also 
+ */
+function p2pu_comment_delete_access($string, $account = NULL, $reset = FALSE) {
+  
+  global $user;
+  static $perm = array();
+
+  if ($reset) {
+    $perm = array();
+  }
+
+  if (!isset($account)) {
+    $account = $user;
+  }
+  
+  // User #1 has all privileges:
+  if ($account->uid == 1) {
+    return TRUE;
+  }
+  // Allow course organisers to delete comments in their courses
+  // We don't have group context on the comment/delete/$comment->cid page, so we
+  // need to check which group the comment belongs to 
+  if (arg(0) == 'comment' && arg(1) == 'delete' && is_numeric(arg(2))) {
+    $nid = db_result(db_query('SELECT (nid) FROM {comments} WHERE cid = %d', arg(2)));
+    if ($nid) {
+      $group_node = og_determine_context_get_group(node_load($nid));
+      og_set_group_context($group_node);        
+    }
+  }
+  $group = og_get_group_context();
+  if (!empty($group)) {
+    return (og_is_group_admin($group, $account));
+  }
+  // Otherwise use the default user permissions
+
+  // To reduce the number of SQL queries, we cache the user's permissions
+  // in a static variable.
+  if (!isset($perm[$account->uid])) {
+    $result = db_query("SELECT p.perm FROM {role} r INNER JOIN {permission} p ON p.rid = r.rid WHERE r.rid IN (". db_placeholders($account->roles) .")", array_keys($account->roles));
+
+    $perms = array();
+    while ($row = db_fetch_object($result)) {
+      $perms += array_flip(explode(', ', $row->perm));
+    }
+    $perm[$account->uid] = $perms;
+  }
+
+  return isset($perm[$account->uid][$string]);
 }
 
 function p2pu_og_forum_link_redirect($ctid = 0) {
@@ -640,6 +708,18 @@ function p2pu_link_alter(&$links, $node) {
   if (in_array($node->type, $content_types) && isset($links['comment_add'])) {
     $links['comment_add']['href'] = $_GET['q'];
     $links['comment_add']['fragment'] = 'add-comment-anchor';
+  }
+  // Insert a link for course admins to allow them to delete spam comments
+  // Because we use an existing reply to comment link to get the comment id, this
+  // link won't appear if comments are closed for the node
+  if (!isset($links['comment_delete']) && isset($links['comment_reply'])) {
+      if (p2pu_comment_delete_access('administer comments') && user_access('post comments')) {
+        $comment_array = explode('/', $links['comment_reply']['href']);
+        $links['comment_delete'] = array(
+          'title' => t('delete'),
+          'href' => "comment/delete/" . $comment_array[3]
+        );
+      }
   }
 }
 

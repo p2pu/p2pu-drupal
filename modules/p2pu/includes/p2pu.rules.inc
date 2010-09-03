@@ -15,7 +15,12 @@ function p2pu_rules_action_info() {
   return array(
     'p2pu_rules_action_create_course_syllabus' => array(
 			'label' => t('Create empty course syllabus document and link to course.'),
-      'type' => 'node',
+      'arguments' => array(
+        'group' => array(
+          'type' => 'node',
+          'label' => t('Group node that user will be subscribed to notifications of'),
+        ),
+			),
       'configurable' => FALSE,
       'hooks' => array(
         'nodeapi' => array('insert'),
@@ -59,7 +64,7 @@ function p2pu_rules_action_info() {
 * Implementation of a Drupal action.
 * Blocks the current user.
 */
-function p2pu_rules_action_create_course_syllabus(&$object, $context = array()) {
+function p2pu_rules_action_create_course_syllabus($object) {
   global $user;
   $document = new StdClass();
 	$document->type = "document";

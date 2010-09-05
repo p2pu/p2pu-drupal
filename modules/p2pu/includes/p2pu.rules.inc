@@ -18,7 +18,7 @@ function p2pu_rules_action_info() {
       'arguments' => array(
         'group' => array(
           'type' => 'node',
-          'label' => t('Group node that user will be subscribed to notifications of'),
+          'label' => t('Node that the syllabus will be linked to'),
         ),
 			),
       'configurable' => FALSE,

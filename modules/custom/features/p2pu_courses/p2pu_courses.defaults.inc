@@ -2630,6 +2630,30 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
     $pane = new stdClass;
     $pane->pid = 'new-2';
     $pane->panel = 'center';
+    $pane->type = 'custom';
+    $pane->subtype = 'custom';
+    $pane->shown = TRUE;
+    $pane->access = array();
+    $pane->configuration = array(
+      'admin_title' => 'Custom course dates block (static)',
+      'title' => '<none>',
+      'body' => 'Sign-up closes 8 Sep. The course starts on 15 Sep. Applicants will be notified of acceptance by 8 Sep.',
+      'format' => '1',
+      'substitute' => 1,
+    );
+    $pane->cache = array();
+    $pane->style = array();
+    $pane->css = array(
+      'css_id' => '',
+      'css_class' => 'yellow-panel',
+    );
+    $pane->extras = array();
+    $pane->position = 1;
+    $display->content['new-2'] = $pane;
+    $display->panels['center'][1] = 'new-2';
+    $pane = new stdClass;
+    $pane->pid = 'new-3';
+    $pane->panel = 'center';
     $pane->type = 'content_field';
     $pane->subtype = 'field_course_photo';
     $pane->shown = TRUE;
@@ -2648,11 +2672,11 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
       'css_class' => '',
     );
     $pane->extras = array();
-    $pane->position = 1;
-    $display->content['new-2'] = $pane;
-    $display->panels['center'][1] = 'new-2';
+    $pane->position = 2;
+    $display->content['new-3'] = $pane;
+    $display->panels['center'][2] = 'new-3';
     $pane = new stdClass;
-    $pane->pid = 'new-3';
+    $pane->pid = 'new-4';
     $pane->panel = 'center';
     $pane->type = 'panels_mini';
     $pane->subtype = 'course_general_info';
@@ -2672,11 +2696,11 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
       'css_class' => 'grey-panel',
     );
     $pane->extras = array();
-    $pane->position = 2;
-    $display->content['new-3'] = $pane;
-    $display->panels['center'][2] = 'new-3';
+    $pane->position = 3;
+    $display->content['new-4'] = $pane;
+    $display->panels['center'][3] = 'new-4';
     $pane = new stdClass;
-    $pane->pid = 'new-4';
+    $pane->pid = 'new-5';
     $pane->panel = 'center';
     $pane->type = 'views_panes';
     $pane->subtype = 'dashboard_mytracker-panel_pane_2';
@@ -2690,11 +2714,11 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
       'css_class' => 'grey-panel',
     );
     $pane->extras = array();
-    $pane->position = 3;
-    $display->content['new-4'] = $pane;
-    $display->panels['center'][3] = 'new-4';
+    $pane->position = 4;
+    $display->content['new-5'] = $pane;
+    $display->panels['center'][4] = 'new-5';
     $pane = new stdClass;
-    $pane->pid = 'new-5';
+    $pane->pid = 'new-6';
     $pane->panel = 'center';
     $pane->type = 'views';
     $pane->subtype = 'og_members_faces';
@@ -2728,11 +2752,41 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
       'css_class' => 'yellow-panel',
     );
     $pane->extras = array();
-    $pane->position = 4;
-    $display->content['new-5'] = $pane;
-    $display->panels['center'][4] = 'new-5';
+    $pane->position = 5;
+    $display->content['new-6'] = $pane;
+    $display->panels['center'][5] = 'new-6';
     $pane = new stdClass;
-    $pane->pid = 'new-6';
+    $pane->pid = 'new-7';
+    $pane->panel = 'center';
+    $pane->type = 'custom';
+    $pane->subtype = 'custom';
+    $pane->shown = TRUE;
+    $pane->access = array();
+    $pane->configuration = array(
+      'admin_title' => 'Custom: temporary leave this course link',
+      'title' => '<none>',
+      'body' => '<?php
+  global $user;
+  $nid = arg(1);
+  if (og_is_group_member($nid, FALSE)) {
+    print \'<strong>\' . l(t(\'Unsubscribe from this course\'), "og/unsubscribe/$nid/$user->uid") . \'</strong>\';
+  }
+?>',
+      'format' => '3',
+      'substitute' => 1,
+    );
+    $pane->cache = array();
+    $pane->style = array();
+    $pane->css = array(
+      'css_id' => '',
+      'css_class' => 'grey-panel',
+    );
+    $pane->extras = array();
+    $pane->position = 6;
+    $display->content['new-7'] = $pane;
+    $display->panels['center'][6] = 'new-7';
+    $pane = new stdClass;
+    $pane->pid = 'new-8';
     $pane->panel = 'top_region';
     $pane->type = 'block';
     $pane->subtype = 'p2pu-6';
@@ -2750,10 +2804,10 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
     );
     $pane->extras = array();
     $pane->position = 0;
-    $display->content['new-6'] = $pane;
-    $display->panels['top_region'][0] = 'new-6';
+    $display->content['new-8'] = $pane;
+    $display->panels['top_region'][0] = 'new-8';
     $pane = new stdClass;
-    $pane->pid = 'new-7';
+    $pane->pid = 'new-9';
     $pane->panel = 'top_region';
     $pane->type = 'panels_mini';
     $pane->subtype = 'course_summary_and_syllabus';
@@ -2774,10 +2828,10 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
     );
     $pane->extras = array();
     $pane->position = 1;
-    $display->content['new-7'] = $pane;
-    $display->panels['top_region'][1] = 'new-7';
+    $display->content['new-9'] = $pane;
+    $display->panels['top_region'][1] = 'new-9';
     $pane = new stdClass;
-    $pane->pid = 'new-8';
+    $pane->pid = 'new-10';
     $pane->panel = 'top_region';
     $pane->type = 'views_panes';
     $pane->subtype = 'activity_atrium-panel_pane_1';
@@ -2795,10 +2849,10 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
     );
     $pane->extras = array();
     $pane->position = 2;
-    $display->content['new-8'] = $pane;
-    $display->panels['top_region'][2] = 'new-8';
+    $display->content['new-10'] = $pane;
+    $display->panels['top_region'][2] = 'new-10';
     $pane = new stdClass;
-    $pane->pid = 'new-9';
+    $pane->pid = 'new-11';
     $pane->panel = 'top_region';
     $pane->type = 'panels_mini';
     $pane->subtype = 'prereq_and_signup_task';
@@ -2832,10 +2886,10 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
     );
     $pane->extras = array();
     $pane->position = 3;
-    $display->content['new-9'] = $pane;
-    $display->panels['top_region'][3] = 'new-9';
+    $display->content['new-11'] = $pane;
+    $display->panels['top_region'][3] = 'new-11';
     $pane = new stdClass;
-    $pane->pid = 'new-10';
+    $pane->pid = 'new-12';
     $pane->panel = 'top_region';
     $pane->type = 'node_comments';
     $pane->subtype = 'node_comments';
@@ -2857,14 +2911,14 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
     );
     $pane->extras = array();
     $pane->position = 4;
-    $display->content['new-10'] = $pane;
-    $display->panels['top_region'][4] = 'new-10';
+    $display->content['new-12'] = $pane;
+    $display->panels['top_region'][4] = 'new-12';
     $pane = new stdClass;
-    $pane->pid = 'new-11';
+    $pane->pid = 'new-13';
     $pane->panel = 'top_region';
     $pane->type = 'node_comment_form';
     $pane->subtype = 'node_comment_form';
-    $pane->shown = FALSE;
+    $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(
       'context' => 'argument_nid_1',
@@ -2876,10 +2930,10 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
     $pane->css = array();
     $pane->extras = array();
     $pane->position = 5;
-    $display->content['new-11'] = $pane;
-    $display->panels['top_region'][5] = 'new-11';
+    $display->content['new-13'] = $pane;
+    $display->panels['top_region'][5] = 'new-13';
   $display->hide_title = PANELS_TITLE_PANE;
-  $display->title_pane = 'new-3';
+  $display->title_pane = 'new-4';
   $handler->conf['display'] = $display;
 
   $export['node_view_panel_context_2'] = $handler;
@@ -4353,8 +4407,6 @@ Panel page of courses list<br />
       ),
     ),
     'logic' => 'and',
-    'type' => 'none',
-    'settings' => NULL,
   );
   $page->menu = array(
     'type' => 'tab',
@@ -4994,6 +5046,135 @@ print "</div>\\n";
 function _p2pu_courses_rules_defaults() {
   return array(
     'rules' => array(
+      'p2pu_courses_2' => array(
+        '#type' => 'rule',
+        '#set' => 'event_node_insert',
+        '#label' => 'Mail administrators when a course is created and create empty syllabus document',
+        '#active' => 1,
+        '#weight' => '0',
+        '#categories' => array(
+          '0' => 'course',
+          '1' => 'p2pu_courses',
+          'p2pu_courses' => 'p2pu_courses',
+        ),
+        '#status' => 'default',
+        '#conditions' => array(
+          '0' => array(
+            '#type' => 'condition',
+            '#settings' => array(
+              'type' => array(
+                'course' => 'course',
+              ),
+              '#argument map' => array(
+                'node' => 'node',
+              ),
+            ),
+            '#name' => 'rules_condition_content_is_type',
+            '#info' => array(
+              'label' => 'Created content is Course',
+              'arguments' => array(
+                'node' => array(
+                  'type' => 'node',
+                  'label' => 'Content',
+                ),
+              ),
+              'module' => 'Node',
+            ),
+            '#weight' => 0,
+          ),
+        ),
+        '#actions' => array(
+          '0' => array(
+            '#weight' => 0,
+            '#info' => array(
+              'label' => 'Send a mail to all users of a role',
+              'module' => 'System',
+              'eval input' => array(
+                '0' => 'subject',
+                '1' => 'message',
+                '2' => 'from',
+              ),
+            ),
+            '#name' => 'rules_action_mail_to_users_of_role',
+            '#settings' => array(
+              'recipients' => array(
+                '0' => 4,
+              ),
+              'from' => '',
+              'subject' => 'New course created ([node:title])',
+              'message' => 'A new course has been created by [node:author-name].
+
+Please review this at [node:site-url]/node/[node:nid]
+',
+              '#eval input' => array(
+                'token_rules_input_evaluator' => array(
+                  'subject' => array(
+                    '0' => 'node',
+                  ),
+                  'message' => array(
+                    '0' => 'node',
+                  ),
+                ),
+              ),
+            ),
+            '#type' => 'action',
+          ),
+          '1' => array(
+            '#type' => 'action',
+            '#settings' => array(
+              'severity' => '6',
+              'type' => 'rules',
+              'message' => 'Webmasters notified of new course created ([node:title])',
+              'link' => '',
+              '#eval input' => array(
+                'token_rules_input_evaluator' => array(
+                  'message' => array(
+                    '0' => 'node',
+                  ),
+                ),
+              ),
+            ),
+            '#name' => 'rules_action_watchdog',
+            '#info' => array(
+              'label' => 'Log to watchdog',
+              'module' => 'System',
+              'eval input' => array(
+                '0' => 'type',
+                '1' => 'message',
+                '2' => 'link',
+              ),
+            ),
+            '#weight' => 0,
+          ),
+          '2' => array(
+            '#weight' => 0,
+            '#info' => array(
+              'label' => 'Create empty course syllabus document and link to course.',
+              'arguments' => array(
+                'group' => array(
+                  'type' => 'node',
+                  'label' => 'Group node that user will be subscribed to notifications of',
+                ),
+              ),
+              'configurable' => FALSE,
+              'hooks' => array(
+                'nodeapi' => array(
+                  '0' => 'insert',
+                ),
+              ),
+              'module' => 'P2PU',
+            ),
+            '#name' => 'p2pu_rules_action_create_course_syllabus',
+            '#settings' => array(
+              '#argument map' => array(
+                'group' => 'node',
+              ),
+            ),
+            '#type' => 'action',
+          ),
+        ),
+        '#version' => 6003,
+      ),
       'p2pu_courses_1' => array(
         '#type' => 'rule',
         '#set' => 'event_node_update',
@@ -5133,133 +5314,6 @@ function _p2pu_courses_rules_defaults() {
                 '1' => 'message',
                 '2' => 'from',
               ),
-            ),
-            '#weight' => 0,
-          ),
-        ),
-        '#version' => 6003,
-      ),
-      'p2pu_courses_2' => array(
-        '#type' => 'rule',
-        '#set' => 'event_node_insert',
-        '#label' => 'Mail administrators when a course is created and create empty syllabus document',
-        '#active' => 1,
-        '#weight' => '0',
-        '#categories' => array(
-          '0' => 'course',
-          '1' => 'p2pu_courses',
-          'p2pu_courses' => 'p2pu_courses',
-        ),
-        '#status' => 'default',
-        '#conditions' => array(
-          '0' => array(
-            '#weight' => 0,
-            '#info' => array(
-              'label' => 'Created content is Course',
-              'arguments' => array(
-                'node' => array(
-                  'type' => 'node',
-                  'label' => 'Content',
-                ),
-              ),
-              'module' => 'Node',
-            ),
-            '#name' => 'rules_condition_content_is_type',
-            '#settings' => array(
-              'type' => array(
-                'course' => 'course',
-              ),
-              '#argument map' => array(
-                'node' => 'node',
-              ),
-            ),
-            '#type' => 'condition',
-          ),
-        ),
-        '#actions' => array(
-          '0' => array(
-            '#type' => 'action',
-            '#settings' => array(
-              'recipients' => array(
-                '0' => 4,
-              ),
-              'from' => '',
-              'subject' => 'New course created ([node:title])',
-              'message' => 'A new course has been created by [node:author-name].
-
-Please review this at [node:site-url]/node/[node:nid]
-',
-              '#eval input' => array(
-                'token_rules_input_evaluator' => array(
-                  'subject' => array(
-                    '0' => 'node',
-                  ),
-                  'message' => array(
-                    '0' => 'node',
-                  ),
-                ),
-              ),
-            ),
-            '#name' => 'rules_action_mail_to_users_of_role',
-            '#info' => array(
-              'label' => 'Send a mail to all users of a role',
-              'module' => 'System',
-              'eval input' => array(
-                '0' => 'subject',
-                '1' => 'message',
-                '2' => 'from',
-              ),
-            ),
-            '#weight' => 0,
-          ),
-          '1' => array(
-            '#weight' => 0,
-            '#info' => array(
-              'label' => 'Log to watchdog',
-              'module' => 'System',
-              'eval input' => array(
-                '0' => 'type',
-                '1' => 'message',
-                '2' => 'link',
-              ),
-            ),
-            '#name' => 'rules_action_watchdog',
-            '#settings' => array(
-              'severity' => '6',
-              'type' => 'rules',
-              'message' => 'Webmasters notified of new course created ([node:title])',
-              'link' => '',
-              '#eval input' => array(
-                'token_rules_input_evaluator' => array(
-                  'message' => array(
-                    '0' => 'node',
-                  ),
-                ),
-              ),
-            ),
-            '#type' => 'action',
-          ),
-          '2' => array(
-            '#type' => 'action',
-            '#settings' => array(
-              'auto_save' => 1,
-              '#argument map' => array(
-                'node' => 'node',
-              ),
-            ),
-            '#name' => 'rules_core_p2pu_create_course_syllabus_action',
-            '#info' => array(
-              'module' => 'Node',
-              'arguments' => array(
-                'node' => array(
-                  'label' => 'Content',
-                  'type' => 'node',
-                ),
-              ),
-              'label' => 'Create empty course syllabus document and link to course.',
-              'base' => 'rules_core_action_execute',
-              'action_name' => 'p2pu_create_course_syllabus_action',
-              'configurable' => FALSE,
             ),
             '#weight' => 0,
           ),

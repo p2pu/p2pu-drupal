@@ -4189,52 +4189,11 @@ return date(\'Y-m\');',
   ));
   $handler = $view->new_display('page', 'Public', 'page_1');
   $handler->override_option('fields', array(
-    'field_course_short_desc_value' => array(
-      'label' => '',
-      'alter' => array(
-        'alter_text' => 1,
-        'text' => ' ([field_course_short_desc_value])',
-        'make_link' => 0,
-        'path' => '',
-        'link_class' => '',
-        'alt' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'target' => '',
-        'help' => '',
-        'trim' => 0,
-        'max_length' => '',
-        'word_boundary' => 1,
-        'ellipsis' => 1,
-        'html' => 0,
-        'strip_tags' => 0,
-      ),
-      'empty' => '',
-      'hide_empty' => 1,
-      'empty_zero' => 0,
-      'link_to_node' => 0,
-      'label_type' => 'none',
-      'format' => 'default',
-      'multiple' => array(
-        'group' => TRUE,
-        'multiple_number' => '',
-        'multiple_from' => '',
-        'multiple_reversed' => FALSE,
-      ),
-      'exclude' => 1,
-      'id' => 'field_course_short_desc_value',
-      'table' => 'node_data_field_course_short_desc',
-      'field' => 'field_course_short_desc_value',
-      'override' => array(
-        'button' => 'Use default',
-      ),
-      'relationship' => 'none',
-    ),
     'title' => array(
       'label' => 'Course Name',
       'alter' => array(
         'alter_text' => 1,
-        'text' => '[title] [field_course_short_desc_value]',
+        'text' => '<div>[title]</div>',
         'make_link' => 0,
         'path' => '',
         'link_class' => '',
@@ -4258,6 +4217,47 @@ return date(\'Y-m\');',
       'id' => 'title',
       'table' => 'node',
       'field' => 'title',
+      'override' => array(
+        'button' => 'Use default',
+      ),
+      'relationship' => 'none',
+    ),
+    'field_course_short_desc_value' => array(
+      'label' => '',
+      'alter' => array(
+        'alter_text' => 1,
+        'text' => '<span class=\'tweet-text\'>[field_course_short_desc_value]</span><span class="ui-expand-contract-default"></span>',
+        'make_link' => 0,
+        'path' => '',
+        'link_class' => '',
+        'alt' => '',
+        'prefix' => '',
+        'suffix' => '',
+        'target' => '',
+        'help' => '',
+        'trim' => 0,
+        'max_length' => '',
+        'word_boundary' => 1,
+        'ellipsis' => 1,
+        'html' => 0,
+        'strip_tags' => 0,
+      ),
+      'empty' => '',
+      'hide_empty' => 0,
+      'empty_zero' => 0,
+      'link_to_node' => 0,
+      'label_type' => 'none',
+      'format' => 'default',
+      'multiple' => array(
+        'group' => TRUE,
+        'multiple_number' => '',
+        'multiple_from' => '',
+        'multiple_reversed' => FALSE,
+      ),
+      'exclude' => 0,
+      'id' => 'field_course_short_desc_value',
+      'table' => 'node_data_field_course_short_desc',
+      'field' => 'field_course_short_desc_value',
       'override' => array(
         'button' => 'Use default',
       ),
@@ -4366,8 +4366,8 @@ return date(\'Y-m\');',
     'field_course_summary_value' => array(
       'label' => '',
       'alter' => array(
-        'alter_text' => 0,
-        'text' => '',
+        'alter_text' => 1,
+        'text' => '<div class="course-description">[field_course_summary_value]</div>',
         'make_link' => 0,
         'path' => '',
         'link_class' => '',
@@ -4380,8 +4380,8 @@ return date(\'Y-m\');',
         'max_length' => '',
         'word_boundary' => 1,
         'ellipsis' => 1,
-        'strip_tags' => 0,
         'html' => 0,
+        'strip_tags' => 0,
       ),
       'empty' => '',
       'hide_empty' => 0,
@@ -4548,11 +4548,52 @@ return date(\'Y-m\');',
       'reduce_duplicates' => 0,
     ),
   ));
-  $handler->override_option('header', 'This page lists all of P2PU\'s courses. By default you see the courses that are open for sign-up. Click the course title to see more information about the course, including the course materials and assignments. You can also apply to join a course by clicking the "request membership" link. 
+  $handler->override_option('header', 'By default you see the courses that are open for sign-up. Click on "Show filter" below to view previous courses, or search for specific courses. Click on the + icon after each course summary that to see more course details.
+<div id=\'filter-toggle\'><a>Show filter</a></div>
 
-If you are looking for a particular course that is currently running, change the status of displayed courses to "running" and hit the Apply button. ');
-  $handler->override_option('header_format', '1');
+<?php
+$js = "
+$(document).ready(function(){
+   $(\'.views-exposed-widgets\').hide(); 
+	$(\'#filter-toggle a\').mouseover(function () {
+		$(this).css(\'cursor\', \'pointer\');
+	});   
+   $(\'#filter-toggle\').click(function(){ 
+       if($(\'.views-exposed-widgets\').is(\':visible\')){      //is the filter already visible?
+		$(\'.views-exposed-widgets\').hide();		
+       	$(\'#filter-toggle a\').text(\'Show filter\');           
+       }else{	
+		$(\'.views-exposed-widgets\').show();		
+       	$(\'#filter-toggle a\').text(\'Hide filter\');
+       }
+   });
+});
+";
+drupal_add_js ($js, \'inline\');	
+
+?>');
+  $handler->override_option('header_format', '3');
   $handler->override_option('header_empty', 0);
+  $handler->override_option('footer', '<?php
+$js = "
+$(document).ready(function(){
+   $(\'div.course-description\').hide(); 
+   $(\'.ui-expand-contract-default\').click(function(){   //clicked on the + or -
+       if($(this).next().is(\':visible\')){      //is this description already visible?
+       	$(this).next().hide(\'fast\');           //hide it (toggle)
+		$(this).toggleClass(\'minus\');
+       }else{	
+		$(this).toggleClass(\'minus\');		
+       	$(this).next().show(\'fast\');					//show the description we clicked on
+       }
+   });
+});
+";
+drupal_add_js ($js, \'inline\');	
+
+?>');
+  $handler->override_option('footer_format', '3');
+  $handler->override_option('footer_empty', 0);
   $handler->override_option('empty', 'There are currently no courses ... ');
   $handler->override_option('items_per_page', 50);
   $handler->override_option('use_pager', 'mini');
@@ -4563,6 +4604,7 @@ If you are looking for a particular course that is currently running, change the
     'order' => 'asc',
     'columns' => array(
       'title' => 'title',
+      'field_course_short_desc_value' => 'title',
       'name' => 'name',
       'picture' => 'name',
       'subscribe' => 'subscribe',
@@ -4570,6 +4612,10 @@ If you are looking for a particular course that is currently running, change the
     ),
     'info' => array(
       'title' => array(
+        'sortable' => 0,
+        'separator' => '',
+      ),
+      'field_course_short_desc_value' => array(
         'sortable' => 0,
         'separator' => '',
       ),

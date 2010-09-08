@@ -233,6 +233,9 @@ div.view-feeds .views-field-title{font-size: 115%; font-family: Georgia;}
 div.view-feeds .views-field-timestamp{font-size: 85%; color: gray;}
 div.view-feeds.view-display-id-page_1 .views-field-timestamp{color: #4F4F4F;}
 .view-display-id-panel_pane_1 .views-row {padding-bottom: 7px;}
+.view-display-id-page_1.view-course-list .views-field-title a {}
+.view-display-id-page_1.view-course-list .views-field-title .tweet-text {float: left;}
+.course-description {clear: both;}
 
 /* Comments */
 div.comment{ background: #fff; margin: 0;}
@@ -464,3 +467,13 @@ div#page-footer div.block:last{ float: right;}
 .form-item .description {
 	font-size:0.98em;
 }
+
+/* jquery UI styles */
+
+.ui-expand-contract-default.minus {background: url(../images/icons/ui/jqueryui/ffffff_11x11_icon_minus.gif) no-repeat 50% 50%; display: block; width: 11px; height: 11px; float: left;}
+.ui-expand-contract-default.minus:hover, .ui-expand-contract-default.minus-hover {background: url(../images/icons/ui/jqueryui/454545_11x11_icon_minus.gif) no-repeat 50% 50%;}
+.ui-expand-contract-default.minus:active, .ui-expand-contract-default.minus-active {background: url(../images/icons/ui/jqueryui/222222_11x11_icon_minus.gif) no-repeat 50% 50%;}
+.ui-expand-contract-default {background: url(../images/icons/ui/jqueryui/ffffff_11x11_icon_plus.gif) no-repeat 50% 50%; margin: 2px 4px; display: block; width: 11px; height: 11px; float: left;}
+.ui-expand-contract-default:hover, .ui-expand-contract-default-hover {background: url(../images/icons/ui/jqueryui/454545_11x11_icon_plus.gif) no-repeat 50% 50%;}
+.ui-expand-contract-default:active, .ui-expand-contract-default-active {background: url(../images/icons/ui/jqueryui/222222_11x11_icon_plus.gif) no-repeat 50% 50%;}
+

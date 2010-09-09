@@ -88,11 +88,11 @@ function p2pu_rules_action_create_course_syllabus($object) {
     og_save_ancestry($document);        
     $syllabus_url = l('course syllabus', 'node/' . $document->nid);
     $message = t('Automatically created !syllabus for %course_name.', array('!syllabus' => $syllabus_url, '%course_name' => check_plain($object->title)));
-    
     // Now add the nid of the document as a node reference
     $object->field_refers_to_syllabus[0]['nid'] = $document->nid;
     watchdog('action', $message);
     drupal_set_message($message);
+		return array('node' => $object); // Ensure our syllabus is saved to the group node
   }
   else {
     $message = t('Could not creat course syllabus for %course_name.', array('%course_name' => check_plain($object->title)));
@@ -105,8 +105,6 @@ function p2pu_rules_action_create_course_syllabus($object) {
 * Subscribe a user to notifications on course node comments.
 */
 function p2pu_rules_action_subscribe_user_to_course_comments($user, $node) {
-  //dpm($user);
-  //dpm($node);
 	$type = 'thread';
 	$event_type = 'node';
 	$field = 'nid';
@@ -127,8 +125,6 @@ function p2pu_rules_action_subscribe_user_to_course_comments($user, $node) {
 * Unsubscribe a user from course node comments.
 */
 function p2pu_rules_action_unsubscribe_user_from_course_comments($user, $node) {
-  //dpm($user);
-  //dpm($node);
 	$type = 'thread';
 	$event_type = 'node';
 	$field = 'nid';

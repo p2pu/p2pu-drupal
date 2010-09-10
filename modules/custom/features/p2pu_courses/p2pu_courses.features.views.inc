@@ -4548,8 +4548,8 @@ return date(\'Y-m\');',
       'reduce_duplicates' => 0,
     ),
   ));
-  $handler->override_option('header', 'By default you see the courses that are open for sign-up. Click on "Show filter" below to view previous courses, or search for specific courses. Click on the + icon after each course summary that to see more course details.
-<div id=\'filter-toggle\'><a>Show filter</a></div>
+  $handler->override_option('header', 'By default you see the courses that are open for sign-up. Click on "Show filter" below to view previous courses, or search for specific courses. Click on the + icon after each course summary to see more course details.
+<div id=\'filter-toggle\'><a title=\'Show or hide the full course description\'>Show filter</a></div>
 
 <?php
 $js = "

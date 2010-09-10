@@ -1686,11 +1686,25 @@ else {
     ),
   ));
   $handler->override_option('sorts', array(
-    'nid' => array(
-      'order' => 'ASC',
-      'id' => 'nid',
+    'sticky' => array(
+      'order' => 'DESC',
+      'id' => 'sticky',
       'table' => 'node',
-      'field' => 'nid',
+      'field' => 'sticky',
+      'override' => array(
+        'button' => 'Override',
+      ),
+      'relationship' => 'none',
+    ),
+    'created' => array(
+      'order' => 'ASC',
+      'granularity' => 'second',
+      'id' => 'created',
+      'table' => 'node',
+      'field' => 'created',
+      'override' => array(
+        'button' => 'Override',
+      ),
       'relationship' => 'none',
     ),
   ));

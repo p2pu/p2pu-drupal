@@ -926,11 +926,12 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
   //Modify the organic group subscribe form to ask for the submission requirement and save the application
   if ($form_id == 'og_confirm_subscribe') {
     //Adding a checkbox in the og_confirm_subscribe form.
+    $options = array('attributes' => array('target' => '_blank'));
     $form['terms_and_cond'] = array(
     '#type' => 'checkbox',      
     '#title' =>t("Before you sign up for the course, we'd like to remind you of our !license and !privacy.
                  By default all content you create and conversations you have with other users on this site are publicly viewable.",
-                 array('!license'=>l(t("license provisions"),"license"),'!privacy' => l(t("privacy guidelines"),"privacy"))),
+                 array('!license'=>l(t("license provisions"),"license",$options),'!privacy' => l(t("privacy guidelines"),"privacy",$options))),
     '#weight'=>0,
     '#element_validate' => array('p2pu_terms_and_cond_validate'),
     );

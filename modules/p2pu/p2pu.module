@@ -902,17 +902,7 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
   
   //Redirect comments
   if ($form_id == 'comment_form') {
-
-   // $node = node_load($form['nid']['#value']);
-    //Discussions
-    // CHARLES: I've removed Diricia's redirect, so that we redirect to the
-    // course discussion which lists the comments - it was redirectint to the
-    // discussions page, not sure why?
-    //if ($node->type == 'discussion') {
-    //  $group = og_get_group_context();
-    //  $form['#redirect'] = array('node/'.$group->nid.'/discussions');
-    //}
-  
+ 
     // Don't display the subscriptions fieldset on the node comment form
     $form[0]['subscriptions']['#access'] = FALSE;
   
@@ -1432,6 +1422,21 @@ function p2pu_views_pre_execute(&$view) {
     $view->title = $group->title;
   }
   
+}
+
+/* Temporarily add a webcraft logo to the course listing
+ * @todo Remove this once we've implemented the PURL/Context site sections
+ */
+function p2pu_views_pre_render(&$view) {
+  if ($view->name == 'course_list' && $view->current_display == 'page_1') {
+    // We want to add a webcraft logo to the webcraft course listing
+    // Only show if the filter is set to only show webcraft courses
+    if ($view->exposed_data['tid'][307] == 307 && (count($view->exposed_data['tid']) == 1)) {
+      $current_header = $view->display['page_1']->display_options['header'];
+      $webcraft_logo = "<div id='course-list-webcraft-logo'><img src='/" . path_to_theme() . "/images/webcraft/fall-semester-logo.jpg' width=300 height=168></img></div>";
+      $view->display_handler->set_option('header', $webcraft_logo . $current_header);
+    }
+  }
 }
 
 function p2pu_realname_from_uid($uid) {

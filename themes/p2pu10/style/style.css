@@ -476,3 +476,18 @@ div#page-footer div.block:last{ float: right;}
 .ui-expand-contract-default {background: url(../images/icons/ui/jqueryui/ffffff_11x11_icon_plus.gif) no-repeat 50% 50%; margin: 2px 4px; display: block; width: 11px; height: 11px;}
 .ui-expand-contract-default:hover, .ui-expand-contract-default-hover {background: url(../images/icons/ui/jqueryui/454545_11x11_icon_plus.gif) no-repeat 50% 50%;}
 .ui-expand-contract-default:active, .ui-expand-contract-default-active {background: url(../images/icons/ui/jqueryui/222222_11x11_icon_plus.gif) no-repeat 50% 50%;}
+
+/* CONTEXT STYLES */
+
+/* Webcraft */
+
+/* Adobe: Neutral Blue */
+body.p2pu-context-course-section-webcraft {background:url("../images/body-back-webcraft-2.png") repeat-x scroll left 87px #D1DBBD;}
+body.p2pu-context-course-section-webcraft div.grey-panel{ background: #193441; color: #eee;}
+body.p2pu-context-course-section-webcraft div.orange-panel{ background: #3E606F; color: #333;}
+body.p2pu-context-course-section-webcraft div.yellow-panel{ background: #91AA9D; color: #333;}
+
+/* Temporary styles for the webcraft course listing - remove when we start using PURL and Context */
+#course-list-webcraft-logo {float:right; border: 1px solid white;}
+#course-list-webcraft-logo img{display:block;}
+.view-course-list.view-display-id-page_1 .views-table {clear: both;}

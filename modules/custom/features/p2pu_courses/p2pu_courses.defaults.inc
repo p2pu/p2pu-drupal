@@ -2761,7 +2761,19 @@ if (in_array($contexts[\'argument_nid_1\']->data->field_course_status[0][\'value
     $pane->type = 'custom';
     $pane->subtype = 'custom';
     $pane->shown = TRUE;
-    $pane->access = array();
+    $pane->access = array(
+      'plugins' => array(
+        '0' => array(
+          'name' => 'php',
+          'settings' => array(
+            'description' => 'Hide if course applications are closed',
+            'php' => 'if ($contexts[\'argument_nid_1\']->data->og_selective != 3) {
+	return TRUE;
+}',
+          ),
+        ),
+      ),
+    );
     $pane->configuration = array(
       'admin_title' => 'Custom: temporary leave this course link',
       'title' => '<none>',

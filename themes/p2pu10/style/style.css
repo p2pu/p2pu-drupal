@@ -558,3 +558,10 @@ body.logged-in.p2pu-context-course-section-webcraft div#page-header div#block-me
 .p2pu-context-course-section-webcraft #navigation .primary a:hover,
 .p2pu-context-course-section-webcraft #navigation .primary a:active {color: #ffff66; text-decoration: none;}
 .p2pu-context-course-section-webcraft #navigation .primary ul {margin:0; padding:3px 2px 0;}
+
+/* P2PU navigation Webcraft link */
+#navigation #block-block-10 {margin-left:10px;}
+#navigation #block-block-10 p{margin:8px 0 0;}
+#navigation #block-block-10 a {color: #fff; font: 140% georgia;}
+#navigation #block-block-10 a:hover,
+#navigation #block-block-10 a:active {color: #ffff66; text-decoration: none;}

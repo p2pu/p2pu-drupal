@@ -1,4 +1,4 @@
-// $Id: display_editor.js,v 1.4.4.7 2009/10/07 22:20:29 merlinofchaos Exp $
+// $Id: display_editor.js,v 1.4.4.8 2010/07/22 18:59:02 merlinofchaos Exp $
 /**
  * @file display_editor.js
  *
@@ -453,7 +453,7 @@
     // Show javascript only items.
     $('span#panels-js-only').css('display', 'inline');
 
-    $('div.panel-pane:not(.panel-portlet)', context)
+    $('#panels-dnd-main div.panel-pane:not(.panel-portlet)')
       .addClass('panel-portlet')
       .each(Drupal.Panels.bindPortlet);
 

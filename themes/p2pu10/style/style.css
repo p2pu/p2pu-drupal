@@ -482,7 +482,7 @@ div#page-footer div.block:last{ float: right;}
 /* Webcraft */
 
 /* Adobe: Neutral Blue */
-body.p2pu-context-course-section-webcraft {background:url("../images/body-back-webcraft-2.png") repeat-x scroll left 87px #D1DBBD;}
+body.p2pu-context-course-section-webcraft {background:url("../images/webcraft/body-back-webcraft-2.png") repeat-x scroll left 87px #D1DBBD;}
 body.p2pu-context-course-section-webcraft div.grey-panel{ background: #193441; color: #eee;}
 body.p2pu-context-course-section-webcraft div.orange-panel{ background: #3E606F; color: #333;}
 body.p2pu-context-course-section-webcraft div.yellow-panel{ background: #91AA9D; color: #333;}
@@ -491,3 +491,70 @@ body.p2pu-context-course-section-webcraft div.yellow-panel{ background: #91AA9D;
 #course-list-webcraft-logo {float:right; border: 1px solid white;}
 #course-list-webcraft-logo img{display:block;}
 .view-course-list.view-display-id-page_1 .views-table {clear: both;}
+
+/* Webcraft views table styling */
+.p2pu-context-course-section-webcraft div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row-even,
+.p2pu-context-course-section-webcraft div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row-even{background: #D1DBBD;}
+
+.p2pu-context-course-section-webcraft div#content-column .view-activity-atrium .views-row-odd,
+.p2pu-context-course-section-webcraft div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row-odd,
+.p2pu-context-course-section-webcraft div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row-odd{background: #91AA9D;}
+
+.p2pu-context-course-section-webcraft div#content-column .view-activity-atrium .views-row,
+.p2pu-context-course-section-webcraft div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row,
+.p2pu-context-course-section-webcraft div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row{	background: #4D788A; border-style: solid none; border-color:#3A5B69;	border-style:none none solid;	border-width:1px;	clear:both;	min-height:35px; padding:7px 5px;}
+.p2pu-context-course-section-webcraft div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row-even,
+.p2pu-context-course-section-webcraft div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row-even{background: #91AA9D;}
+
+.p2pu-context-course-section-webcraft div#content-column .view-activity-atrium .views-row-odd,
+.p2pu-context-course-section-webcraft div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row-odd,
+.p2pu-context-course-section-webcraft div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row-odd{background: #91AA9D;}
+
+.view-course-list.view-display-id-panel_pane_1 .view-header {color: white;}
+.view-course-list.view-display-id-panel_pane_1 .view-header a {color: white;}
+.view-course-list.view-display-id-panel_pane_1 .view-header a:hover {color: #ffff66;}
+
+/* Webcraft orange table */
+.p2pu-context-course-section-webcraft div.orange-panel table *{ border-color: #3A5B69;}
+.p2pu-context-course-section-webcraft div.orange-panel tr.even{ background: #4D788A;}
+.p2pu-context-course-section-webcraft div.orange-panel tr.odd{ background: #91AA9D;}
+
+.p2pu-context-course-section-webcraft div.orange-panel div.tl{ background-image: url('../images/webcraft/corners/orange/orange-tl.png');}
+.p2pu-context-course-section-webcraft div.orange-panel div.tr{ background-image: url('../images/webcraft/corners/orange/orange-tr.png');}
+.p2pu-context-course-section-webcraft div.orange-panel div.bl{ background-image: url('../images/webcraft/corners/orange/orange-bl.png');}
+.p2pu-context-course-section-webcraft div.orange-panel div.br{ background-image: url('../images/webcraft/corners/orange/orange-br.png');}
+
+/* Webcraft grey panel */
+
+.p2pu-context-course-section-webcraft div.grey-panel div.tl{ background-image: url('../images/webcraft/corners/grey/grey-tl.png');}
+.p2pu-context-course-section-webcraft div.grey-panel div.tr{ background-image: url('../images/webcraft/corners/grey/grey-tr.png');}
+.p2pu-context-course-section-webcraft div.grey-panel div.bl{ background-image: url('../images/webcraft/corners/grey/grey-bl.png');}
+.p2pu-context-course-section-webcraft div.grey-panel div.br{ background-image: url('../images/webcraft/corners/grey/grey-br.png');}
+
+/* Webcraft yellow panel */
+
+.p2pu-context-course-section-webcraft div.yellow-panel div.tl{ background-image: url('../images/webcraft/corners/yellow/yellow-tl.png');}
+.p2pu-context-course-section-webcraft div.yellow-panel div.tr{ background-image: url('../images/webcraft/corners/yellow/yellow-tr.png');}
+.p2pu-context-course-section-webcraft div.yellow-panel div.bl{ background-image: url('../images/webcraft/corners/yellow/yellow-bl.png');}
+.p2pu-context-course-section-webcraft div.yellow-panel div.br{ background-image: url('../images/webcraft/corners/yellow/yellow-br.png');}
+
+/* Webcraft white on orange panel */
+
+.p2pu-context-course-section-webcraft div.white-on-orange-panel div.tl{ background-image: url('../images/webcraft/corners/white_on_orange/white-on-orange-tl.png');}
+.p2pu-context-course-section-webcraft div.white-on-orange-panel div.tr{ background-image: url('../images/webcraft/corners/white_on_orange/white-on-orange-tr.png');}
+.p2pu-context-course-section-webcraft div.white-on-orange-panel div.bl{ background-image: url('../images/webcraft/corners/white_on_orange/white-on-orange-bl.png');}
+.p2pu-context-course-section-webcraft div.white-on-orange-panel div.br{ background-image: url('../images/webcraft/corners/white_on_orange/white-on-orange-br.png');}
+/* Page corners */
+.p2pu-context-course-section-webcraft div.page-body-top{ background: url('../images/webcraft/content-top.png') no-repeat left top;}
+.p2pu-context-course-section-webcraft div.page-body-bottom{ background: url('../images/webcraft/content-bottom.png') no-repeat left bottom;}
+
+/* Webcraft login button */
+
+.p2pu-context-course-section-webcraft div#page-header div#block-menu-menu-login a{ background: url('../images/webcraft/login.png'); display: block; height: 53px; width: 52px;}
+body.logged-in.p2pu-context-course-section-webcraft div#page-header div#block-menu-menu-login a{ background: url('../images/webcraft/logout.png');}
+
+/* Webcraft menu */
+.p2pu-context-course-section-webcraft #navigation .primary a {color: #fff; font: 140% georgia;}
+.p2pu-context-course-section-webcraft #navigation .primary a:hover,
+.p2pu-context-course-section-webcraft #navigation .primary a:active {color: #ffff66; text-decoration: none;}
+.p2pu-context-course-section-webcraft #navigation .primary ul {margin:0; padding:3px 2px 0;}

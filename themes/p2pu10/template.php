@@ -284,9 +284,21 @@ function _page_variables(&$vars){
       : ''
     ).
     implode(' ', $body_class).'"';
+    
+  // I'm not sure about the toggles above - I don't think we're using them
+  // We want the ability to set the logo based on p2pu course section context
+  if (module_exists("context")) {
+    $namespace = '';
+    // If a context is set
+    if ($contexts = context_active_contexts()) {
+      foreach ($contexts as $context) {
+        if ($context->tag == 'P2PU course section') {
+          $vars['logo'] = '<a title="P2PU Home" href="/"><img alt="P2PU Home" src="/' . path_to_theme() . '/images/logos/logo-section-' . $context->name . '.png"></a>';
+        }
+      }      
+    }
+  }
 }
-
-
 
 /**
  * Converts a title into an id

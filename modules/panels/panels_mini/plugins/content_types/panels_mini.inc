@@ -1,5 +1,5 @@
 <?php
-// $Id: panels_mini.inc,v 1.1.2.5 2010/05/17 19:27:01 sdboyer Exp $
+// $Id: panels_mini.inc,v 1.1.2.6 2010/05/25 02:33:25 merlinofchaos Exp $
 
 /**
  * @file
@@ -7,7 +7,7 @@
  * need to be broken out into a .inc file, it's convenient that we do so
  * that we don't load code unneccessarily. Plus it demonstrates plugins
  * in modules other than Panels itself.
- * 
+ *
  */
 
 /**

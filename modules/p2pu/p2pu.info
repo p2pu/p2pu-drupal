@@ -3,3 +3,6 @@ name = "P2PU Support"
 description = "P2P University module"
 core = 6.x
 package = P2PU
+dependencies[] = context
+dependencies[] = purl
+dependencies[] = og

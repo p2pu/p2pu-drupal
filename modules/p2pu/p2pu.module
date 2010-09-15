@@ -1673,3 +1673,50 @@ function p2pu_exit() {
   }
 }
 
+/* PURL and Context implementation */
+/**
+ * Registry hook for PURL providers. Should return a keyed array where each key
+ * is a provider identifier and each value is a sub-array of information for
+ * the the provider. Possible keys:
+ *    "name": the human-readable name of the provider. Should be wrapped in
+ *      t() if localization is desired.
+ *    "description": description of the provider. Should be wrapped in t()
+ *      if localization is desired.
+ *    "callback": String. Callback function to be called when a modifier for
+ *      this provider is found in a page request.
+ *    "callback arguments": Optional. Array of arguments to supply to the
+ *      callback function. Note that the modifier ID is always provided as the
+ *      *last* argument to the callback function.
+ *    "example": String. Example modifier to be displayed to administrators.
+ */
+function p2pu_purl_provider() {
+  return array(
+    'p2pu_course_section' => array(
+      'name' => t('P2PU Course Section'),
+      'description' => t('Set the page context to the appropriate course section.'),
+      'callback' => 'p2pu_set_section_context',
+      'example' => 'webcraft',
+    ),
+  );
+}
+
+function p2pu_set_section_context($department = 'general') {
+  $context = context_load($department);
+  if (!context_isset($context->name)) {
+    context_set('context', $context->name, $context);
+  }
+}
+
+/**
+ * Optional hook for providers who use custom storage for modifiers. Should
+ * return a keyed array where each key is a provider identifier and each value
+ * is a sub-array of modifiers with modifier value and ID.
+ */
+function p2pu_purl_modifiers() {
+  return array(
+    'p2pu_course_section' => array(
+      array('value' => 'webcraft', 'id' => 'webcraft'),
+      array('value' => 'general', 'id' => 'general'),
+    ),
+  );
+}

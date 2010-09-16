@@ -79,42 +79,44 @@ function popup_filter_filter($op, $delta =  0, $format = -1, $text = ''){
  * @param $form_state
  * @param $form_id
  */
-function popup_filter_form_alter(&$form, &$form_state, $form_id){
+// CHARLES: Disabled this as it was preventing users in IE from submitting a post @todo
 
-  if ($form['#id'] == 'node-form' || $form['#id']== 'block-add-block-form' || $form['#id']== 'block-admin-configure'){
-
-    module_load_include('inc', 'popup', 'processing');
-
-    $attributes = array(
-      'origin' => 'top-left',
-      'expand' => 'top-right',
-      'activate' => 'click',
-      'close-button' => TRUE,
-      'class' => 'popup-filter-admin-form',
-      'opacity' => '0.9',
-      'effect' => 'slide-fade',
-    );
-
-    $popup_form = _popup_element(
-      t('Insert popup element'),
-      drupal_get_form('popup_filter_insert_form'),
-      $attributes,
-      _classes($attributes)
-    );
-
-    if ($form['#id'] == 'node-form') {
-      $form['body_field']['body']['#suffix'] =
-        $popup_form .
-        $form['body_field']['body']['#suffix'];
-    } else {
-      $form['block_settings']['body_field']['body']['#suffix'] =
-        $popup_form .
-        $form['block_settings']['body_field']['body']['#suffix'];
-    }
-
-  }
-
-}
+//function popup_filter_form_alter(&$form, &$form_state, $form_id){
+//
+//  if ($form['#id'] == 'node-form' || $form['#id']== 'block-add-block-form' || $form['#id']== 'block-admin-configure'){
+//
+//    module_load_include('inc', 'popup', 'processing');
+//
+//    $attributes = array(
+//      'origin' => 'top-left',
+//      'expand' => 'top-right',
+//      'activate' => 'click',
+//      'close-button' => TRUE,
+//      'class' => 'popup-filter-admin-form',
+//      'opacity' => '0.9',
+//      'effect' => 'slide-fade',
+//    );
+//
+//    $popup_form = _popup_element(
+//      t('Insert popup element'),
+//      drupal_get_form('popup_filter_insert_form'),
+//      $attributes,
+//      _classes($attributes)
+//    );
+//
+//    if ($form['#id'] == 'node-form') {
+//      $form['body_field']['body']['#suffix'] =
+//        $popup_form .
+//        $form['body_field']['body']['#suffix'];
+//    } else {
+//      $form['block_settings']['body_field']['body']['#suffix'] =
+//        $popup_form .
+//        $form['block_settings']['body_field']['body']['#suffix'];
+//    }
+//
+//  }
+//
+//}
 
 
 

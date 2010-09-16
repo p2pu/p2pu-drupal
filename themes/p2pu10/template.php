@@ -79,13 +79,6 @@ function p2pu10_preprocess_comment(&$vars, $hook) {
  */
 function p2pu10_preprocess_node($vars = array()) {
 
-  $imagecache_id = variable_get('user_picture_imagecache_profiles_default', FALSE);
-
-  if ($imagecache_id){
-    $preset = imagecache_preset($imagecache_id);
-    $vars['picture'] = theme('imagecache', $preset['presetname'], $vars['user']->picture);
-  }
-
   if($vars['teaser']) {
     $vars['template_files'] = array(
       'node-teaser', 

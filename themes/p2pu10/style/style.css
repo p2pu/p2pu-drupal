@@ -484,8 +484,8 @@ div#page-footer div.block:last{ float: right;}
 /* Adobe: Neutral Blue */
 body.p2pu-context-course-section-webcraft {background:url("../images/webcraft/body-back-webcraft-2.png") repeat-x scroll left 87px #D1DBBD;}
 body.p2pu-context-course-section-webcraft div.grey-panel{ background: #193441; color: #eee;}
-body.p2pu-context-course-section-webcraft div.orange-panel{ background: #3E606F; color: #333;}
-body.p2pu-context-course-section-webcraft div.yellow-panel{ background: #91AA9D; color: #333;}
+body.p2pu-context-course-section-webcraft div.orange-panel{ background: #3E606F; color: #fff;}
+body.p2pu-context-course-section-webcraft div.yellow-panel{ background: #91AA9D; color: #193441;}
 
 /* Temporary styles for the webcraft course listing - remove when we start using PURL and Context */
 #course-list-webcraft-logo {float:right; border: 1px solid white;}
@@ -558,6 +558,15 @@ body.logged-in.p2pu-context-course-section-webcraft div#page-header div#block-me
 .p2pu-context-course-section-webcraft #navigation .primary a:hover,
 .p2pu-context-course-section-webcraft #navigation .primary a:active {color: #ffff66; text-decoration: none;}
 .p2pu-context-course-section-webcraft #navigation .primary ul {margin:0; padding:3px 2px 0;}
+
+/* Webcraft links */
+.p2pu-context-course-section-webcraft .grey-panel a,
+.p2pu-context-course-section-webcraft .yellow-panel a,
+.p2pu-context-course-section-webcraft .grey-panel a { color: #F3F130;}
+
+.p2pu-context-course-section-webcraft .grey-panel a:hover,
+.p2pu-context-course-section-webcraft .yellow-panel a:hover,
+.p2pu-context-course-section-webcraft .grey-panel a:hover { color: #fff;}
 
 /* P2PU navigation Webcraft link */
 #navigation #block-block-10 {margin-left:10px;}

@@ -568,6 +568,22 @@ body.logged-in.p2pu-context-course-section-webcraft div#page-header div#block-me
 .p2pu-context-course-section-webcraft .yellow-panel a:hover,
 .p2pu-context-course-section-webcraft .grey-panel a:hover { color: #fff;}
 
+.p2pu-context-course-section-webcraft div#content-column .view-activity-atrium .views-row-odd,
+.p2pu-context-course-section-webcraft div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row-odd,
+.p2pu-context-course-section-webcraft div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row-odd{background: #91AA9D;}
+
+.p2pu-context-course-section-webcraft div#content-column .view-activity-atrium.view-display-id-panel_pane_2 .views-row a,
+.p2pu-context-course-section-webcraft div#content-column .view-activity-atrium.view-display-id-panel_pane_1 .views-row a,
+.p2pu-context-course-section-webcraft div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row a,
+.p2pu-context-course-section-webcraft div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row a{
+	color: #F3F130;
+}
+.p2pu-context-course-section-webcraft div#content-column .view-activity-atrium.view-display-id-panel_pane_2 .views-row a:hover,
+.p2pu-context-course-section-webcraft div#content-column .view-activity-atrium.view-display-id-panel_pane_1 .views-row a:hover,
+.p2pu-context-course-section-webcraft div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row a:hover,
+.p2pu-context-course-section-webcraft div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row a:hover{
+	color: #222;
+}
 /* P2PU navigation Webcraft link */
 #navigation #block-block-10 {margin-left:10px;}
 #navigation #block-block-10 p{margin:8px 0 0;}

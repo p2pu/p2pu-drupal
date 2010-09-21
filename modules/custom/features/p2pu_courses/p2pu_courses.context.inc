@@ -27,6 +27,12 @@ function p2pu_courses_context_default_contexts() {
           'region' => 'primary_navigation',
           'weight' => 0,
         ),
+        'block-10' => array(
+          'module' => 'block',
+          'delta' => 10,
+          'region' => 'primary_navigation',
+          'weight' => 1,
+        ),
       ),
     ),
     'theme' => array(

@@ -2705,7 +2705,10 @@ Panel page of courses list<br />
   $page->admin_title = 'Webcraft: Course listing';
   $page->admin_description = '';
   $page->path = 'course-listing';
-  $page->access = array();
+  $page->access = array(
+    'type' => 'none',
+    'settings' => NULL,
+  );
   $page->menu = array();
   $page->arguments = array();
   $page->conf = array();

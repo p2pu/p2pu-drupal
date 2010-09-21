@@ -5770,28 +5770,6 @@ print "Next start date: <strong>".substr($start_date, 0, 10)."</strong><br/>";
       ),
       'relationship' => 'none',
     ),
-    'field_course_status_value_many_to_one_1' => array(
-      'operator' => 'or',
-      'value' => array(
-        '10_open' => '10_open',
-        '20_running' => '20_running',
-        '30_complete' => '30_complete',
-      ),
-      'group' => '0',
-      'exposed' => FALSE,
-      'expose' => array(
-        'operator' => FALSE,
-        'label' => '',
-      ),
-      'id' => 'field_course_status_value_many_to_one_1',
-      'table' => 'node_data_field_course_status',
-      'field' => 'field_course_status_value_many_to_one',
-      'relationship' => 'none',
-      'reduce_duplicates' => 0,
-      'override' => array(
-        'button' => 'Override',
-      ),
-    ),
     'title' => array(
       'operator' => 'contains',
       'value' => '',
@@ -5839,8 +5817,7 @@ print "Next start date: <strong>".substr($start_date, 0, 10)."</strong><br/>";
       'reduce_duplicates' => 0,
     ),
   ));
-  $handler->override_option('header', 'By default you see the courses that are open for sign-up. Click on "Show filter" below to view previous courses, or search for specific courses. Click on the + icon after each course summary to see more course details.
-<div id=\'filter-toggle\'><a title=\'Show or hide the full course description\'>Show filter</a></div>
+  $handler->override_option('header', 'By default you see the courses that are open for sign-up. Click on the + icon after each course summary to see more course details.
 
 <?php
 $js = "
@@ -5946,7 +5923,7 @@ drupal_add_js ($js, \'inline\');
   ));
   $handler->override_option('argument_input', array());
   $handler->override_option('link_to_view', 0);
-  $handler->override_option('inherit_panels_path', 0);
+  $handler->override_option('inherit_panels_path', '1');
 
   $views[$view->name] = $view;
 

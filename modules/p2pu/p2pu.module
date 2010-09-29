@@ -1720,3 +1720,13 @@ function p2pu_purl_modifiers() {
     ),
   );
 }
+
+function p2pu_mail_alter(&$message){
+  $default_from = variable_get('site_mail', ini_get('sendmail_from'));
+ 
+  if($message['from'] == $default_from){
+    $message['from'] =  variable_get('p2pu_sender_name', 'P2PU') .' <'. $default_from .'>';
+    $message['headers']['From'] = $message['headers']['Sender'] = $message['headers']['Return-Path'] = $message['headers']['Errors-To'] = $message['headers']['Reply-To'] = $message['from'];
+  }
+}
+

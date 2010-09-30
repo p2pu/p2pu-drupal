@@ -120,3 +120,18 @@ function p2pu_custom_scripts_subscribe_members_to_course_thread($nids = array())
 		}				
 	}
 }
+
+/**
+ * Find all users who have applied for a course and their application is still pending,
+ * then unsubscribe from group(course) content notifications. They should only be subscribed
+ * once approved by the course organiser.
+ */
+function p2pu_custom_scripts_clear_pending_member_course_notification_subscriptions() {
+	// For each couse on the site that is open or running
+	$result = db_query("SELECT * FROM {og_uid} WHERE is_active = 0");
+	while ($og_member = db_fetch_object($result)) {
+		$account = user_load(array('uid' => $og_member->uid));
+		og_notifications_user_unsubscribe($account, $og_member->nid);
+		echo $og_member->uid . ", " . $og_member->nid . ";\n";
+	}
+}

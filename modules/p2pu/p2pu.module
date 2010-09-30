@@ -1154,12 +1154,30 @@ function p2pu_og_confirm_subscribe($form, &$form_state) {
 
 }
 
-function p2pu_og($op, $nid, $uid, $message) {
-  $node = node_load($nid);
-  if ($op == 'user approve' && $node->type == 'course') {
-    $user = user_load(array('uid'=>$uid));
-    p2pu_create_report_card($user,$node);
-  }
+function p2pu_og($op, $gid, $uid, $args) {
+  switch ($op) {
+    // Temporarily unsubscribe the user (they would have been subscribed by og_notifications module)
+    // @todo Remove this once the issue http://drupal.org/node/926184 is patched
+    // see revision 152 for the state that this function was originally
+    // NOTE: this needs to run after og_notifications_og, so module weight is NB
+    case 'user insert':
+      // We only unsubscribe the user if they haven't yet been approved
+      if (!$args[4]['is_active']) {
+        $account = user_load(array('uid' => $uid));
+        og_notifications_user_unsubscribe($account, $gid);
+      }
+      break;
+    case 'user approve':
+      // @todo Remove the next 2 lines once the issue http://drupal.org/node/926184 is patched
+      $account = user_load(array('uid' => $uid));
+      og_notifications_user_autosubscribe($account, $gid);
+      $node = node_load($gid);
+      if ($node->type == 'course') {
+        $user = user_load(array('uid'=>$uid));
+        p2pu_create_report_card($user,$node);
+      }      
+      break;
+  }  
 }
 
 function p2pu_create_report_card($user,$course) {

@@ -1,5 +1,5 @@
 <?php
-// $Id: mollom_test.module,v 1.1.2.7 2010/03/06 21:37:59 dries Exp $
+// $Id: mollom_test.module,v 1.1.2.10 2010/09/12 23:44:15 dries Exp $
 
 /**
  * @file
@@ -13,11 +13,23 @@ function mollom_test_xmlrpc() {
   return array(
     // $data contains a variable amount of properties, so we cannot specify a
     // signature.
+    'mollom.getServerList' => 'mollom_test_get_server_list',
     'mollom.verifyKey' => 'mollom_test_verify_key',
     'mollom.checkContent' => 'mollom_test_check_content',
     'mollom.getImageCaptcha' => 'mollom_test_get_captcha',
     'mollom.checkCaptcha' => 'mollom_test_check_captcha',
  );
+}
+
+/**
+ * XML-RPC callback for mollom.getServerList to retrieve new server list.
+ */
+function mollom_test_get_server_list($data) {
+  $storage = variable_get(__FUNCTION__, array());
+  $storage[] = $data;
+  variable_set(__FUNCTION__, $storage);
+
+  return array($GLOBALS['base_url'] . '/xmlrpc.php?version=');
 }
 
 /**
@@ -31,9 +43,8 @@ function mollom_test_verify_key($data) {
   module_load_include('inc', 'mollom');
   module_load_include('php', 'simpletest', 'drupal_web_test_case');
   module_load_include('test', 'mollom', 'tests/mollom');
-  $expected = _mollom_authentication(MOLLOM_TEST_PUBLIC_KEY, MOLLOM_TEST_PRIVATE_KEY);
 
-  if ($data['public_key'] === $expected['public_key'] && $data['hash'] === $expected['hash']) {
+  if ($data['public_key'] === MOLLOM_TEST_PUBLIC_KEY) {
     return TRUE;
   }
   xmlrpc_error(MOLLOM_ERROR);
@@ -49,54 +60,83 @@ function mollom_test_check_content($data) {
   $storage[] = $data;
   variable_set(__FUNCTION__, $storage);
 
-  // Check post_title and post_body to determine whether to return ham, spam, or
-  // unsure as response.
-  $spam = FALSE;
-  $ham = FALSE;
-  foreach (array('post_title', 'post_body') as $key) {
-    if (!isset($data[$key])) {
-      continue;
+  $response = array();
+
+  // Spam filter: Check post_title and post_body for ham, spam, or unsure.
+  if (!isset($data['checks']) || strpos($data['checks'], 'spam') !== FALSE) {
+    $spam = FALSE;
+    $ham = FALSE;
+    foreach (array('post_title', 'post_body') as $key) {
+      if (!isset($data[$key])) {
+        continue;
+      }
+      // 'spam' always has precedence.
+      if (strpos($data[$key], 'spam') !== FALSE) {
+        $spam = TRUE;
+      }
+      // Otherwise, check for 'ham'.
+      elseif (strpos($data[$key], 'ham') !== FALSE) {
+        $ham = TRUE;
+      }
+      // Lastly, take a forced 'unsure' into account.
+      elseif (strpos($data[$key], 'unsure') !== FALSE) {
+        $spam = TRUE;
+        $ham = TRUE;
+      }
     }
-    // 'spam' always has precedence.
-    if (strpos($data[$key], 'spam') !== FALSE) {
-      $spam = TRUE;
+    if ($spam && $ham) {
+      $response['spam'] = MOLLOM_ANALYSIS_UNSURE;
+      $quality = 0.5;
     }
-    // Otherwise, check for 'ham'.
-    elseif (strpos($data[$key], 'ham') !== FALSE) {
-      $ham = TRUE;
+    elseif ($spam) {
+      $response['spam'] = MOLLOM_ANALYSIS_SPAM;
+      $quality = 0;
     }
-    // Lastly, take a forced 'unsure' into account.
-    elseif (strpos($data[$key], 'unsure') !== FALSE) {
-      $spam = TRUE;
-      $ham = TRUE;
+    elseif ($ham) {
+      $response['spam'] = MOLLOM_ANALYSIS_HAM;
+      $quality = 1;
     }
-  }
-  if ($spam && $ham) {
-    $response = MOLLOM_ANALYSIS_UNSURE;
-    $quality = 0.5;
-  }
-  elseif ($spam) {
-    $response = MOLLOM_ANALYSIS_SPAM;
-    $quality = 0;
-  }
-  elseif ($ham) {
-    $response = MOLLOM_ANALYSIS_HAM;
-    $quality = 1;
-  }
-  else {
-    $response = MOLLOM_ANALYSIS_UNKNOWN;
-    $quality = NULL;
+    else {
+      $response['spam'] = MOLLOM_ANALYSIS_UNKNOWN;
+      $quality = NULL;
+    }
   }
 
-  // Drupal 6 Pressflow support.
-  if (function_exists('drupal_session_start')) {
-    drupal_session_start();
+  // Quality filter.
+  if (!isset($data['checks']) || strpos($data['checks'], 'quality') !== FALSE) {
+    if (isset($quality)) {
+      $response['quality'] = $quality;
+    }
+    // @todo No idea how quality is calculated during testing without spam
+    //   results above.
+    else {
+      $response['quality'] = 0;
+    }
   }
-  return array(
-    'session_id' => !empty($data['session_id']) ? $data['session_id'] : session_id(),
-    'spam' => $response,
-    'quality' => $quality,
-  );
+
+  // Profanity filter.
+  if (isset($data['checks']) && strpos($data['checks'], 'profanity') !== FALSE) {
+    $profanity = 0.0;
+    foreach (array('post_title', 'post_body') as $key) {
+      if (isset($data[$key]) && strpos($data[$key], 'profanity') !== FALSE) {
+        $profanity = 1.0;
+      }
+    }
+    $response['profanity'] = $profanity;
+  }
+
+  if (!empty($data['session_id'])) {
+    $response['session_id'] = $data['session_id'];
+  }
+  else {
+    // Drupal 6 Pressflow support.
+    if (function_exists('drupal_session_start')) {
+      drupal_session_start();
+    }
+    $response['session_id'] = session_id();
+  }
+
+  return $response;
 }
 
 /**
@@ -154,6 +194,7 @@ function mollom_test_menu() {
 function mollom_test_mollom_form_list() {
   $forms['mollom_test_form'] = array(
     'title' => 'Mollom test form',
+    'entity' => 'mollom_test',
   );
   return $forms;
 }
@@ -289,3 +330,12 @@ function mollom_test_form_submit($form, &$form_state) {
   drupal_set_message('<pre>' . var_export($form_state['values'], TRUE) . '</pre>');
 }
 
+/**
+ * Implements hook_form_alter().
+ */
+function mollom_test_form_alter(&$form, &$form_state, $form_id) {
+  if (variable_get('mollom_test_disable_mollom', FALSE)) {
+    $form_state['mollom']['require_analysis'] = FALSE;
+    $form_state['mollom']['require_captcha'] = FALSE;
+  }
+}

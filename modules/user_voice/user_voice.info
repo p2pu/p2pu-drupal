@@ -1,0 +1,12 @@
+; $Id: user_voice.info,v 1.1 2009/09/15 17:22:31 eastabrook Exp $
+name = User Voice
+description = Creates a block which holds the user voice code, allowing it to be easily enabled.
+package = User Voice
+core = 6.x
+dependencies[] = block
+; Information added by drupal.org packaging script on 2009-09-15
+version = "6.x-1.0"
+core = "6.x"
+project = "user_voice"
+datestamp = "1253040395"
+

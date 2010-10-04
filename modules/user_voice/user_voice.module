@@ -1,0 +1,72 @@
+<?php 
+// $Id: user_voice.module,v 1.1 2009/09/15 17:22:31 eastabrook Exp $
+
+/**
+ * @file
+ * The User Voice integration module.
+ *
+ * Creates a block which holds the user voice code, allowing it to be easily enabled.
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function user_voice_menu() {
+  $items['admin/settings/user_voice'] = array(
+    'title' => 'User voice settings',  
+    'description' => 'Settings form to amend and customize User Voice for your site.', 
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('user_voice_admin_settings'),
+    'access arguments' => array('administer site configuration'),  
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'user_voice.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_block().
+ */
+function user_voice_block($op = 'list', $delta = 0, $edit = array()) {
+  
+  switch ($op) {
+    case 'list':
+      $blocks[0]['info'] = t('User Voice');
+      $blocks[0]['cache'] = BLOCK_NO_CACHE;
+      $blocks[0]['status'] = 1;
+      $blocks[0]['region'] = 'footer';
+      return $blocks;
+      
+    case 'view':      
+      $blocks['subject'] = t('<none>');
+      $blocks['content'] = theme('user_voice', $block_content);
+      return $blocks;
+  }
+}
+
+/**
+ * This is a preprocess function passing variables to a template
+ */
+function template_preprocess_user_voice(&$variables) {   
+  // changable variables of admin settings form
+  $variables['key'] = variable_get('user_voice_key', '');
+  $variables['host'] = variable_get('user_voice_host', '');
+  $variables['forum'] = variable_get('user_voice_general', '');  
+  $variables['alignment'] = variable_get('user_voice_alignment', 'right'); // 'right' 'left'
+  $variables['background_color'] = variable_get('user_voice_background_color', '#F00');
+  $variables['text_color'] = variable_get('user_voice_text_color', 'white'); // 'white' 'black'
+  $variables['hover_color'] = variable_get('user_voice_hover_color', '#06C');
+  $variables['lang'] = variable_get('user_voice_lang', 'en'); // 'en' 'de' 'nl' 'es' 'fr'
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function user_voice_theme() {
+  return array(
+    'user_voice' => array(
+      'template' => 'user_voice',
+      'arguments' => array(),
+    ),
+  );
+}

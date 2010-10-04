@@ -1,0 +1,22 @@
+<?php
+// $Id: user_voice.install,v 1.1 2009/09/15 17:22:31 eastabrook Exp $
+
+/**
+ * @file
+ * Install, update and uninstall functions for the user voice module.
+ */
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function user_voice_uninstall() {
+  variable_del('user_voice_key');
+  variable_del('user_voice_host');
+  variable_del('user_voice_general');
+  variable_del('user_voice_alignment');
+  variable_del('user_voice_background_color');
+  variable_del('user_voice_text_color');
+  variable_del('user_voice_hover_color');
+  variable_del('user_voice_lang');
+}
+

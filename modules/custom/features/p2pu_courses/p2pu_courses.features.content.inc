@@ -1054,7 +1054,7 @@ function p2pu_courses_content_default_fields() {
         ),
       ),
       'default_value_php' => NULL,
-      'label' => 'Sign Up Requirement',
+      'label' => 'Sign-up task',
       'weight' => '14',
       'description' => 'Please outline a short assignment that users have to complete when they sign-up for your course. This should give an indication of the work load required in the course - and the types of things users will be doing. Don\'t make it too easy - but don\'t make it too hard either. ',
       'type' => 'text_textarea',
@@ -1977,7 +1977,7 @@ incomplete|Incomplete',
   t('Opening Date');
   t('Prerequisites');
   t('Short description');
-  t('Sign Up Requirement');
+  t('Sign-up task');
   t('Status');
   t('Submissions');
   t('Summary');

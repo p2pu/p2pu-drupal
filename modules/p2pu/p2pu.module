@@ -824,6 +824,12 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
     //dprint_r($form);
     $form['#field_info']['field_course_status']['allowed_values'] = p2pu_filter_course_status_select($form);
     $form['title']['#maxlength'] = 30;
+    // We never want to allow users to apply for a course at the same time as
+    // they register on the site
+    $form['og_register']['#type'] = 'hidden';
+    $form['og_register']['#value'] = 0;
+    $form['og_register']['#default_value'] = 0;
+    
     if (in_array('webmaster', array_values($user->roles))) {
       //expand the publishing fieldset
       $form['options']['#collapsed'] = FALSE;
@@ -847,9 +853,7 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
       $form['og_selective']['#value'] = 1; //TODO: review as this was set to 0 for course template
       $form['og_selective']['#default_value'] = 1  ;
   
-      $form['og_register']['#type'] = 'hidden';
-      $form['og_register']['#value'] = 0;
-      $form['og_register']['#default_value'] = 0;
+      //$form['og_register'] is hidden for all users (see the beginning of this function)
   
       $form['og_directory']['#type'] = 'hidden';
       $form['og_directory']['#value'] = 1;

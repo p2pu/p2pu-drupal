@@ -983,6 +983,18 @@ function p2pu_form_alter(&$form, $form_state, $form_id) {
     //$form['tid']['#type'] = 'checkboxes';
     //$form['status']['#type'] = 'checkboxes';
   }
+  
+  // Hide the forum taxonomy select list to avoid user confusion - we're currently only
+  // using a single forum for each course (general discussion) which is selected by default
+  if ($form_id == 'forum_node_form') {
+    $forum_vid = variable_get('forum_nav_vocabulary', '');
+    $taxonomy = array(
+      '#type' => 'hidden',
+      '#default_value' => $form['taxonomy'][$forum_vid]['#default_value'][0],
+      '#value' => $form['taxonomy'][$forum_vid]['#default_value'][0],
+    );
+    $form['taxonomy'][$forum_vid] = $taxonomy;
+  }
 } // p2pu_form_alter
 
 /*

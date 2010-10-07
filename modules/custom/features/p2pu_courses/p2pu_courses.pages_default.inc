@@ -2515,7 +2515,13 @@ Panel page of courses list<br />
       ),
     ),
   );
-  $display->panel_settings = array();
+  $display->panel_settings = array(
+    'style_settings' => array(
+      'default' => NULL,
+      'right' => NULL,
+      'left_' => NULL,
+    ),
+  );
   $display->cache = array();
   $display->title = '%node:title';
   $display->content = array();
@@ -2541,7 +2547,7 @@ Panel page of courses list<br />
         print (\'You must \'.$register.\' or \'.$login.\' in order to post into this group.\');
         return;  
       }
-      if (!og_is_group_member($group->nid)) {
+      if (!og_is_group_member($group->nid, FALSE)) {
         $link = l(\'Sign-up\', \'og/subscribe/\'.$group->nid, array(\'query\' => \'destination=node/\'.$group->nid.\'/forums\'));
         print ($link);
         return;
@@ -2563,7 +2569,9 @@ Panel page of courses list<br />
       'substitute' => 1,
     );
     $pane->cache = array();
-    $pane->style = array();
+    $pane->style = array(
+      'settings' => NULL,
+    );
     $pane->css = array(
       'css_id' => '',
       'css_class' => 'button-panel yellow-panel',
@@ -2585,7 +2593,9 @@ Panel page of courses list<br />
       'override_title_text' => '',
     );
     $pane->cache = array();
-    $pane->style = array();
+    $pane->style = array(
+      'settings' => NULL,
+    );
     $pane->css = array(
       'css_id' => 'forum-rss-icon-block',
       'css_class' => 'yellow-panel',
@@ -2604,7 +2614,9 @@ Panel page of courses list<br />
     $pane->access = array();
     $pane->configuration = array();
     $pane->cache = array();
-    $pane->style = array();
+    $pane->style = array(
+      'settings' => NULL,
+    );
     $pane->css = array(
       'css_id' => '',
       'css_class' => 'grey-panel',
@@ -2623,7 +2635,9 @@ Panel page of courses list<br />
     $pane->access = array();
     $pane->configuration = array();
     $pane->cache = array();
-    $pane->style = array();
+    $pane->style = array(
+      'settings' => NULL,
+    );
     $pane->css = array(
       'css_id' => '',
       'css_class' => 'grey-panel',
@@ -2645,7 +2659,9 @@ Panel page of courses list<br />
       'override_title_text' => '',
     );
     $pane->cache = array();
-    $pane->style = array();
+    $pane->style = array(
+      'settings' => NULL,
+    );
     $pane->css = array(
       'css_id' => 'forum-listing-pane',
       'css_class' => 'orange-panel',
@@ -2682,6 +2698,7 @@ Panel page of courses list<br />
     $pane->cache = array();
     $pane->style = array(
       'style' => 'default',
+      'settings' => NULL,
     );
     $pane->css = array(
       'css_id' => 'forum-post-and-comments-mini-panel',

@@ -96,10 +96,8 @@ function p2pu_custom_scripts_subscribe_members_to_course_thread($nids = array())
 		$courses[] = node_load($node_obj->nid);
 	}
 	foreach ($courses as $course) {
-		//dpm($course);
 		// Load all members of the course
 		$result = db_query(og_list_users_sql(0, 0, NULL), $course->nid);
-		$cntpending = $cntall = 0;
 		$subscription = '';
 		while ($user = db_fetch_object($result)) {
 			if ($user->is_active) {
@@ -127,11 +125,35 @@ function p2pu_custom_scripts_subscribe_members_to_course_thread($nids = array())
  * once approved by the course organiser.
  */
 function p2pu_custom_scripts_clear_pending_member_course_notification_subscriptions() {
-	// For each couse on the site that is open or running
+	// For each course user that is associated with a group, but not yet approved
 	$result = db_query("SELECT * FROM {og_uid} WHERE is_active = 0");
 	while ($og_member = db_fetch_object($result)) {
 		$account = user_load(array('uid' => $og_member->uid));
 		og_notifications_user_unsubscribe($account, $og_member->nid);
 		echo $og_member->uid . ", " . $og_member->nid . ";\n";
+	}
+}
+
+/**
+ * Find all users who have applied and been approved for a course and assign
+ * them the the appropriate role.
+ *
+ * @param integer $rid Which role to assign the members
+ */
+function p2pu_custom_scripts_add_role_to_group_members($rid) {
+	if (!empty($rid)){
+		// For each user that is approved as a member of a course
+		$result = db_query("SELECT uid FROM {og_uid} WHERE is_active = 1");
+		while ($uid = db_result($result)) {
+			// Don't add the role twice
+			$count = (int)db_result(db_query("SELECT COUNT(*) AS COUNT FROM {users_roles} WHERE uid = %d AND rid = %d", $uid, $rid));
+			if($count < 1) {
+				db_query("INSERT INTO {users_roles} (rid, uid) VALUES ('%d','%d')", $rid, $uid);
+				echo $uid . " assigned role course member (rid=" . $rid . ")\n"; 
+			}			
+		}
+	}
+	else {
+		echo 'You need to pass the role id you are assigning as a parameter for this function!';
 	}
 }

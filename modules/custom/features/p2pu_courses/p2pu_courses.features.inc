@@ -279,6 +279,72 @@ Please review this at [node:site-url]/node/[node:nid]
         ),
         '#version' => 6003,
       ),
+      'p2pu_courses_4' => array(
+        '#type' => 'rule',
+        '#set' => 'event_og_user_approved',
+        '#label' => 'User accepted to join a course: Subscribe them to the course node comment notifications and add course member role',
+        '#active' => 1,
+        '#weight' => '0',
+        '#categories' => array(
+          '0' => 'p2pu_courses',
+          '1' => 'p2pu_courses',
+        ),
+        '#status' => 'default',
+        '#conditions' => array(),
+        '#actions' => array(
+          '0' => array(
+            '#type' => 'action',
+            '#settings' => array(
+              '#argument map' => array(
+                'user' => 'account',
+                'group' => 'group',
+              ),
+            ),
+            '#name' => 'p2pu_rules_action_subscribe_user_to_course_comments',
+            '#info' => array(
+              'label' => 'Subscribe a user to notifications on course node comments.',
+              'arguments' => array(
+                'user' => array(
+                  'type' => 'user',
+                  'label' => 'User who will be subscribed',
+                ),
+                'group' => array(
+                  'type' => 'node',
+                  'label' => 'Group node that user will be subscribed to notifications of',
+                ),
+              ),
+              'configurable' => FALSE,
+              'module' => 'P2PU',
+            ),
+            '#weight' => 0,
+          ),
+          '1' => array(
+            '#weight' => 0,
+            '#info' => array(
+              'label' => 'Add user role: course member',
+              'label callback' => FALSE,
+              'arguments' => array(
+                'user' => array(
+                  'type' => 'user',
+                  'label' => 'User whos roles should be changed',
+                ),
+              ),
+              'module' => 'User',
+            ),
+            '#name' => 'rules_action_user_addrole',
+            '#settings' => array(
+              'roles' => array(
+                '0' => 10,
+              ),
+              '#argument map' => array(
+                'user' => 'account',
+              ),
+            ),
+            '#type' => 'action',
+          ),
+        ),
+        '#version' => 6003,
+      ),
       'p2pu_courses_1' => array(
         '#type' => 'rule',
         '#set' => 'event_node_update',
@@ -462,48 +528,6 @@ Please review this at [node:site-url]/node/[node:nid]
               'module' => 'P2PU',
             ),
             '#weight' => 0,
-          ),
-        ),
-        '#version' => 6003,
-      ),
-      'p2pu_courses_4' => array(
-        '#type' => 'rule',
-        '#set' => 'event_og_user_approved',
-        '#label' => 'User accepted to join a course: Subscribe them to the course node comment notifications',
-        '#active' => 1,
-        '#weight' => '0',
-        '#categories' => array(
-          '0' => 'p2pu_courses',
-          'p2pu_courses' => 'p2pu_courses',
-        ),
-        '#status' => 'default',
-        '#conditions' => array(),
-        '#actions' => array(
-          '0' => array(
-            '#weight' => 0,
-            '#info' => array(
-              'label' => 'Subscribe a user to notifications on course node comments.',
-              'arguments' => array(
-                'user' => array(
-                  'type' => 'user',
-                  'label' => 'User who will be subscribed',
-                ),
-                'group' => array(
-                  'type' => 'node',
-                  'label' => 'Group node that user will be subscribed to notifications of',
-                ),
-              ),
-              'configurable' => FALSE,
-              'module' => 'P2PU',
-            ),
-            '#name' => 'p2pu_rules_action_subscribe_user_to_course_comments',
-            '#settings' => array(
-              '#argument map' => array(
-                'user' => 'account',
-                'group' => 'group',
-              ),
-            ),
-            '#type' => 'action',
           ),
         ),
         '#version' => 6003,

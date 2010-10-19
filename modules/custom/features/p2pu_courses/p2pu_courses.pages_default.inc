@@ -2415,8 +2415,6 @@ Panel page of courses list<br />
       ),
     ),
     'logic' => 'and',
-    'type' => 'none',
-    'settings' => NULL,
   );
   $page->menu = array(
     'type' => 'tab',

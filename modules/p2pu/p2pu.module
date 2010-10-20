@@ -535,9 +535,38 @@ function p2pu_menu() {
     'weight' => 20,    
   );
 
+  // Etherpad link
+  $items['node/%p2pu_custom/etherpad'] = array(
+    'title' => 'Etherpad',
+    'page callback' => 'p2pu_etherpad',
+    'page arguments' => array(1),
+    'access callback' => TRUE,
+    'weight' => 20,
+    'type' => MENU_LOCAL_TASK,
+  );
+
   return $items;
 }
 
+function p2pu_custom_load($node_id) {
+  //this is the node ID for the test course that will run Etherpad	
+  if ($node_id == 8220) {
+	return node_load(array('nid' => $node_id, 'type' => 'course'));
+  } else {
+	return false;
+  }
+}
+
+//Redirects to the Etherpad page based on the Course parameters
+function p2pu_etherpad($node) {
+  global $user;
+  $pad_name = $node -> path;
+  $pad_name = str_replace("/", "-", $pad_name);
+  $pad_name = 'p2pu-' .$pad_name;
+  
+  return '<div id="chat_box" style="text-align:center;width:100%;"><iframe src="http://pad.p2pu.org/' .$pad_name .'" width="860" height="600"></iframe></div>';
+
+}
 
 //Returns access statistics for node
 function p2pu_node_tracker() {  

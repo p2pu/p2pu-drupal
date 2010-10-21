@@ -776,6 +776,13 @@ function p2pu_link($type, $object, $teaser = FALSE) {
       'href' => "toggle-signup/".$object->nid,
     );
   }
+  if ($type == 'comment') {
+    $links['p2pu_comment_link'] = array(
+      'title' => t('link to this comment'),
+      'href' =>  drupal_get_normal_path($_GET['q']),
+      'fragment' => 'comment-' . $object->cid,      
+    );
+  }    
   return $links;
 }
 

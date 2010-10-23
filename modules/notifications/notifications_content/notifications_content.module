@@ -111,9 +111,18 @@ function notifications_content_form_alter(&$form, &$form_state, $form_id) {
         if (notifications_event_enabled('node', 'comment')) {
           _notifications_content_add_disable_field($form);
         }
-        // If editing the comment, add values to remember
-        if (!empty($form['cid']['#value']) && !empty($form['admin']['status'])) {
-          $form['notifications_comment_status'] = array('#type' => 'value', '#value' => $form['admin']['status']['#default_value']);
+        // If editing the comment, set a flag to prevent duplicate comment notifications
+        if (!empty($form['cid']['#value'])) {
+          if (!empty($form['admin']['status'])) {
+            // The user has 'Administer comments' permission and the comment admin fieldset 
+            // will have been displayed so we can safely use the status value.
+            $form['notifications_comment_status'] = array('#type' => 'value', '#value' => $form['admin']['status']['#default_value']);
+          }
+          else {
+            // Set the default value to published because if a user without the 'Administer comments'
+            // permission is editing, then it must be published.
+            $form['notifications_comment_status'] = array('#type' => 'value', '#value' => 0);  
+          }
         }
       }
 

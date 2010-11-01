@@ -1,10 +1,10 @@
 <?php
   $course_nid = array_pop( $node->og_groups );
-  
+
   $uid = $node->uid;
   $token = og_get_token($course_nid);
   $item = menu_get_item("og/approve/$nid/$uid/$token");
-  $new_link = t('Request: <a href="@approve">approve</a> or <a href="@deny">deny</a>.', array('@approve' => url("og/approve/$course_nid/$uid/$token", array('query' => drupal_get_destination())), '@deny' => url("og/deny/$course_nid/$uid/$token", array('query' => drupal_get_destination()))));
+  $new_link = t('Request: <a href="@approve">approve</a> or <a href="@deny">deny</a>.', array('@approve' => url("og/approve/$course_nid/$uid/$token", array('query' => "destination=node/$course_nid/course/admin")), '@deny' => url("og/deny/$course_nid/$uid/$token", array('query' => "destination=node/$course_nid/course/admin"))));
 ?>
 
 <div id="node-<?php print $node->nid; ?>" class="node<?php if ($sticky) { print ' sticky'; } ?><?php if (!$status) { print ' node-unpublished'; } ?> node-<?php print $node->type; ?> clear-block">

@@ -406,8 +406,10 @@ div.yellow-panel div.tr{ background-image: url('../images/yellow-tr.png');}
 div.yellow-panel div.bl{ background-image: url('../images/yellow-bl.png');}
 div.yellow-panel div.br{ background-image: url('../images/yellow-br.png');}
 div.yellow-panel table *{ border-color: #f3f130;}
-div.yellow-panel tr.even{ background: #ffffcc;}
-div.yellow-panel tr.odd{ background: #ffff99;}
+/* Not yellow at all but this makes things on the admin section of the course
+ * site readable*/
+div.yellow-panel tr.even{ background: #777;}
+div.yellow-panel tr.odd{ background: #999;}
 
 /* Button panel */
 div.button-panel div.pane-inner{ padding: 10px;}
@@ -599,3 +601,5 @@ div.node-course_application div.approve-deny {
   background: 1px solid #eee;
   padding: 10px;
 }
+
+

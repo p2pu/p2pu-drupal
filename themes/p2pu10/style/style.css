@@ -591,3 +591,11 @@ body.logged-in.p2pu-context-course-section-webcraft div#page-header div#block-me
 #navigation #block-block-10 a {color: #fff; font: 140% georgia;}
 #navigation #block-block-10 a:hover,
 #navigation #block-block-10 a:active {color: #ffff66; text-decoration: none;}
+
+
+div.node-course_application div.approve-deny {
+  font-size: 18px;
+  border: 1px solid #ddd;
+  background: 1px solid #eee;
+  padding: 10px;
+}

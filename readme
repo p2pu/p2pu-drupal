@@ -109,13 +109,13 @@ sites/all/files/ directory is web server writable
 
 ========= How to Include Database Chages Made Via GUI in the Codebase ========
 * Make your change in gui
-* run `drush features-update p2pu_course`
+* run `drush features-update p2pu_courses`
 * Commit your change
 
 
 ======== How Others Can Update Their Feature to the One You Just Pushed =======
 * git pull origin master
-* `drush features-revert p2pu_course`
+* `drush features-revert p2pu_courses`
 
 
 =========== Other Notes ==========

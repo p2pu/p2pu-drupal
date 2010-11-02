@@ -1,7 +1,7 @@
 How to get your dev environment set up
-
-======== Requirements =========
-
+======================================
+Requirements
+------------
 * install drush, php, php cli (Make sure you install PHP 5.2.x)
 * you probably want to increase the memory limit for php and php cli, i have it
   set up to 128MB and it STILL spazzes some times. 
@@ -9,21 +9,21 @@ How to get your dev environment set up
 * make sure mod rewrite (rewrite.load) is enabled in /etc/apache2/mods-enabled.
 * set up a virtual host for server. here is an example virtual host file:
 
-<VirtualHost *:80>                                                                                          
-     ServerName p2pudev.p2pudev
-     ServerAdmin jessy.cowansharp@gmail.com
-     DocumentRoot /home/jessy/dev/p2pu/drupal/src/drupal-6.19
-     ErrorLog /var/log/apache2/p2pudev-error
-     CustomLog /var/log/apache2/p2pudev-access.log combined
-   
-   <Directory /home/jessy/dev/p2pu/drupal/src/drupal-6.19>
-       RewriteEngine On
-      RewriteBase /
-      RewriteCond %{REQUEST_FILENAME} !-f
-      RewriteCond %{REQUEST_FILENAME} !-d
-      RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]
-  </Directory>
-</VirtualHost>
+  <VirtualHost *:80>                                                                                          
+       ServerName p2pudev.p2pudev
+       ServerAdmin jessy.cowansharp@gmail.com
+       DocumentRoot /home/jessy/dev/p2pu/drupal/src/drupal-6.19
+       ErrorLog /var/log/apache2/p2pudev-error
+       CustomLog /var/log/apache2/p2pudev-access.log combined
+
+     <Directory /home/jessy/dev/p2pu/drupal/src/drupal-6.19>
+         RewriteEngine On
+        RewriteBase /
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]
+    </Directory>
+  </VirtualHost>
 
 * add an entry to your /etc/hosts file:
   $sudo vi /etc/hosts
@@ -31,32 +31,33 @@ How to get your dev environment set up
 * then add your site name to the end of the localhost line
   127.0.0.1   localhost p2pudev.p2pudev 
 
-======== installation =======
+installation
+------------
 
 * create a new database for the site: 
-  $ mysql -u root -p 
-  mysql> create database p2pu_dev_anonymized;
-  mysql> exit;
+    $ mysql -u root -p 
+    mysql> create database p2pu_dev_anonymized;
+    mysql> exit;
 
 * grab the db dump from Dropbox. 
-  $ wget http://dl.dropbox.com/u/1914037/p2pu_anon_db.20101101.tgz
-  $ tar xvfz p2pu_anon_db.20101101.tgz
-  read in into mysql:
-  $ mysql -u root -p p2pu_dev_anonymized < p2pu_anon_dump.sql
+    $ wget http://dl.dropbox.com/u/1914037/p2pu_anon_db.20101101.tgz
+    $ tar xvfz p2pu_anon_db.20101101.tgz
+    read in into mysql:
+    $ mysql -u root -p p2pu_dev_anonymized < p2pu_anon_dump.sql
 
 * set up the admin password (change 'password' to whatever you like):
-  $ mysql -u root -p 
-  mysql> use p2pu_dev_anonymized;
-  mysql> update users set pass = md5('password') where uid=1;
+    $ mysql -u root -p 
+    mysql> use p2pu_dev_anonymized;
+    mysql> update users set pass = md5('password') where uid=1;
 
 * download and unpack drupal core into your site root (6.19)
 
 * checkout the p2pu.org files from svn into sites/all within your drupal install:
-  git clone http://github.com/p2pu/p2pu.git all
+    git clone http://github.com/p2pu/p2pu.git all
 
 * copy sites/default/default.settings.php to sites/default/settings.php  
 * edit the $db_url setting to contain the right db settings. eg:
-  $db_url = 'mysql://myusername:mypassword@localhost/p2pu_dev_anonymized';
+    $db_url = 'mysql://myusername:mypassword@localhost/p2pu_dev_anonymized';
 
 also, in case you have any trouble logging into the site at first, you might
 want to set $update_free_access = TRUE;, which will allow you to run update.php
@@ -101,24 +102,28 @@ sites/all/files/ directory is web server writable
 * run update.php
 
 
-========== if you need to update the database again ==============
+if you need to update the database again
+----------------------------------------
 * read in the new copy of the db (see above)
 * run update.php
 * sudo dbrush cc all
 
 
-========= How to Include Database Chages Made Via GUI in the Codebase ========
+How to Include Database Chages Made Via GUI in the Codebase
+-----------------------------------------------------------
 * Make your change in gui
 * run `drush features-update p2pu_courses`
 * Commit your change
 
 
-======== How Others Can Update Their Feature to the One You Just Pushed =======
+How Others Can Update Their Feature to the One You Just Pushed
+--------------------------------------------------------------
 * git pull origin master
 * `drush features-revert p2pu_courses`
 
 
-=========== Other Notes ==========
+Other Notes
+-----------
 
 Make sure that the languages/ directory in the Drupal root is writable by the
 web server user. If you get errors about moving files from /tmp/fileXXXX to

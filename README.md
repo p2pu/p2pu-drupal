@@ -35,39 +35,39 @@ installation
 ------------
 
 * create a new database for the site: 
-    $ mysql -u root -p 
-    mysql> create database p2pu_dev_anonymized;
-    mysql> exit;
+      $ mysql -u root -p 
+      mysql> create database p2pu_dev_anonymized;
+      mysql> exit;
 
 * grab the db dump from Dropbox. 
-    $ wget http://dl.dropbox.com/u/1914037/p2pu_anon_db.20101101.tgz
-    $ tar xvfz p2pu_anon_db.20101101.tgz
-    read in into mysql:
-    $ mysql -u root -p p2pu_dev_anonymized < p2pu_anon_dump.sql
+      $ wget http://dl.dropbox.com/u/1914037/p2pu_anon_db.20101101.tgz
+      $ tar xvfz p2pu_anon_db.20101101.tgz
+      read in into mysql:
+      $ mysql -u root -p p2pu_dev_anonymized < p2pu_anon_dump.sql
 
 * set up the admin password (change 'password' to whatever you like):
-    $ mysql -u root -p 
-    mysql> use p2pu_dev_anonymized;
-    mysql> update users set pass = md5('password') where uid=1;
+      $ mysql -u root -p 
+      mysql> use p2pu_dev_anonymized;
+      mysql> update users set pass = md5('password') where uid=1;
 
 * download and unpack drupal core into your site root (6.19)
 
 * checkout the p2pu.org files from svn into sites/all within your drupal install:
-    git clone http://github.com/p2pu/p2pu.git all
+      git clone http://github.com/p2pu/p2pu.git all
 
 * copy sites/default/default.settings.php to sites/default/settings.php  
 * edit the $db_url setting to contain the right db settings. eg:
-    $db_url = 'mysql://myusername:mypassword@localhost/p2pu_dev_anonymized';
+      $db_url = 'mysql://myusername:mypassword@localhost/p2pu_dev_anonymized';
 
 also, in case you have any trouble logging into the site at first, you might
 want to set $update_free_access = TRUE;, which will allow you to run update.php
 without authenticating
 
 * set up the permissions on the files and themes directories so the web server can move move things around as it sees fit:
-  sudo chown -R <username>.www-data all/files
-  sudo chmod -R 775 all/files
-  sudo chown -R <username>.www-data all/themes
-  sudo chmod -R 775 all/themes
+      sudo chown -R <username>.www-data all/files
+      sudo chmod -R 775 all/files
+      sudo chown -R <username>.www-data all/themes
+      sudo chmod -R 775 all/themes
 
 (these permissions may mean you need to use sudo when running drush)
 
@@ -75,19 +75,20 @@ without authenticating
   step 3:
   * 3: as prescribed
   * 4: all prescribed
-  * 5: drush dl reroute_email
-     drush en reroute_email
-     drush php-eval "menu_router_build(TRUE);" 
-     then as described
+  * 5:
+         drush dl reroute_email
+         drush en reroute_email
+         drush php-eval "menu_router_build(TRUE);" 
+         then as described
   * 6: as described
   * 7: as described
 
 * you probably want to turn the css caching settings off so you'll see any css
   changes you make:  
-  $ drush -y vset cache '0'
-  $ drush -y vset page_compression '0'
-  $ drush -y vset preprocess_css '0'
-  $ drush -y vset preprocess_js '0'
+      $ drush -y vset cache '0'
+      $ drush -y vset page_compression '0'
+      $ drush -y vset preprocess_css '0'
+      $ drush -y vset preprocess_js '0'
 
 * you should now be able to access your site at the hostname you set in
   /etc/hosts, eg. http://p2pudev/p2pudev
@@ -106,7 +107,7 @@ if you need to update the database again
 ----------------------------------------
 * read in the new copy of the db (see above)
 * run update.php
-* sudo dbrush cc all
+* `sudo drush cc all`
 
 
 How to Include Database Chages Made Via GUI in the Codebase
@@ -118,7 +119,7 @@ How to Include Database Chages Made Via GUI in the Codebase
 
 How Others Can Update Their Feature to the One You Just Pushed
 --------------------------------------------------------------
-* git pull origin master
+* `git pull origin master`
 * `drush features-revert p2pu_courses`
 
 

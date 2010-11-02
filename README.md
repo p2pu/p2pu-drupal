@@ -9,21 +9,21 @@ Requirements
 * make sure mod rewrite (rewrite.load) is enabled in /etc/apache2/mods-enabled.
 * set up a virtual host for server. here is an example virtual host file:
 
-  &lt;VirtualHost *:80&gt;
-       ServerName p2pudev.p2pudev
-       ServerAdmin jessy.cowansharp@gmail.com
-       DocumentRoot /home/jessy/dev/p2pu/drupal/src/drupal-6.19
-       ErrorLog /var/log/apache2/p2pudev-error
-       CustomLog /var/log/apache2/p2pudev-access.log combined
+    &lt;VirtualHost *:80&gt;
+         ServerName p2pudev.p2pudev
+         ServerAdmin jessy.cowansharp@gmail.com
+         DocumentRoot /home/jessy/dev/p2pu/drupal/src/drupal-6.19
+         ErrorLog /var/log/apache2/p2pudev-error
+         CustomLog /var/log/apache2/p2pudev-access.log combined
 
-     &lt;Directory /home/jessy/dev/p2pu/drupal/src/drupal-6.19&gt;
-         RewriteEngine On
-        RewriteBase /
-        RewriteCond %{REQUEST_FILENAME} !-f
-        RewriteCond %{REQUEST_FILENAME} !-d
-        RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]
-    &lt;/Directory&gt;
-  &lt;/VirtualHost&gt;
+       &lt;Directory /home/jessy/dev/p2pu/drupal/src/drupal-6.19&gt;
+          RewriteEngine On
+          RewriteBase /
+          RewriteCond %{REQUEST_FILENAME} !-f
+          RewriteCond %{REQUEST_FILENAME} !-d
+          RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]
+      &lt;/Directory&gt;
+    &lt;/VirtualHost&gt;
 
 * add an entry to your /etc/hosts file:
   $sudo vi /etc/hosts

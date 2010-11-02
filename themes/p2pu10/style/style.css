@@ -191,7 +191,7 @@ div#content-column .view-activity-atrium.view-display-id-panel_pane_2 .views-row
 div#content-column .view-activity-atrium.view-display-id-panel_pane_1 .views-row a,
 div#content-column .view-og-mytracker.view-display-id-panel_pane_1 .views-row a,
 div#content-column .view-dashboard-mytracker.view-display-id-page_1 .views-row a{
-color: white;
+  /* color: white; */
 }
 div#content-column .view-activity-atrium.view-display-id-panel_pane_2 .views-row a:hover,
 div#content-column .view-activity-atrium.view-display-id-panel_pane_1 .views-row a:hover,
@@ -619,3 +619,41 @@ div.node-course_application div.approve-deny {
 }
 
 
+.view-activity-atrium {
+  font-size: 13px;
+  line-height: 22px;
+}
+  .view-activity-atrium span.field-content a {
+    color: #222;
+    font-weight: bold;
+    text-decoration: none !important;
+  }
+    .view-activity-atrium span.field-content a:hover {
+      text-decoration: underline !important;
+    }
+  
+  .view-activity-atrium span.marker  {
+    color: #c77;
+    background: #fdd;
+    padding: 3px;
+    border: 1px solid #ecc;
+    margin-left: 3px;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+
+  }
+
+.node-type-course .field-type-text {
+  font-size: 14px;
+  line-height: 20px;
+}
+.node-type-course .field-field-course-facilitator-about {
+  font-size: 13px;
+  line-height: 18px;
+}
+.node-type-course div.field-course-no-of-seats,
+.node-type-course div.field-field-course-status {
+  font-size: 12px;
+  line-height: 16px;
+}

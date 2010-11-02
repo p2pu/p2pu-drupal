@@ -56,8 +56,7 @@ installation
       git clone http://github.com/p2pu/p2pu.git all
 
 * copy sites/default/default.settings.php to sites/default/settings.php  
-* edit the $db_url setting to contain the right db settings. eg:
-      $db_url = 'mysql://myusername:mypassword@localhost/p2pu_dev_anonymized';
+* edit the $db_url setting to contain the right db settings. eg: $db_url = 'mysql://myusername:mypassword@localhost/p2pu_dev_anonymized';
 
 also, in case you have any trouble logging into the site at first, you might
 want to set $update_free_access = TRUE;, which will allow you to run update.php

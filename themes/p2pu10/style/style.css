@@ -234,9 +234,25 @@ div.view-feeds .views-field-title{font-size: 115%; font-family: Georgia;}
 div.view-feeds .views-field-timestamp{font-size: 85%; color: gray;}
 div.view-feeds.view-display-id-page_1 .views-field-timestamp{color: #4F4F4F;}
 .view-display-id-panel_pane_1 .views-row {padding-bottom: 7px;}
-.view-display-id-page_1.view-course-list .views-field-title a {}
-.view-display-id-page_1.view-course-list .views-field-title .tweet-text {}
-.course-description {clear: both;}
+
+.view-display-id-page_1.view-course-list .views-field-title a {
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.view-display-id-page_1.view-course-list .views-field-title .tweet-text {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 18px;
+}
+table.views-table .views-field-field-course-dates-value {
+  width: 170px;
+}
+.course-description {
+  clear: both;
+  display: none;
+}
 
 /* Comments */
 div.comment{ background: #fff; margin: 0;}
